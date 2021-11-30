@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+*.vcxproj
+*.filters
+*.user
+cmake_install.cmake
+CMakeCache.txt
+Project-Space.sln
+.vs/
+Debug/
+Project-Space.dir/
+x64/
+CMakeFiles/
