@@ -41,3 +41,6 @@ Debug/
 Project-Space.dir/
 x64/
 CMakeFiles/
+CMakeSettings.json
+.vscode/
+out/
