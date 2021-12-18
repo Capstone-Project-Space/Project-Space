@@ -16,10 +16,10 @@ FileStorage::FileStorage(const std::string& filename) : filename(filename) {
 int FileStorage::save(const std::string& filepath) const {
 	FILE* fp;
 	std::string file = filepath + filename;
-	int err = mkdir(file.substr(0, file.find_last_of('/') + 1).c_str());
-	if (err == ENOENT) {
+	int err = _mkdir(file.substr(0, file.find_last_of('/') + 1).c_str());
+	if (err && errno != EEXIST) {
 		perror("Unable to create directory for saving.");
-		fprintf(stderr, "filepath: %s\n", file.c_str());
+		fprintf(stderr, "filepath: %s  %d\n", file.c_str(), err);
 		return err;
 	}
 	err = fopen_s(&fp, file.c_str(), "wb");
@@ -71,6 +71,8 @@ int FileStorage::load(const std::string& filepath) {
 	fseek(fp, 0, SEEK_END);
 	long fileSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
+
+	unloaded.clear();
 
 	size_t size;
 	void* buffer = NULL;
