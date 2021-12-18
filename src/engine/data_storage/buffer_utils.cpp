@@ -83,6 +83,24 @@ void BufferUtils::WriteULong(void** buffer, uint64_t ub) {
 }
 
 
+float BufferUtils::ReadFloat(const void** buffer) {
+	float f = *(*((float**)buffer))++;
+	return f;
+}
+void BufferUtils::WriteFloat(void** buffer, float f) {
+	*(*((float**)buffer))++ = f;
+}
+
+double BufferUtils::ReadDouble(const void** buffer) {
+	double d = *(*((double**)buffer))++;
+	return d;
+}
+
+void BufferUtils::WriteDouble(void** buffer, double d) {
+	*(*((double**)buffer))++ = d;
+}
+
+
 std::string BufferUtils::ReadString(const void** buffer) {
 	size_t length = ((size_t*) *buffer)[0];
 	char* string = (char*) malloc(length + 1);
@@ -109,7 +127,15 @@ void BufferUtils::ReadString(const void** buffer, char* string) {
 
 void BufferUtils::WriteString(void** buffer, const char* string) {
 	size_t length = strlen(string);
-	((size_t*) buffer)[0] = length;
+	((size_t**) buffer)[0][0] = length;
 	std::memcpy(*((char**) buffer) + sizeof(size_t), string, length);
 	*((char**) buffer) += length + sizeof(size_t);
+}
+
+size_t BufferUtils::GetStringSize(const std::string& string) {
+	return sizeof(size_t) + string.size();
+}
+
+size_t BufferUtils::GetStringSize(const char* string) {
+	return sizeof(size_t) + strlen(string);
 }
