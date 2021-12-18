@@ -3,26 +3,43 @@
 
 #include <map>
 #include <string>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 
 #include "tests.h"
+#include "test_filestorage.h"
 
+TestResult::TestResult(const std::string& name) : name(name), msg(""), succeeded(false) {}
+TestResult::TestResult(const std::string& name, const std::string& msg, bool succeeded) : name(name), msg(msg), succeeded(succeeded) {}
 
-TestResults::TestResults(size_t total) : success(0), failed(0), total(total) {}
-
-void PrintTestResults(const TestResults& results) {
-	fprintf(stderr, "    \x1b[1;32mSuccess:\x1b[32m %llu \x1b[0m/ %llu (\x1b[32m%llu%%\x1b[0m)\n", results.success, results.total, (size_t)roundf((float)results.success / (float)results.total) * 100);
-	fprintf(stderr, "    \x1b[1;31mFailed:\x1b[31m  %llu \x1b[0m/ %llu (\x1b[31m%llu%%\x1b[0m)\n", results.failed, results.total, (size_t)roundf((float)results.failed / (float)results.total) * 100);
+void PrintTestResult(const TestResult& result) {
+	if (result.succeeded) {
+		fprintf(stderr, "    %s \x1b[1;32mSucceeded\x1b[0m.\n", result.name.c_str());
+	} else {
+		fprintf(stderr, "    %s \x1b[1;31mFailed\x1b[0m.\n        \x1b[1;31mERROR\x1b[0m: %s.\n", result.name.c_str(), result.msg.c_str());
+	}
 }
 
-TestResults TestFileStorage();
-
-std::map<std::string, TestResults(*)()> Tests {
-	{ "FileStorage", TestFileStorage }
+std::map<std::string, std::vector<TestResult (*)()>> Tests {
+	{ "FileStorage", { FS_TestAllDataTypes, FS_TestMultipleSaveables } }
 };
 
 void Test() {
-	for (auto[name, func] : Tests) {
+	for (auto[name, funcs] : Tests) {
 		fprintf(stderr, "%s:\n", name.c_str());
-		PrintTestResults(func());
+		std::vector<TestResult> results;
+		results.reserve(funcs.size());
+		size_t successful = 0;
+		// TODO: Attempt to add exception error support.
+		for (const auto func : funcs) {
+			TestResult result = func();
+			results.push_back(result);
+			PrintTestResult(results.back());
+			successful += (size_t) results.back().succeeded;
+		}
+		size_t total = results.size(), failed = total - successful;
+		fprintf(stderr, "    \x1b[1;32mSucceeded:\x1b[32m %llu \x1b[0m/ %llu (\x1b[32m%llu%%\x1b[0m)\n", successful, total, (size_t)roundf((float)successful / (float)total) * 100);
+		fprintf(stderr, "    \x1b[1;31mFailed:\x1b[31m    %llu \x1b[0m/ %llu (\x1b[31m%llu%%\x1b[0m)\n", failed, total, (size_t)roundf((float)failed / (float)total) * 100);
 	}
 }
