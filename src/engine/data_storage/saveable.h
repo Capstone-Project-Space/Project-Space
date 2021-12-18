@@ -37,5 +37,5 @@ public:
 	const std::string& getIdentifier() const;
 
 protected:
-	std::string identifier;
+	const std::string identifier;
 };
