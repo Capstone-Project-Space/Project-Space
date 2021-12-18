@@ -6,20 +6,21 @@
 #include <stb_image.h>
 #include <glfw3/glfw3.h>
 
-#include <vector>
-#include <list>
-
 #define TESTING
 
 #if defined(TESTING)
+
 #include "./testing/tests.h"
+
+#define SIZE_DUMP(type) fprintf(stderr, "sizeof(%s): %llu\n", #type, sizeof(type))
+
 int main(int argc, char** args) {
 	Test();
 	return 0;
 }
 #else
 
-#define SIZE_DUMP(type) fprintf(stderr, "sizeof(%s): %llu\n", #type, sizeof(type))
+
 
 int main(int argc, char** args) {
 	printf("Hello World!\n");
