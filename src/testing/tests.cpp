@@ -9,6 +9,8 @@
 
 #include "tests.h"
 #include "test_filestorage.h"
+#include "test_randomgen.h"
+#include "test_noisemap.h"
 
 TestResult::TestResult(const std::string& name) : name(name), msg(""), succeeded(false) {}
 TestResult::TestResult(const std::string& name, const std::string& msg, bool succeeded) : name(name), msg(msg), succeeded(succeeded) {}
@@ -22,7 +24,9 @@ void PrintTestResult(const TestResult& result) {
 }
 
 std::map<std::string, std::vector<TestResult (*)()>> Tests {
-	{ "FileStorage", { FS_TestAllDataTypes, FS_TestMultipleSaveables } }
+	{ "FileStorage", { FS_TestAllDataTypes, FS_TestMultipleSaveables } },
+	{ "RandomGen", { RG_TestRandomSignedInt, RG_TestRandomUnSignedInt, RG_TestRandomFloat, RG_TestRandomDouble} },
+	{ "NoiseMap", { NM_TestNoiseMapDefaultConstructor,  NM_TestNoiseMapCustomConstructor, NM_TestNoiseMapDestructor, NM_TestNoiseMapGetterSetter, NM_TestNoiseMapGeneration } }
 };
 
 void Test() {
