@@ -1,4 +1,5 @@
-#include <src/engine/io/key.h>
+#include <src/engine/io/keyboard.h>
+#include <src/engine/io/mouse.h>
 
 class UI {
 public:

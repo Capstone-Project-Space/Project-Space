@@ -4,8 +4,11 @@
 #include <memory.h>
 
 #ifdef WIN32
+#include <Windows.h>
 #include <direct.h>
 #endif
+
+#include <src/engine/data_storage/buffer_utils.h>
 
 std::vector<FileStorage*> FileStorage::storages;
 
@@ -13,109 +16,114 @@ FileStorage::FileStorage(const std::string& filename) : filename(filename) {
 	storages.push_back(this);
 }
 
+size_t FileStorage::getCurrentSize() const {
+	uint32_t size = 0;
+	for (const auto& saveable : this->saveables) {
+	   size += BufferUtils::GetStringSize(saveable->getIdentifier()) + sizeof(size_t) + saveable->getSize();
+	}
+	for (const auto& un : unloaded) {
+	   size += BufferUtils::GetStringSize(un.identifier) + sizeof(size_t) + un.size;
+	}
+	return size;
+}
+
+void LogWin32Error() {
+	uint32_t err = GetLastError();
+	if (err == 0) {
+	   fprintf(stderr, "Unknown Error.\n");
+	} else {
+	   LPSTR messageBuffer = NULL;
+	   size_t size = FormatMessageA(
+		  FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		  NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &messageBuffer, 0, NULL
+	   );
+	   fprintf(stderr, "ERROR: %s", messageBuffer);
+	   LocalFree(messageBuffer);
+	}
+}
+
 int FileStorage::save(const std::string& filepath) const {
-	FILE* fp;
-	std::string file = filepath + filename;
-	int err = _mkdir(file.substr(0, file.find_last_of('/') + 1).c_str());
-	if (err && errno != EEXIST) {
-		perror("Unable to create directory for saving.");
-		fprintf(stderr, "filepath: %s  %d\n", file.c_str(), err);
-		return err;
-	}
-	err = fopen_s(&fp, file.c_str(), "wb");
-	if (!fp) {
-		perror("Unable to open file for saving.");
-		fprintf(stderr, "filename: %s\n", file.c_str());
-		return err;
+	HANDLE file = CreateFile((filepath + filename).c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE) {
+	   LogWin32Error();
+	   return -1;
 	}
 
-	size_t size;
-	void* buffer = NULL;
-	for (auto& ptr : saveables) {
-		Saveable& saveable = *ptr;
-		size = saveable.getIdentifier().size();
-		fwrite(&size, sizeof(size_t), 1, fp);
-		fwrite(saveable.getIdentifier().c_str(), 1, size, fp);
-
-		// Write the saveables save data.
-		size = saveable.getSize();
-		void* temp = realloc(buffer, size);
-		assert(temp && "Out of Memory.");
-		buffer = temp;
-		saveable.save(buffer);
-		fwrite(&size, sizeof(size_t), 1, fp);
-		fwrite(buffer, 1, size, fp);
+	size_t size = getCurrentSize();
+	HANDLE mapping = CreateFileMapping(file, NULL, PAGE_READWRITE, (size & 0xFFFFFFFF00000000) >> 32, size & 0xFFFFFFFF, NULL);
+	if (mapping == 0) {
+	   LogWin32Error();
+	   return -2;
 	}
-	// Write all of the unloaded data as well.
-	for (auto& unload : unloaded) {
-		size_t length = unload.identifier.size();
-		fwrite(&length, sizeof(size_t), 1, fp);
-		fwrite(unload.identifier.c_str(), 1, length, fp);
-		fwrite(&unload.size, sizeof(size_t), 1, fp);
-		fwrite(unload.data, 1, unload.size, fp);
+	void* start = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+	if (start == NULL) {
+		LogWin32Error();
+		return -3;
 	}
-	fclose(fp);
-	if (buffer) free(buffer);
+	void* data = start;
+	for (const auto& ptr : saveables) {
+	   Saveable& saveable = *ptr;
+	   BufferUtils::WriteString(&data, saveable.getIdentifier());
+	   BufferUtils::WriteULong(&data, saveable.getSize());
+	   saveable.save(data);
+	   data = ((char*) data) + saveable.getSize();
+	}
+	for (const auto& un : unloaded) {
+	   BufferUtils::WriteString(&data, un.identifier);
+	   BufferUtils::WriteULong(&data, un.size);
+	   memcpy(data, un.data, un.size);
+	   data = ((char*)data) + un.size;
+	}
+	assert(start == (((char*)data) - size));
+	FlushViewOfFile(start, size);
+	UnmapViewOfFile(start);
+	CloseHandle(mapping);
+	CloseHandle(file);
 	return 0;
 }
 
 int FileStorage::load(const std::string& filepath) {
-	FILE* fp;
-	errno_t err = fopen_s(&fp, (filepath + this->filename).c_str(), "rb");
-	if (!fp) {
-		perror("Unable to open file for loading.");
-		fprintf(stderr, "filename: %s\n", (filepath + filename).c_str());
-		return err;
+	HANDLE file = CreateFile((filepath + filename).c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE) {
+	   LogWin32Error();
+	   return -1;
 	}
-
-	fseek(fp, 0, SEEK_END);
-	long fileSize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
+	unsigned long highOrder;
+	size_t size = GetFileSize(file, &highOrder);
+	
+	HANDLE mapping = CreateFileMapping(file, NULL, PAGE_READONLY, highOrder, size, NULL);
+	if (mapping == 0) {
+		LogWin32Error();
+		return -2;
+	}
+	size &= ((size_t)highOrder) << 32;
+	const void* start = MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, size);
+	if (start == NULL) {
+		LogWin32Error();
+		return -3;
+	}
+	const void* data = start;
+	const void* end = ((char*) start) + size;
 	unloaded.clear();
-
-	size_t size;
-	void* buffer = NULL;
-	char* identifier = NULL;
-	while (fileSize) {
-		// Read in the Saveable identifier.
-		fread(&size, sizeof(size_t), 1, fp);
-		void* temp = std::realloc(identifier, size+1);
-		assert(temp && "Out of Memory.");
-		identifier = (char*) temp;
-		fread(identifier, 1, size, fp);
-		((char*)identifier)[size] = 0;
-		fileSize -= (size + sizeof(size_t));
-
-		// Read in the Saveable load data;
-		fread(&size, sizeof(size_t), 1, fp);
-		temp = std::realloc(buffer, size);
-		assert(temp && "Out of Memory.");
-		buffer = temp;
-		fread(buffer, 1, size, fp);
-		fileSize -= (size + sizeof(size_t));
-
-		bool found = false;
-		// Attempt to find a Saveable in memory to load the data into.
-		for (auto& ptr : saveables) {
-			Saveable& saveable = *ptr;
-			if (saveable.getIdentifier() == (char*)buffer) {
-				saveable.load(buffer, size);
-				found = true;
-				break;
-			}
+		
+	while (data != end) {
+		std::string identifier = BufferUtils::ReadString(&data);
+		size_t size = BufferUtils::ReadULong(&data);
+		const auto saveable = std::find_if(
+			saveables.cbegin(), saveables.cend(),
+			[identifier](std::shared_ptr<Saveable> s) {return s->getIdentifier() == identifier; }
+		);
+		if (saveable != saveables.cend()) {
+			(*saveable)->load(data, size);
+		} else {
+			unloaded.emplace_back(identifier, data, size);
 		}
-
-		// If it wasn't found store the data for later
-		if (!found) {
-			unloaded.emplace_back(std::string{ identifier }, buffer, size);
-		}
+		data = ((char*) data) + size;
 	}
-	fclose(fp);
-	if (identifier) {
-		std::free(identifier);
-		std::free(buffer);
-	}
+	FlushViewOfFile(start, size);
+	UnmapViewOfFile(start);
+	CloseHandle(mapping);
+	CloseHandle(file);
 	return 0;
 }
 

@@ -56,6 +56,7 @@ public:
 	 */
 	void removeSaveable(std::shared_ptr<Saveable> saveable);
 
+	size_t getCurrentSize() const;
 private:
 	struct Unloaded {
 		const std::string identifier;
@@ -68,6 +69,7 @@ private:
 	std::string filename;
 	std::vector<std::shared_ptr<Saveable>> saveables;
 	std::list<Unloaded> unloaded;
+
 	
 };
 

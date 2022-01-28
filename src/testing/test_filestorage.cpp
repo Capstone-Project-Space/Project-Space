@@ -107,8 +107,14 @@ TestResult FS_TestAllDataTypes() {
 
     storage.addSaveable(saveable);
 
-    storage.save("./test/");
-    storage.load("./test/");
+    if (storage.save("./test/")) {
+        result.msg = "FileStorage failed to save.";
+        return result;
+    }
+    if (storage.load("./test/")) {
+        result.msg = "FileStorage failed to load.";
+        return result;
+    }
     if (remove("./test/test_alldata_types.data")) {
         perror("Unable to delete test_alldata_types save file.");
     }
@@ -179,8 +185,14 @@ TestResult FS_TestMultipleSaveables() {
     storage.addSaveable(character1);
     storage.addSaveable(character2);
 
-    storage.save("./test/");
-    storage.load("./test/");
+    if (storage.save("./test/")) {
+        result.msg = "FileStorage failed to save.";
+        return result;
+    }
+    if (storage.load("./test/")) {
+        result.msg = "FileStorage failed to load.";
+        return result;
+    }
     if (remove("./test/test_multiple_saveables.data")) {
         perror("Unable to delete test_multiple_saveables save file.");
     }
@@ -210,6 +222,118 @@ TestResult FS_TestMultipleSaveables() {
         }
     }
 
+    result.succeeded = true;
+    return result;
+}
+
+
+struct DataTestLarge : Saveable {
+    std::string content;
+    DataTestLarge(const std::string& id) : Saveable(id) {
+        for (size_t i = 0; i < 1024 * 1024; i++) {
+            content += (char) rand();
+        }
+    }
+
+    virtual void save(void* buf) const override {
+        BufferUtils::WriteString(&buf, this->content);
+    }
+
+    virtual void load(const void* buf, size_t size) override {
+        this->content = BufferUtils::ReadString(&buf);
+    }
+
+    virtual size_t getSize() override {
+        return BufferUtils::GetStringSize(this->content);
+    }
+
+};
+
+struct DataTestSmall : Saveable {
+    std::string content;
+    DataTestSmall(const std::string& id) : Saveable(id) {
+        for (size_t i = 0; i < 64; i++) {
+            content += (char) rand();
+        }
+    }
+
+    virtual void save(void* buf) const override {
+        BufferUtils::WriteString(&buf, this->content);
+    }
+
+    virtual void load(const void* buf, size_t size) override {
+        this->content = BufferUtils::ReadString(&buf);
+    }
+
+    virtual size_t getSize() override {
+        return BufferUtils::GetStringSize(this->content);
+    }
+};
+
+TestResult FS_TestLargeFileSaveable() {
+    TestResult result{"Multiple Large Saveables"};
+    std::vector<std::string> larges;
+    std::vector<std::shared_ptr<DataTestLarge>> datas;
+    FileStorage storage = FileStorage("test_large_filesize.data");
+    for (int i = 0; i < 5; i++) {
+        std::shared_ptr<DataTestLarge> ptr = std::make_shared<DataTestLarge>(std::string{ "large" } + (char)((char)i + '0'));
+        larges.push_back(ptr->content);
+        datas.push_back(ptr);
+        storage.addSaveable(ptr);
+    }
+
+    if (storage.save("./test/")) {
+        result.msg = "FileStorage failed to save.";
+        return result;
+    }
+    if (storage.load("./test/")) {
+        result.msg = "FileStorage failed to load.";
+        return result;
+    }
+    if (remove("./test/test_large_filesize.data")) {
+        perror("Unable to delete test_large_filesize save file.");
+    }
+
+    for (int i = 0; i < 5; i++) {
+        if (larges[i] != datas[i]->content) {
+            result.msg = "Failed to read DataTestLarge at " + std::to_string(i) + ".";
+            return result;
+        }
+    }
+    result.succeeded = true;
+    return result;
+}
+
+TestResult FS_TestManySmallSaveable() {
+    constexpr size_t COUNT = 1024 * 128;
+    TestResult result{"Many Small Saveables"};
+    std::vector<std::string> smalls;
+    std::vector<std::shared_ptr<DataTestSmall>> datas;
+    FileStorage storage{"test_many_smalls.data"};
+    for (size_t i = 0; i < COUNT; i++) {
+        std::shared_ptr<DataTestSmall> ptr = std::make_shared<DataTestSmall>(std::string{ "small" } + std::to_string(i));
+        smalls.push_back(ptr->content);
+        datas.push_back(ptr);
+        storage.addSaveable(ptr);
+    }
+    if (storage.save("./test/")) {
+        result.msg = "FileStorage failed to save.";
+        return result;
+    }
+    if (storage.load("./test/")) {
+        result.msg = "FileStorage failed to load.";
+        return result;
+    }
+    if (remove("./test/test_many_smalls.data")) {
+        perror("Unable to delete test_many_smalls save file.");
+    }
+
+    for (size_t i = 0; i < COUNT; i++) {
+        if (smalls[i] != datas[i]->content) {
+            result.msg = "Failed to read DataTestSmall at " + std::to_string(i) + ".";
+            return result;
+        }
+    }
     result.succeeded = true;
     return result;
 }

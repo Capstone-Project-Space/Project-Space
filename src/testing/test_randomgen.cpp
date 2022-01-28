@@ -45,13 +45,13 @@ TestResult RG_TestRandomUnSignedInt() {
      TestResult result{ "Random UnSigned Integer Generation" };
      std::map<unsigned int, unsigned int> valuecount;
 
-     for (int i = mid; i <= hi; i++) {
+     for (int i = mid; i <= hi*2; i++) {
           valuecount.emplace(i, 0);
      }
 
      for (int i = 0; i < 100; i++) {
-          unsigned int x = RandomGen::RangedRandomUnSignedInt(mid, hi);
-          if ((x < mid) || (x > hi)) {
+          unsigned int x = RandomGen::RangedRandomUnSignedInt(mid, hi*2);
+          if ((x < mid) || (x > hi*2)) {
                result.msg = "unsigned int value not generated within correct range";
                return result;
           }
@@ -60,7 +60,7 @@ TestResult RG_TestRandomUnSignedInt() {
 
      for (auto [i, j] : valuecount) {
           if (j > 2) {
-               result.msg = "signed int value generated too much";
+               result.msg = "unsigned int value generated too much";
                return result;
           }
      }

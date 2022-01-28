@@ -5,5 +5,9 @@ struct Key {
 };
 
 struct Keyboard {
-	bool keyStates[GLFW_KEY_LAST+1];
+	bool keyStates[GLFW_KEY_LAST + 1];
+	int timeStamp[GLFW_KEY_LAST + 1];
+
+	inline bool isKeyDown
+
 };
