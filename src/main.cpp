@@ -20,8 +20,6 @@ int main(int argc, char** args) {
 }
 #else
 
-
-
 int main(int argc, char** args) {
 	printf("Hello World!\n");
 	return 0;
