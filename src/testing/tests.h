@@ -1,7 +1,12 @@
 #pragma once
 
+#include <assert.h>
+
 #include <chrono>
 #include <string>
+#include <variant>
+
+#include <Windows.h>
 
 struct TestResult {
 	std::string name;
@@ -15,17 +20,29 @@ struct PerfMetric {
 	size_t seconds, milli, nano;
 };
 
+struct Pair {
+	std::variant<std::string, TestResult> result;
+	PerfMetric metric;
+	Pair(const std::string& error, const PerfMetric& metric);
+	Pair(const TestResult& result, const PerfMetric& metric);
+};
+
 using hr_clock = std::chrono::high_resolution_clock;
 
-template<typename T>
-std::pair<T, PerfMetric> MeasurePerf(T(*func)()) {
-	hr_clock::time_point start = hr_clock::now();
-	T res = func();
-	hr_clock::duration elapsed = hr_clock::now() - start;
-	PerfMetric p;
-	p.seconds = elapsed.count() / 1000000000;
-	p.milli = (elapsed.count() - (p.seconds * 1000000000)) / 1000000;
-	p.nano = (elapsed.count() - (p.seconds * 1000000000) - (p.milli / 1000000));
-	return { res, p };
-}
+struct Exception {
+	bool isErr = false;
+	union {
+		const char* error = NULL;
+		void* result;
+	};
+	Exception();
+	Exception(Exception& e);
+};
+
+Exception PerfHelper(TestResult(*func)());
+
+Exception PerfExcept(TestResult(*func)());
+
+Pair MeasurePerf(TestResult(*func)());
+
 void Test();
