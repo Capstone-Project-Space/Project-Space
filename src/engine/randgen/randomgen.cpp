@@ -46,7 +46,7 @@ float RandomGen::Noise(int octave, int x, int y, int xoffset, int yoffset, float
      }
 
      n /= maxamp;
-     n = n * hi - lo / 2 + hi + lo / 2;
+     n = n * (hi - lo) / 2 + (hi + lo) / 2;
 
      return n;
 }
