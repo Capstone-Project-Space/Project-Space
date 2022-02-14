@@ -13,6 +13,7 @@
 #include "test_noisemap.h"
 #include "test_gamestate.h"
 #include "test_window.h"
+#include "test_bodysystems.h"
 
 TestResult::TestResult(const std::string& name)
 	: name(name), msg(""), succeeded(false) {}
@@ -120,7 +121,8 @@ std::map<std::string, std::vector<TestResult (*)()>> Tests {
 	{ "RandomGen", { RG_TestRandomSignedInt, RG_TestRandomUnSignedInt, RG_TestRandomFloat, RG_TestRandomDouble} },
 	{ "NoiseMap", { NM_TestNoiseMapDefaultConstructor,  NM_TestNoiseMapCustomConstructor, NM_TestNoiseMapDestructor, NM_TestNoiseMapGetterSetter, NM_TestNoiseMapGeneration } },
 	{ "GameStates", { GS_TestStateChanges, GS_TestEventReceiving } },
-	{ "Window", { WN_Test_Creation }}
+	{ "Window", { WN_Test_Creation }},
+	{ "BodySystems", { BS_TestBodySystemConstructor } }
 };
 
 void Test() {
