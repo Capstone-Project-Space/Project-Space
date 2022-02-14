@@ -1,3 +1,4 @@
+#pragma once
 #include <src/engine/io/keyboard.h>
 #include <src/engine/io/mouse.h>
 
