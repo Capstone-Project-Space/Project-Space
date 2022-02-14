@@ -15,11 +15,13 @@ file(GLOB_RECURSE SOURCES
 add_executable(Project-Space ${SOURCES})
 set_property(DIRECTORY ${PROJECT_BINARY_DIR} PROPERTY VS_STARTUP_PROJECT Project-Space)
 
+add_compile_definitions(GLFW_INCLUDE_NONE)
+
 include_directories("${PROJECT_BINARY_DIR}/libraries/glad/include" "${PROJECT_BINARY_DIR}/libraries/glfw3/include" "${PROJECT_BINARY_DIR}/libraries/glm/include" "${PROJECT_BINARY_DIR}/libraries/stb_image/include")
 
 # target_link_libraries(Project-Space PRIVATE opengl glad glfw3 glm stb_image)
 find_package(OpenGL REQUIRED)
-if (WIN32)
+if (CMAKE_SIZEOF_VOID_P EQUAL 4)
     target_link_libraries(Project-Space PRIVATE 
         "opengl32.lib"
         "${PROJECT_BINARY_DIR}/libraries/glad/WIN32/glad.lib"
