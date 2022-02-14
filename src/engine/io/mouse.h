@@ -1,9 +1,13 @@
-struct MouseButton {
-	int buttonCode;
-};
+#pragma once
+#include <array>
+#include <stdint.h>
+
+#include <glfw3/glfw3.h>
+
+using MouseButton = uint32_t;
 
 struct Mouse {
-	bool buttonStates[8] = { false };
-	float x = 0.0, y = 0.0;
-	inline bool isButtonDown(int buttonCode) { return buttonStates[buttonCode]; }
+	static std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> ButtonStates;
+	static double x, y;
+	inline static bool isButtonDown(MouseButton button) { return Mouse::ButtonStates[button]; }
 };
