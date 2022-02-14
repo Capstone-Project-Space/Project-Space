@@ -10,7 +10,6 @@ NoiseMap::NoiseMap() {
      this->persistence = 0.0f;
      this->scale = 1.0f;
 
-     noisemap = new std::vector<float>;
 }
 
 NoiseMap::NoiseMap(int width, int height) {
@@ -22,19 +21,12 @@ NoiseMap::NoiseMap(int width, int height) {
 
      this->persistence = 0.0f;
      this->scale = 1.0f;
-
-     noisemap = new std::vector<float>;
-}
-
-NoiseMap::~NoiseMap() {
-     noisemap->clear();
-     delete noisemap;
 }
 
 void NoiseMap::GenerateNoiseMap() {
      for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
-               noisemap->push_back(RandomGen::Noise(4, x, y, this->xoffset, this->yoffset, this->persistence, this->scale, 0.0f, 1.0f));
+               noisemap.push_back(RandomGen::Noise(4, x, y, this->xoffset, this->yoffset, this->persistence, this->scale, 0.0f, 1.0f));
           }
      }
 }

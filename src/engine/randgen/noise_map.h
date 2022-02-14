@@ -5,11 +5,10 @@
 
 class NoiseMap {
 public:
-     std::vector<float> *noisemap;
+     std::vector<float> noisemap;
 
      NoiseMap();
      NoiseMap(int width, int height);
-     ~NoiseMap();
 
      void GenerateNoiseMap();
 
