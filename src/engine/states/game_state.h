@@ -1,27 +1,36 @@
+#pragma once
 #include <src/engine/data_storage/filestorage.h>
 #include <src/engine/graphics/ui.h>
+#include <src/engine/io/event_receiver.h>
 
 #include <stack>
 
-class GameState : FileStorage {
+class GameState : public FileStorage, public EventReceiver {
 public:
-	std::shared_ptr<GameState> CurrentState;
-	std::stack<std::shared_ptr<GameState>> StateStack;
-
-	GameState() = default;
+	GameState(const std::string& saveFileName);
+	virtual ~GameState();
 
 	virtual void update(float delta) = 0;
 	virtual void render(float delta) = 0;
+
+	template<typename T, typename... Args>
+	static std::shared_ptr<GameState> CreateState(Args&&... args) {
+		T* t = new T(std::forward<Args>(args)...);
+		return std::shared_ptr<GameState>(reinterpret_cast<GameState*>(t));
+	}
 
 private:
 	std::vector<UI> uis;
 	void renderUIs(float delta);
 };
 
-namespace State {
-	void ChangeState(std::shared_ptr<GameState> state);
-	void RestoreState();
-	void ResetStateTo(std::shared_ptr<GameState> state);
+struct State {
+	static std::shared_ptr<GameState> CurrentState;
+	static std::stack<std::shared_ptr<GameState>> StateStack;
 
-	void Draw(float delta);
+	static void ChangeState(std::shared_ptr<GameState> state);
+	static void RestoreState();
+	static void ResetStateTo(std::shared_ptr<GameState> state);
+
+	static void Draw(float delta);
 };
