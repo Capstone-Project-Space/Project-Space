@@ -145,13 +145,12 @@ TestResult NM_TestNoiseMapGeneration() {
      nm->GenerateNoiseMap();
 
      int x = nm->GetWidth() * nm->GetHeight();
-     if (nm->noisemap->size() != x) {
+     if (nm->noisemap.size() != x) {
           result.msg = "noise map generation failed";
      }
-
-     for (std::vector<float>::iterator i = nm->noisemap->begin(); i != nm->noisemap->end(); i++) {
-          if ((*i < 0.0f) || (*i > 1.0f)) {
-               result.msg = "noise map value not within range [0.0, 1.0]: " + std::to_string(*i);
+     for (float f : nm->noisemap) {
+          if ((f < 0.0f) || (f > 1.0f)) {
+               result.msg = ("noise map value not within range [0.0, 1.0]: " + std::to_string(f));
                return result;
           }
      }
