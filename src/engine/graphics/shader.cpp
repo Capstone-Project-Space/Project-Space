@@ -5,12 +5,12 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-std::shared_ptr<ShaderProgram> ShaderProgram::CreateShaderProgram(const std::string& vertSrc, const std::string& fragSrc) {
+std::shared_ptr<ShaderProgram> ShaderProgram::CreateFromSource(const std::string& vertSrc, const std::string& fragSrc) {
 	std::shared_ptr<ShaderProgram> program = std::shared_ptr<ShaderProgram>(new ShaderProgram(vertSrc, fragSrc));
 	return program;
 }
 
-std::shared_ptr<ShaderProgram> ShaderProgram::CreateShaderProgram(const std::string& vertPath, const std::string& fragPath) {
+std::shared_ptr<ShaderProgram> ShaderProgram::Create(const std::string& vertPath, const std::string& fragPath) {
 	std::string vertSrc = readFile(vertPath);
 	std::string fragSrc = readFile(fragPath);
 	std::shared_ptr<ShaderProgram> program = std::shared_ptr<ShaderProgram>(new ShaderProgram(vertSrc, fragSrc));
@@ -23,75 +23,75 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::bind() { glUseProgram(this->id); }
 
-void ShaderProgram::uploadFloat(const std::string& name, float f) {
+void ShaderProgram::uploadFloat(const std::string& name, const float f) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform1f(location, f);
 }
 
-void ShaderProgram::uploadFloat2(const std::string& name, glm::vec2 vec) {
+void ShaderProgram::uploadFloat2(const std::string& name, const glm::vec2& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform2f(location, vec[0], vec[1]);
 }
 
-void ShaderProgram::uploadFloat3(const std::string& name, glm::vec3 vec) {
+void ShaderProgram::uploadFloat3(const std::string& name, const glm::vec3& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform3f(location, vec[0], vec[1], vec[2]);
 }
 
-void ShaderProgram::uploadFloat4(const std::string& name, glm::vec4 vec) {
+void ShaderProgram::uploadFloat4(const std::string& name, const glm::vec4& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform4f(location, vec[0], vec[1], vec[2], vec[3]);
 }
 
 
-void ShaderProgram::uploadInt(const std::string& name, int i) {
+void ShaderProgram::uploadInt(const std::string& name, const int i) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform1i(location, i);
 }
 
-void ShaderProgram::uploadInt2(const std::string& name, glm::vec<2, int> vec) {
+void ShaderProgram::uploadInt2(const std::string& name, const glm::vec<2, int>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform2i(location, vec[0], vec[1]);
 }
 
-void ShaderProgram::uploadInt3(const std::string& name, glm::vec<3, int> vec) {
+void ShaderProgram::uploadInt3(const std::string& name, const glm::vec<3, int>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform3i(location, vec[0], vec[1], vec[2]);
 }
 
-void ShaderProgram::uploadInt4(const std::string& name, glm::vec<4, int> vec) {
+void ShaderProgram::uploadInt4(const std::string& name, const glm::vec<4, int>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform4i(location, vec[0], vec[1], vec[2], vec[3]);
 }
 
 
-void ShaderProgram::uploadBool(const std::string& name, bool b) {
+void ShaderProgram::uploadBool(const std::string& name, const bool b) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform1i(location, b);
 }
 
-void ShaderProgram::uploadBool2(const std::string& name, glm::vec<2, bool> vec) {
+void ShaderProgram::uploadBool2(const std::string& name, const glm::vec<2, bool>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform2i(location, vec[0], vec[1]);
 }
 
-void ShaderProgram::uploadBool3(const std::string& name, glm::vec<3, bool> vec) {
+void ShaderProgram::uploadBool3(const std::string& name, const glm::vec<3, bool>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform3i(location, vec[0], vec[1], vec[2]);
 }
 
-void ShaderProgram::uploadBool4(const std::string& name, glm::vec<4, bool> vec) {
+void ShaderProgram::uploadBool4(const std::string& name, const glm::vec<4, bool>& vec) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniform4i(location, vec[0], vec[1], vec[2], vec[3]);
 }
 
 
-void ShaderProgram::uploadMat3(const std::string& name, glm::mat3 matrix) {
+void ShaderProgram::uploadMat3(const std::string& name, const glm::mat3& matrix) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void ShaderProgram::uploadMat4(const std::string& name, glm::mat4 matrix) {
+void ShaderProgram::uploadMat4(const std::string& name, const glm::mat4& matrix) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
