@@ -48,7 +48,6 @@ public:
 		GS_Mouse_Y = y;
 		return true;
 	}
-
 };
 
 TestResult GS_TestStateChanges() {

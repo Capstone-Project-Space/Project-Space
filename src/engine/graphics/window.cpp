@@ -81,13 +81,29 @@ Window::Window(const std::string& title, int width, int height, std::shared_ptr<
 			throw msg;
 		});
 		glfwInit();
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwInited = true;
 	}
 
 	this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
+	if (this->window == NULL) {
+		printf("Fauled to create GLFW window\n");
+		glfwTerminate();
+		exit(1);
+	} 
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		printf("Failed to initialize GLAD\n");
+		exit(1);
+	}
 	this->isOpen = true;
+}
+
+GLFWwindow* Window::getWindowPtr() {
+	return this->window;
 }
 
 Window::~Window() {
