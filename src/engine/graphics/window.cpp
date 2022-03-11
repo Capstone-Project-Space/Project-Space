@@ -89,14 +89,14 @@ Window::Window(const std::string& title, int width, int height, std::shared_ptr<
 
 	this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
 	if (this->window == NULL) {
-		printf("Fauled to create GLFW window\n");
+		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
 		exit(1);
 	} 
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		printf("Failed to initialize GLAD\n");
+		fprintf(stderr, "Failed to initialize GLAD\n");
 		exit(1);
 	}
 	this->isOpen = true;
