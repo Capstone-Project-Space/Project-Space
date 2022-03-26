@@ -1,55 +1,12 @@
 #include "vertex_array.h"
 
+#include <assert.h>
+
+#define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
+
 std::shared_ptr<VertexArray> VertexArray::CreateVertexArray(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> buffer) {
 	std::shared_ptr<VertexArray> vertArray = std::shared_ptr<VertexArray>(new VertexArray());
-	glBindVertexArray(vertArray->id);
-	buffer->bind();
-	uint32_t index = 0;
-	for (const auto& element : layout) {
-		switch (element.type) {
-		case ShaderDataType::Type::FLOAT:
-		case ShaderDataType::Type::FLOAT2:
-		case ShaderDataType::Type::FLOAT3:
-		case ShaderDataType::Type::FLOAT4:
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(
-				index, ShaderDataType::GetCount(element.type), GL_FLOAT,
-				element.normalized ? GL_TRUE : GL_FALSE,
-				layout.getStride(), (const void*)element.offset
-			);
-			index++;
-			break;
-
-		case ShaderDataType::Type::MAT3:
-			for (uint64_t j = 0; j < 36; j+=12) {
-				glEnableVertexAttribArray(index);
-				glVertexAttribPointer(
-					index, 3, GL_FLOAT, element.normalized ? GL_TRUE : GL_FALSE,
-					layout.getStride(), (const void*)(element.offset + j)
-				);
-				index++;
-			}
-			break;
-		case ShaderDataType::Type::MAT4:
-			for (uint64_t j = 0; j < 64; j += 16) {
-				glEnableVertexAttribArray(index);
-				glVertexAttribPointer(
-					index, 4, GL_FLOAT, element.normalized ? GL_TRUE : GL_FALSE,
-					layout.getStride(), (const void*)(element.offset + j)
-				);
-				index++;
-			}
-			break;
-		default:
-			glEnableVertexAttribArray(index);
-			glVertexAttribIPointer(
-				index, ShaderDataType::GetCount(element.type),
-				GL_INT, layout.getStride(), (const void*)element.offset
-			);
-			index++;
-			break;
-		}
-	}
+	if (buffer) vertArray->addVertexBuffer(layout, buffer);
 	return vertArray;
 }
 
@@ -91,8 +48,8 @@ uint64_t ShaderDataType::GetCount(Type type) {
 	}
 }
 
-LayoutElement::LayoutElement(const std::string& name, ShaderDataType::Type type, bool normalized)
-	: name(name), type(type), normalized(normalized), offset(0) {}
+LayoutElement::LayoutElement(const char* name, ShaderDataType::Type type, bool normalized)
+	: type(type), normalized(normalized), offset(0) {}
 
 VertexLayout::VertexLayout() : stride(0) {}
 VertexLayout::VertexLayout(const std::initializer_list<LayoutElement>& elements)
@@ -111,12 +68,77 @@ void VertexLayout::calculateOffsetAndStride() {
 
 VertexArray::VertexArray() {
 	glGenVertexArrays(1, &this->id);
+	LOG_GL_ERROR;
 }
 
 VertexArray::~VertexArray() {
 	glDeleteVertexArrays(1, &this->id);
+	LOG_GL_ERROR;
 }
 
 void VertexArray::bind() {
 	glBindVertexArray(this->id);
+	LOG_GL_ERROR;
+}
+
+void VertexArray::addVertexBuffer(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> vertices) {
+	if (buffers.find(vertices) != buffers.end()) return;
+	buffers.insert(vertices);
+	glBindVertexArray(this->id);
+	LOG_GL_ERROR;
+	vertices->bind();
+	uint32_t index = 0;
+	for (const auto& element : layout) {
+		switch (element.type) {
+		case ShaderDataType::Type::FLOAT:
+		case ShaderDataType::Type::FLOAT2:
+		case ShaderDataType::Type::FLOAT3:
+		case ShaderDataType::Type::FLOAT4:
+			glEnableVertexAttribArray(index);
+			LOG_GL_ERROR;
+			glVertexAttribPointer(
+				index, ShaderDataType::GetCount(element.type), GL_FLOAT,
+				element.normalized ? GL_TRUE : GL_FALSE,
+				layout.getStride(), (const void*)element.offset
+			);
+			LOG_GL_ERROR;
+			index++;
+			break;
+
+		case ShaderDataType::Type::MAT3:
+			for (uint64_t j = 0; j < 36; j += 12) {
+				glEnableVertexAttribArray(index);
+				LOG_GL_ERROR;
+				glVertexAttribPointer(
+					index, 3, GL_FLOAT, element.normalized ? GL_TRUE : GL_FALSE,
+					layout.getStride(), (const void*)(element.offset + j)
+				);
+				LOG_GL_ERROR;
+				index++;
+			}
+			break;
+		case ShaderDataType::Type::MAT4:
+			for (uint64_t j = 0; j < 64; j += 16) {
+				LOG_GL_ERROR;
+				glEnableVertexAttribArray(index);
+				glVertexAttribPointer(
+					index, 4, GL_FLOAT, element.normalized ? GL_TRUE : GL_FALSE,
+					layout.getStride(), (const void*)(element.offset + j)
+				);
+				LOG_GL_ERROR;
+				index++;
+			}
+			break;
+		default:
+			glEnableVertexAttribArray(index);
+			LOG_GL_ERROR;
+			glVertexAttribIPointer(
+				index, ShaderDataType::GetCount(element.type),
+				GL_INT, layout.getStride(), (const void*)element.offset
+			);
+			LOG_GL_ERROR;
+			index++;
+			break;
+		}
+	}
 }

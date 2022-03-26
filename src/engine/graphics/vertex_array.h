@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
+#include <unordered_set>
 
 #include "buffers.h"
 
@@ -26,7 +28,7 @@ struct LayoutElement {
 	const std::string name;
 	ShaderDataType::Type type;
 	uint64_t offset;
-	LayoutElement(const std::string& name, ShaderDataType::Type type, bool normalized = false);
+	LayoutElement(const char* name, ShaderDataType::Type type, bool normalized = false);
 };
 
 class VertexLayout {
@@ -50,6 +52,7 @@ private:
 	void calculateOffsetAndStride();
 };
 
+
 class VertexArray {
 public:
 	static std::shared_ptr<VertexArray> CreateVertexArray(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> buffer);
@@ -57,8 +60,10 @@ public:
 	~VertexArray();
 
 	void bind();
+	void addVertexBuffer(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> vertices);
 
 private:
 	uint32_t id;
+	std::unordered_set<std::shared_ptr<VertexBuffer>> buffers;
 	VertexArray();
 };

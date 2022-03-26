@@ -24,6 +24,7 @@ public:
 	~Window();
 
 	void updateTitle(const std::string& appendage);
+	void flush();
 
 private:
 	GLFWwindow* window;

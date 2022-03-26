@@ -73,6 +73,11 @@ void Window::updateTitle(const std::string& appendage) {
 	glfwSetWindowTitle(this->window, (this->baseTitle + appendage).c_str());
 }
 
+void Window::flush() {
+	glfwSwapBuffers(window);
+	glFlush();
+}
+
 Window::Window(const std::string& title, int width, int height, std::shared_ptr<Window> share) 
 	: baseTitle(title), width(width), height(height) {
 	static bool glfwInited = false;
@@ -87,6 +92,7 @@ Window::Window(const std::string& title, int width, int height, std::shared_ptr<
 	this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
 	glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+	glfwSwapInterval(0);
 	this->isOpen = true;
 }
 

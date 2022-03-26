@@ -4,17 +4,21 @@
 #include <memory>
 #include <string>
 
+#include <src/engine/graphics/buffers.h>
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 class ShaderProgram {
 public:
-	std::shared_ptr<ShaderProgram> Create(const std::string& vertPath, const std::string& fragPath);
-	std::shared_ptr<ShaderProgram> CreateFromSource(const std::string& vertSrc, const std::string& fragSrc);
+	static std::shared_ptr<ShaderProgram> Create(const std::string& vertPath, const std::string& fragPath);
+	static std::shared_ptr<ShaderProgram> CreateFromSource(const std::string& vertSrc, const std::string& fragSrc);
 
 	~ShaderProgram();
 
 	void bind();
+
+	void bindUniformBuffer(const std::string& name, const std::shared_ptr<UniformBuffer> ub);
 
 	void uploadFloat(const std::string& name, const float f) const;
 	void uploadFloat2(const std::string& name, const glm::vec2& vec) const;

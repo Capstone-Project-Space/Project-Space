@@ -5,6 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
+
 std::shared_ptr<ShaderProgram> ShaderProgram::CreateFromSource(const std::string& vertSrc, const std::string& fragSrc) {
 	std::shared_ptr<ShaderProgram> program = std::shared_ptr<ShaderProgram>(new ShaderProgram(vertSrc, fragSrc));
 	return program;
@@ -19,9 +21,15 @@ std::shared_ptr<ShaderProgram> ShaderProgram::Create(const std::string& vertPath
 
 ShaderProgram::~ShaderProgram() {
 	glDeleteProgram(this->id);
+	LOG_GL_ERROR;
 }
 
 void ShaderProgram::bind() { glUseProgram(this->id); }
+
+void ShaderProgram::bindUniformBuffer(const std::string& name, const std::shared_ptr<UniformBuffer> ub) {
+	uint32_t id = glGetUniformBlockIndex(this->id, name.c_str());
+	glUniformBlockBinding(this->id, id, ub->getBlockBinding());
+}
 
 void ShaderProgram::uploadFloat(const std::string& name, const float f) const {
 	int location = glGetUniformLocation(this->id, name.c_str());
@@ -99,44 +107,65 @@ void ShaderProgram::uploadMat4(const std::string& name, const glm::mat4& matrix)
 
 ShaderProgram::ShaderProgram(const std::string& vertSrc, const std::string& fragSrc) {
 	this->id = glCreateProgram();
+	LOG_GL_ERROR;
 	uint32_t vertId = glCreateShader(GL_VERTEX_SHADER);
+	LOG_GL_ERROR;
 	compileShader(vertId, vertSrc.c_str(), vertSrc.size());
 	glAttachShader(this->id, vertId);
+	LOG_GL_ERROR;
 	uint32_t fragId = glCreateShader(GL_FRAGMENT_SHADER);
+	LOG_GL_ERROR;
 	compileShader(fragId, fragSrc.c_str(), fragSrc.size());
 	glAttachShader(this->id, fragId);
+	LOG_GL_ERROR;
 
 	glLinkProgram(this->id);
+	LOG_GL_ERROR;
 
 	int isLinked = 0;
 	glGetProgramiv(this->id, GL_LINK_STATUS, &isLinked);
+	LOG_GL_ERROR;
 	if (!isLinked) {
 		int maxLength = 0;
 		glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &maxLength);
+		LOG_GL_ERROR;
 		std::vector<char> infoLog(maxLength);
 		glGetProgramInfoLog(this->id, maxLength, &maxLength, &infoLog[0]);
+		LOG_GL_ERROR;
 		glDeleteProgram(this->id);
+		LOG_GL_ERROR;
 		glDeleteShader(vertId);
+		LOG_GL_ERROR;
 		glDeleteShader(fragId);
+		LOG_GL_ERROR;
 		throw std::string(infoLog.data());
 	}
 	glDeleteShader(vertId);
+	LOG_GL_ERROR;
 	glDeleteShader(fragId);
+	LOG_GL_ERROR;
 }
 
 void ShaderProgram::compileShader(uint32_t id, const char* const src, int length) {
-	glShaderSource(id, 1, &src, &length);
+	glShaderSource(id, 1, &src, 0);
+	LOG_GL_ERROR;
 	glCompileShader(id);
+	LOG_GL_ERROR;
 
 	int status = 0;
 	glGetShaderiv(id, GL_COMPILE_STATUS, &status);
+	LOG_GL_ERROR;
 
 	if (!status) {
 		int maxLength = 0;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
+		LOG_GL_ERROR;
 		std::vector<char> infoLog(maxLength);
 		glGetShaderInfoLog(id, maxLength, &maxLength, &infoLog[0]);
+		LOG_GL_ERROR;
 		glDeleteShader(id);
+		LOG_GL_ERROR;
+		fprintf(stderr, "%s\n", infoLog.data());
 		throw std::string(infoLog.data());
 	}
 }
