@@ -18,10 +18,7 @@ Text::Text() {
 
      shader = ShaderProgram::Create("resources/shaders/text_render.vert", "resources/shaders/text_render.frag");
 
-     ft = new FT_Library;
-     face = new FT_Face;
-
-     if (FT_Init_FreeType(ft)) {
+     if (FT_Init_FreeType(&ft)) {
           fprintf(stderr, "ERROR::FREETYPE: Could not init FreeType Library\n");
           exit(0);
      }
@@ -31,24 +28,25 @@ Text::~Text() {
      delete &va;
      delete &vb;
      Free();
-     delete ft;
-     delete face;
 }
 
 void Text::AddFont(const std::string src) {
      printf("Adding Font: <%s>\n", src.c_str());
-     if (FT_New_Face(*ft, src.c_str(), 0, face)) {
+
+     std::string filepath = "resources/fonts/" + src;
+     if (FT_New_Face(ft, filepath.c_str(), 0, &face)) {
           fprintf(stderr, "ERROR::FREETYPE: Failed to load font\n");
           exit(0);
      }
 
-     FT_Set_Pixel_Sizes(*face, 0, 48);
+     FT_Set_Pixel_Sizes(face, 0, 48);
 
      glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+     printf("Loading font characters\n");
      for (unsigned char c = 0; c < 128; c++){
-          // load character glyph 
-          if (FT_Load_Char(*face, c, FT_LOAD_RENDER)){
+          // load character glyph
+          if (FT_Load_Char(face, c, FT_LOAD_RENDER)){
                fprintf(stderr, "ERROR::FREETYTPE: Failed to load Glyph\n");
                continue;
           }
@@ -60,12 +58,12 @@ void Text::AddFont(const std::string src) {
                GL_TEXTURE_2D,
                0,
                GL_RED,
-               (*face)->glyph->bitmap.width,
-               (*face)->glyph->bitmap.rows,
+               face->glyph->bitmap.width,
+               face->glyph->bitmap.rows,
                0,
                GL_RED,
                GL_UNSIGNED_BYTE,
-               (*face)->glyph->bitmap.buffer
+               face->glyph->bitmap.buffer
           );
           // set texture options
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -75,23 +73,24 @@ void Text::AddFont(const std::string src) {
           // now store character for later use
           Character character = {
               texture,
-              glm::ivec2((*face)->glyph->bitmap.width, (*face)->glyph->bitmap.rows),
-              glm::ivec2((*face)->glyph->bitmap_left, (*face)->glyph->bitmap_top),
-              (*face)->glyph->advance.x
+              glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+              glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+              face->glyph->advance.x
           };
           Characters.insert(std::pair<char, Character>(c, character));
      }
+     printf("Font characters finished loading\n");
      glBindTexture(GL_TEXTURE_2D, 0);
-     FT_Done_Face(*face);
+     FT_Done_Face(face);
 }
 
 void Text::Free() {
-     FT_Done_FreeType(*ft);
+     FT_Done_FreeType(ft);
 }
 
 void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3 color) {
      shader->bind();
-     shader->uploadFloat3("TextColor", color);
+     shader->uploadFloat3("textColor", color);
      glActiveTexture(GL_TEXTURE0);
      va->bind();
 
@@ -118,7 +117,7 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
           // render glyph texture over quad
           glBindTexture(GL_TEXTURE_2D, ch.TextureID);
           // update content of VBO memory
-          vb->updateBuffer(24, vertices, 0);
+          vb->updateBuffer(4 * 6, vertices, 0);
           glBindBuffer(GL_ARRAY_BUFFER, 0);
           // render quad
           glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -126,4 +125,5 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
           x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
      }
      glBindVertexArray(0);
+     glBindTexture(GL_TEXTURE_2D, 0);
 }

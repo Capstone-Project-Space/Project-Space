@@ -32,8 +32,8 @@ private:
      std::shared_ptr<VertexBuffer> vb;
      std::shared_ptr<ShaderProgram> shader;
 
-     FT_Library *ft;
-     FT_Face *face;
+     FT_Library ft;
+     FT_Face face;
 
      std::map<char, Character> Characters;
 };
