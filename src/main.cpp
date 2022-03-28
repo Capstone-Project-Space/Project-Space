@@ -15,9 +15,22 @@
 
 #include <src/engine/randgen/randomgen.h>
 
-//#define TESTING
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#define TESTING
 
 using Clock = std::chrono::high_resolution_clock;
+
+struct Character {
+	unsigned int TextureID;
+	glm::ivec2 Size;
+	glm::ivec2 Bearing;
+	unsigned int Advance;
+};
+std::map<char, Character> Characters;
+
+void RenderText(ShaderProgram s, std::string text, float x, float y, float scale, glm::vec3 color);
 
 #if defined(TESTING)
 
@@ -27,7 +40,7 @@ using Clock = std::chrono::high_resolution_clock;
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-constexpr int count = 8192;
+constexpr int count = 64;
 class TempState : GameState {
 
 	Camera camera;
@@ -89,6 +102,76 @@ int main(int argc, char** args) {
 	double lastTime = Clock::now().time_since_epoch().count();
 	double currentTime, timeSpent = 0;
 	uint32_t frames = 0;
+
+
+
+
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft)) {
+		fprintf(stderr, "ERROR::FREETYPE: Could not init FreeType library\n");
+		return -1;
+	}
+	FT_Face face;
+	if (FT_New_Face(ft, "resources/founts/Movement.ttf", 0, &face)) {
+		fprintf(stderr, "ERROR::FREETYPE: Failed to load font\n");
+		return -1;
+	}
+
+	FT_Set_Pixel_Sizes(face, 0, 48);
+
+	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
+		fprintf(stderr, "ERROR::FREETYPE: Failed to load glyph\n");
+		return -1;
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	for (unsigned int c = 0; c < 128; c++) {
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+			fprintf(stderr, "ERROR::FREETYPE: Failed to load glyph %c\n", c);
+			continue;
+		}
+
+		unsigned int texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RED,
+			face->glyph->bitmap.width,
+			face->glyph->bitmap.rows,
+			0,
+			GL_RED,
+			GL_UNSIGNED_BYTE,
+			face->glyph->bitmap.buffer
+		);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		Character character = {
+			texture,
+			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+			face->glyph->advance.x
+		};
+		Characters.insert(std::pair<char, Character>(c, character));
+	}
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glm::mat4 projection = glm::ortho((float)0.0, (float)window->width, (float)0.0, (float)window->height);
+
+	std::shared_ptr<VertexBuffer> VBO = VertexBuffer::CreateVertexBuffer(24, NULL);
+	std::shared_ptr<VertexArray> VAO = VertexArray::CreateVertexArray(, VBO);
+
+	std::shared_ptr<ShaderProgram> shader = ShaderProgram::Create("resources/shaders/text_render.vert","resources/shaders/text_render.frag");
+
 	while (window->isOpen) {
 		currentTime = Clock::now().time_since_epoch().count();
 		double delta = (currentTime - lastTime) / 1000000000.0;
@@ -106,6 +189,7 @@ int main(int argc, char** args) {
 			frames = 0;
 		}
 	}
+
 	State::RestoreState();
 	Texture::Clear();
 	state.~shared_ptr();
@@ -312,10 +396,34 @@ public:
 			printf("Closing Window\n");
 			glfwSetWindowShouldClose(window->getWindowPtr(), true);
 		}
+		if (Keyboard::isKeyDown(GLFW_KEY_W)) {
+			cameraZ += (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_A)) {
+			cameraX += (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_S)){
+			cameraZ -= (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_D)) {
+			cameraX -= (1.f * delta);
+		}
+		printf("Delta: %f\n", delta);
 	}
 
 	virtual bool onKeyPressed(const Key& key) {
-		Last_Key_Pressed = key;
+		if (key == GLFW_KEY_0) {
+			printf("gameState: changing drawColor to 0\n");
+			drawColor = 0;
+		}
+		if (key == GLFW_KEY_1) {
+			printf("gameState: changing drawColor to 1\n");
+			drawColor = 1;
+		}
+		if (key == GLFW_KEY_2) {
+			printf("gameState: changing drawColor to 2\n");
+			drawColor = 2;
+		}
 		return true;
 	}
 
@@ -348,6 +456,10 @@ public:
 
 //Main Loop
 int main(int argc, char** args) {
+	uint32_t frames = 0;
+	double lastTime = Clock::now().time_since_epoch().count();
+	double currentTime, timeSpent = 0;
+
 	//Create and Open the Main Menu Window
 	printf("Opening Window\n");
 	window = Window::CreateGLWindow("Project Space", 800, 600);
@@ -370,50 +482,27 @@ int main(int argc, char** args) {
 	*/
 
 	while (!glfwWindowShouldClose(window->getWindowPtr())) {
-		//Process Input Based on State
-		/*
-		}else if(State::CurrentState == gameState) {
-			switch (Last_Key_Pressed) {
-			//Escape Key Change to Menu State
-			case GLFW_KEY_0:
-				printf("gameState: changing drawColor to 0\n");
-				drawColor = 0;
-				break;
-			case GLFW_KEY_1:
-				printf("gameState: changing drawColor to 1\n");
-				drawColor = 1;
-				break;
-			case GLFW_KEY_2:
-				printf("gameState: changing drawColor to 2\n");
-				drawColor = 2;
-				break;
-			case GLFW_KEY_W:
-				cameraZ += 0.030f;
-				break;
-			case GLFW_KEY_A:
-				cameraX -= 0.030f;
-				break;
-			case GLFW_KEY_S:
-				cameraZ -= 0.030f;
-				break;
-			case GLFW_KEY_D:
-				cameraX += 0.030f;
-				break;
-			default:
-				break;
-			}
-		}*/
-		//Last_Key_Pressed = NULL;
+		currentTime = Clock::now().time_since_epoch().count();
+		double delta = (currentTime - lastTime) / 1000000000.0;
+		lastTime = currentTime;
+		timeSpent += delta;
 
 		//Update
-		State::CurrentState->update(0.0f);
+		State::CurrentState->update(delta);
 
 		//Render
-		State::CurrentState->render(0.0f);
+		State::CurrentState->render(delta);
 
 		//Check for Events and Swap Buffers
 		glfwSwapBuffers(window->getWindowPtr());
 		glfwPollEvents();
+		window->flush();
+		frames++;
+		if (timeSpent >= 1.0) {
+			window->updateTitle(" Frames: " + std::to_string(frames));
+			timeSpent -= 1.0;
+			frames = 0;
+		}
 	}
 
 	glDeleteVertexArrays(1, &VAO);
@@ -426,3 +515,8 @@ int main(int argc, char** args) {
 }
 
 #endif
+
+
+void RenderText(ShaderProgram s, std::string text, float x, float y, float scale, glm::vec3 color) {
+
+}
