@@ -12,25 +12,13 @@
 #include <src/engine/graphics/shader.h>
 #include <src/engine/graphics/window.h>
 #include <src/engine/graphics/model_renderer.h>
+#include <src/engine/graphics/text.h>
 
 #include <src/engine/randgen/randomgen.h>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 #define TESTING
 
 using Clock = std::chrono::high_resolution_clock;
-
-struct Character {
-	unsigned int TextureID;
-	glm::ivec2 Size;
-	glm::ivec2 Bearing;
-	unsigned int Advance;
-};
-std::map<char, Character> Characters;
-
-void RenderText(ShaderProgram s, std::string text, float x, float y, float scale, glm::vec3 color);
 
 #if defined(TESTING)
 
@@ -89,6 +77,8 @@ int main(int argc, char** args) {
 	std::shared_ptr<GameState> state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
 	LOG_GL_ERROR;
 	State::ChangeState(state);
+	std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
+	text->Free();
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -103,75 +93,6 @@ int main(int argc, char** args) {
 	double currentTime, timeSpent = 0;
 	uint32_t frames = 0;
 
-
-
-
-	FT_Library ft;
-	if (FT_Init_FreeType(&ft)) {
-		fprintf(stderr, "ERROR::FREETYPE: Could not init FreeType library\n");
-		return -1;
-	}
-	FT_Face face;
-	if (FT_New_Face(ft, "resources/founts/Movement.ttf", 0, &face)) {
-		fprintf(stderr, "ERROR::FREETYPE: Failed to load font\n");
-		return -1;
-	}
-
-	FT_Set_Pixel_Sizes(face, 0, 48);
-
-	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
-		fprintf(stderr, "ERROR::FREETYPE: Failed to load glyph\n");
-		return -1;
-	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	for (unsigned int c = 0; c < 128; c++) {
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-			fprintf(stderr, "ERROR::FREETYPE: Failed to load glyph %c\n", c);
-			continue;
-		}
-
-		unsigned int texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			0,
-			GL_RED,
-			face->glyph->bitmap.width,
-			face->glyph->bitmap.rows,
-			0,
-			GL_RED,
-			GL_UNSIGNED_BYTE,
-			face->glyph->bitmap.buffer
-		);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		Character character = {
-			texture,
-			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-			face->glyph->advance.x
-		};
-		Characters.insert(std::pair<char, Character>(c, character));
-	}
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glm::mat4 projection = glm::ortho((float)0.0, (float)window->width, (float)0.0, (float)window->height);
-
-	std::shared_ptr<VertexBuffer> VBO = VertexBuffer::CreateVertexBuffer(24, NULL);
-	std::shared_ptr<VertexArray> VAO = VertexArray::CreateVertexArray(, VBO);
-
-	std::shared_ptr<ShaderProgram> shader = ShaderProgram::Create("resources/shaders/text_render.vert","resources/shaders/text_render.frag");
-
 	while (window->isOpen) {
 		currentTime = Clock::now().time_since_epoch().count();
 		double delta = (currentTime - lastTime) / 1000000000.0;
@@ -180,6 +101,11 @@ int main(int argc, char** args) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		LOG_GL_ERROR;
 		State::Draw(delta);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		text->RenderText("This is a text render test", window->width / 2.0f, window->height / 2.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
+
 		glfwPollEvents();
 		window->flush();
 		frames++;
@@ -192,6 +118,7 @@ int main(int argc, char** args) {
 
 	State::RestoreState();
 	Texture::Clear();
+	text.~shared_ptr();
 	state.~shared_ptr();
 	return 0;
 }
@@ -515,8 +442,3 @@ int main(int argc, char** args) {
 }
 
 #endif
-
-
-void RenderText(ShaderProgram s, std::string text, float x, float y, float scale, glm::vec3 color) {
-
-}
