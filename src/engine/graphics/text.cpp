@@ -17,7 +17,7 @@ std::shared_ptr<Text> Text::CreateText(const std::string src) {
 }
 
 Text::Text() {
-     vb = VertexBuffer::CreateVertexBuffer(6 * 4 * sizeof(float), NULL);
+     vb = VertexBuffer::CreateVertexBuffer(6 * 4 * sizeof(float));
      va = VertexArray::CreateVertexArray(
          {
              { "vertex", ShaderDataType::Type::FLOAT4 }
@@ -33,8 +33,6 @@ Text::Text() {
 }
 
 Text::~Text() {
-     delete &va;
-     delete &vb;
      Free();
 }
 
@@ -100,7 +98,7 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
      shader->bind();
      shader->uploadFloat3("textColor", color);
      shader->uploadInt("text", 0);
-     shader->uploadMat4("projection", glm::identity<glm::mat4>());
+     shader->uploadMat4("projection", glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f));
      glActiveTexture(GL_TEXTURE0);
      va->bind();
 
@@ -127,7 +125,7 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
           // render glyph texture over quad
           glBindTexture(GL_TEXTURE_2D, ch.TextureID);
           // update content of VBO memory
-          vb->updateBuffer(4 * 6 * sizeof(float), vertices, 0);
+          vb->updateFromSeparateBuffer(4 * 6 * sizeof(float), vertices, 0);
           vb->bind();
           // render quad
           glDrawArrays(GL_TRIANGLES, 0, 6);
