@@ -28,6 +28,7 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         "${PROJECT_BINARY_DIR}/libraries/glfw3/WIN32/glfw3.lib"
         "${PROJECT_BINARY_DIR}/libraries/glm/WIN32/glm.lib"
         "${PROJECT_BINARY_DIR}/libraries/stb_image/WIN32/stb_image.lib"
+		"${PROJECT_BINARY_DIR}/libraries/freetype/WIN32/freetype.lib"
     )
     target_include_directories(Project-Space PRIVATE
         "${PROJECT_BINARY_DIR}"
@@ -35,6 +36,7 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         "${PROJECT_BINARY_DIR}/libraries/glfw3/WIN32/include"
         "${PROJECT_BINARY_DIR}/libraries/glm/include"
         "${PROJECT_BINARY_DIR}/libraries/stb_image/include"
+        "${PROJECT_BINARY_DIR}/libraries/freetype/include"
     )
 else()
     target_link_libraries(Project-Space PRIVATE 
@@ -43,6 +45,7 @@ else()
         "${PROJECT_BINARY_DIR}/libraries/glfw3/WIN64/glfw3.lib"
         "${PROJECT_BINARY_DIR}/libraries/glm/WIN64/glm.lib"
         "${PROJECT_BINARY_DIR}/libraries/stb_image/WIN64/stb_image.lib"
+		"${PROJECT_BINARY_DIR}/libraries/freetype/WIN64/freetype.lib"
     )
     target_include_directories(Project-Space PRIVATE
         "${PROJECT_BINARY_DIR}"
@@ -50,5 +53,6 @@ else()
         "${PROJECT_BINARY_DIR}/libraries/glfw3/WIN64/include"
         "${PROJECT_BINARY_DIR}/libraries/glm/include"
         "${PROJECT_BINARY_DIR}/libraries/stb_image/include"
+        "${PROJECT_BINARY_DIR}/libraries/freetype/include"
     )
 endif()

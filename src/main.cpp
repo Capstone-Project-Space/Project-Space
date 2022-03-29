@@ -13,6 +13,7 @@
 #include <src/engine/graphics/window.h>
 #include <src/engine/graphics/renderer.h>
 #include <src/engine/graphics/asset_manager.h>
+#include <src/engine/graphics/text.h>
 
 #include <src/engine/randgen/randomgen.h>
 
@@ -28,7 +29,7 @@ using Clock = std::chrono::high_resolution_clock;
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-constexpr int count = 8192;
+constexpr int count = 64;
 class TempState : GameState {
 
 	Camera orthoCamera{1280.0f, 720.0f};
@@ -81,6 +82,8 @@ int main(int argc, char** args) {
 	LOG_GL_ERROR;
 	
 	State::ChangeState(state);
+	std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
+	text->Free();
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -94,6 +97,7 @@ int main(int argc, char** args) {
 	double lastTime = Clock::now().time_since_epoch().count();
 	double currentTime, timeSpent = 0;
 	uint32_t frames = 0;
+
 	while (window->isOpen) {
 		currentTime = Clock::now().time_since_epoch().count();
 		double delta = (currentTime - lastTime) / 1000000000.0;
@@ -102,6 +106,13 @@ int main(int argc, char** args) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		LOG_GL_ERROR;
 		State::Draw(delta);
+
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		text->RenderText("This is a text render test", window->width / 2.0f, window->height / 2.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
+
 		glfwPollEvents();
 		window->flush();
 		frames++;
@@ -111,6 +122,7 @@ int main(int argc, char** args) {
 			frames = 0;
 		}
 	}
+
 	State::RestoreState();
 	AssetManager::Clear();
 	Renderer::Shutdown();
@@ -318,10 +330,34 @@ public:
 			printf("Closing Window\n");
 			glfwSetWindowShouldClose(window->getWindowPtr(), true);
 		}
+		if (Keyboard::isKeyDown(GLFW_KEY_W)) {
+			cameraZ += (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_A)) {
+			cameraX += (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_S)){
+			cameraZ -= (1.f * delta);
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_D)) {
+			cameraX -= (1.f * delta);
+		}
+		printf("Delta: %f\n", delta);
 	}
 
 	virtual bool onKeyPressed(const Key& key) {
-		Last_Key_Pressed = key;
+		if (key == GLFW_KEY_0) {
+			printf("gameState: changing drawColor to 0\n");
+			drawColor = 0;
+		}
+		if (key == GLFW_KEY_1) {
+			printf("gameState: changing drawColor to 1\n");
+			drawColor = 1;
+		}
+		if (key == GLFW_KEY_2) {
+			printf("gameState: changing drawColor to 2\n");
+			drawColor = 2;
+		}
 		return true;
 	}
 
@@ -354,6 +390,10 @@ public:
 
 //Main Loop
 int main(int argc, char** args) {
+	uint32_t frames = 0;
+	double lastTime = Clock::now().time_since_epoch().count();
+	double currentTime, timeSpent = 0;
+
 	//Create and Open the Main Menu Window
 	printf("Opening Window\n");
 	window = Window::CreateGLWindow("Project Space", 800, 600);
@@ -376,50 +416,27 @@ int main(int argc, char** args) {
 	*/
 
 	while (!glfwWindowShouldClose(window->getWindowPtr())) {
-		//Process Input Based on State
-		/*
-		}else if(State::CurrentState == gameState) {
-			switch (Last_Key_Pressed) {
-			//Escape Key Change to Menu State
-			case GLFW_KEY_0:
-				printf("gameState: changing drawColor to 0\n");
-				drawColor = 0;
-				break;
-			case GLFW_KEY_1:
-				printf("gameState: changing drawColor to 1\n");
-				drawColor = 1;
-				break;
-			case GLFW_KEY_2:
-				printf("gameState: changing drawColor to 2\n");
-				drawColor = 2;
-				break;
-			case GLFW_KEY_W:
-				cameraZ += 0.030f;
-				break;
-			case GLFW_KEY_A:
-				cameraX -= 0.030f;
-				break;
-			case GLFW_KEY_S:
-				cameraZ -= 0.030f;
-				break;
-			case GLFW_KEY_D:
-				cameraX += 0.030f;
-				break;
-			default:
-				break;
-			}
-		}*/
-		//Last_Key_Pressed = NULL;
+		currentTime = Clock::now().time_since_epoch().count();
+		double delta = (currentTime - lastTime) / 1000000000.0;
+		lastTime = currentTime;
+		timeSpent += delta;
 
 		//Update
-		State::CurrentState->update(0.0f);
+		State::CurrentState->update(delta);
 
 		//Render
-		State::CurrentState->render(0.0f);
+		State::CurrentState->render(delta);
 
 		//Check for Events and Swap Buffers
 		glfwSwapBuffers(window->getWindowPtr());
 		glfwPollEvents();
+		window->flush();
+		frames++;
+		if (timeSpent >= 1.0) {
+			window->updateTitle(" Frames: " + std::to_string(frames));
+			timeSpent -= 1.0;
+			frames = 0;
+		}
 	}
 
 	glDeleteVertexArrays(1, &VAO);
