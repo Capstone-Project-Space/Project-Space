@@ -13,7 +13,6 @@
 #include <src/engine/graphics/window.h>
 #include <src/engine/graphics/renderer.h>
 #include <src/engine/graphics/asset_manager.h>
-#include <src/engine/graphics/text.h>
 
 #include <src/engine/randgen/randomgen.h>
 
@@ -32,7 +31,7 @@ using Clock = std::chrono::high_resolution_clock;
 constexpr int count = 64;
 class TempState : GameState {
 
-	Camera orthoCamera{1280.0f, 720.0f};
+	Camera orthoCamera{-640.0f, 640.0f, -360.0f, 360.0f};
 	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
 	glm::mat4 transforms[count];
@@ -49,7 +48,7 @@ public:
 	virtual void render(float delta) override {
 		Renderer::Begin2DScene(orthoCamera);
 		{
-			Renderer::SubmitQuad({ 0.0f, 0.0f }, { 3.6f, 2.0f }, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
+			Renderer::SubmitQuad({ 0.0f, 0.0f }, { 1280.0f, 720.0f }, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
 		}
 		Renderer::End2DScene();
 
@@ -59,6 +58,16 @@ public:
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/spacepod.obj"), transforms[0]);
 		}
 		Renderer::End3DScene();
+
+		Renderer::Begin2DScene(orthoCamera);
+		{
+			Renderer::SubmitText("This is a text render test.", { 0.0f, 0.0f }, { 0.3f, 0.7f, 0.9f });
+
+			Renderer::SubmitText("This text is larger.", { 0.0f, 52.0f }, { 0.3f, 0.7f, 0.9f }, 3.0f);
+
+			Renderer::SubmitText("This text is rotated.", { 200.0f, 300.0f }, { 0.3f, 0.7f, 0.9f }, 1.0f, 30.0f);
+		}
+		Renderer::End2DScene();
 	}
 
 	virtual bool onKeyPressed(const Key& key) { return false; }
@@ -77,12 +86,13 @@ public:
 
 int main(int argc, char** args) {
 	// Test();
-	std::shared_ptr<GameState> state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
+	std::shared_ptr<GameState> state = nullptr;
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
+	state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
 	LOG_GL_ERROR;
 	
 	State::ChangeState(state);
-	std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
+	//std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -104,13 +114,9 @@ int main(int argc, char** args) {
 		timeSpent += delta;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		LOG_GL_ERROR;
-		//State::Draw(delta);
+		State::Draw(delta);
 
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		text->RenderText("This is a text render test", 0.0f, 0.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
+		//text->RenderText("This is a text render test", 0.0f, 0.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
 
 		glfwPollEvents();
 		window->flush();

@@ -58,6 +58,7 @@ public:
 	inline void submitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec2& st, const glm::vec2& pq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
 		submitQuad(position, size, glm::vec4(st, pq), texture, rotation);
 	}
+
 	void draw();
 
 	inline void setCamera(const Camera& camera) { this->camera = &camera; }
@@ -70,7 +71,7 @@ private:
 	uint32_t* indexData = nullptr;
 
 	uint32_t textureCount;
-	std::array<std::shared_ptr<Texture>, 31> textures;
+	std::array<std::shared_ptr<Texture>, 31> textures{0};
 
 	std::shared_ptr<IndexBuffer> indices = nullptr;
 	std::shared_ptr<VertexBuffer> vertices = nullptr;

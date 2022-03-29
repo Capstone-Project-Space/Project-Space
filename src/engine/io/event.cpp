@@ -1,5 +1,7 @@
 #include "event.h"
 
+std::vector<EventReceiver*> Events::Receivers;
+
 void Events::RegisterReceiver(EventReceiver* recv) {
 	Events::Receivers.push_back(recv);
 }

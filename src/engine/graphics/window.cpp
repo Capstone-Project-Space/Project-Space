@@ -60,9 +60,11 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 	glfwSetWindowSizeCallback(window->window,
 		[](GLFWwindow* glfwWindow, int width, int height) {
 			Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
+			float vals[4] = { window->width, window->height, width, height };
 			window->width = width;
 			window->height = height;
 			glViewport(0, 0, width, height);
+			Events::DispatchEvent(Event<float[4]>{ EventType::WINDOW_RESIZE, vals });
 		}
 	);
 

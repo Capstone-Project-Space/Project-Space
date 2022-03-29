@@ -33,15 +33,16 @@ void BatchRenderer::init() {
 	for (uint32_t i = 0; i < 32; i++) {
 		program->uploadInt("u_Texture" + std::to_string(i), i);
 	}
+	delete[] this->indexData;
 }
 
 void BatchRenderer::destroy() {
 	delete[] this->quads;
-	delete[] this->indexData;
 	this->indices = nullptr;
 	this->vertices = nullptr;
 	this->vArray = nullptr;
 	this->program = nullptr;
+	this->textures.fill(nullptr);
 }
 
 void BatchRenderer::submitQuad(QuadData data, const std::shared_ptr<Texture> texture) {
