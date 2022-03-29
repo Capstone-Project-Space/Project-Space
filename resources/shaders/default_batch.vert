@@ -6,7 +6,7 @@ layout(location = 2) in int a_Texture;
 layout(location = 3) in mat4 a_Transform;
 
 out vec2 v_UV;
-out flat int v_Texture;
+flat out int v_Texture;
 
 uniform mat4 u_Projection;
 uniform mat4 u_View;

@@ -83,7 +83,6 @@ int main(int argc, char** args) {
 	
 	State::ChangeState(state);
 	std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
-	text->Free();
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -105,13 +104,13 @@ int main(int argc, char** args) {
 		timeSpent += delta;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		LOG_GL_ERROR;
-		State::Draw(delta);
+		//State::Draw(delta);
 
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		text->RenderText("This is a text render test", window->width / 2.0f, window->height / 2.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
+		text->RenderText("This is a text render test", 0.0f, 0.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
 
 		glfwPollEvents();
 		window->flush();
@@ -126,7 +125,6 @@ int main(int argc, char** args) {
 	State::RestoreState();
 	AssetManager::Clear();
 	Renderer::Shutdown();
-	state.~shared_ptr();
 	return 0;
 }
 #else

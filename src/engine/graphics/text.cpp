@@ -1,5 +1,10 @@
 #include "text.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
+
 std::shared_ptr<Text> Text::CreateText() {
      std::shared_ptr<Text> text = std::shared_ptr<Text>(new Text());
      return text;
@@ -12,9 +17,12 @@ std::shared_ptr<Text> Text::CreateText(const std::string src) {
 }
 
 Text::Text() {
-     vb = VertexBuffer::CreateVertexBuffer(24, NULL);
-     VertexLayout vl;
-     va = VertexArray::CreateVertexArray(vl, vb);
+     vb = VertexBuffer::CreateVertexBuffer(6 * 4 * sizeof(float), NULL);
+     va = VertexArray::CreateVertexArray(
+         {
+             { "vertex", ShaderDataType::Type::FLOAT4 }
+         }, vb
+     );
 
      shader = ShaderProgram::Create("resources/shaders/text_render.vert", "resources/shaders/text_render.frag");
 
@@ -91,6 +99,8 @@ void Text::Free() {
 void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3 color) {
      shader->bind();
      shader->uploadFloat3("textColor", color);
+     shader->uploadInt("text", 0);
+     shader->uploadMat4("projection", glm::identity<glm::mat4>());
      glActiveTexture(GL_TEXTURE0);
      va->bind();
 
@@ -117,10 +127,11 @@ void Text::RenderText(std::string text, float x, float y, float scale, glm::vec3
           // render glyph texture over quad
           glBindTexture(GL_TEXTURE_2D, ch.TextureID);
           // update content of VBO memory
-          vb->updateBuffer(4 * 6, vertices, 0);
-          glBindBuffer(GL_ARRAY_BUFFER, 0);
+          vb->updateBuffer(4 * 6 * sizeof(float), vertices, 0);
+          vb->bind();
           // render quad
           glDrawArrays(GL_TRIANGLES, 0, 6);
+          LOG_GL_ERROR;
           // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
           x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
      }
