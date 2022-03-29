@@ -17,15 +17,17 @@ constexpr uint64_t MAX_INSTANCES = 512;
 
 class ModelRenderer {
 public:
-	ModelRenderer(const Camera& camera);
+	ModelRenderer();
 
 	void init();
 	void destroy();
 
-	void submitLight(const LightData& lightData);
+	void submitLight(const LightSource& lightData);
 	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform);
 
 	void draw();
+
+	inline void setCamera(const Camera& camera) { this->camera = &camera; }
 
 private:
 	const Camera* camera;
@@ -34,7 +36,7 @@ private:
 	
 	glm::mat4 matricesBufferData[MAX_INSTANCES + 2];
 	struct {
-		LightData lightsData[MAX_LIGHTS];
+		LightSource lightsData[MAX_LIGHTS];
 		int32_t count = 0;
 	} lightBufferData;
 	std::shared_ptr<UniformBuffer> lightsBuffer = nullptr;

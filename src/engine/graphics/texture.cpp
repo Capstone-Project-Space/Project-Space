@@ -5,21 +5,11 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-std::map<std::string, std::shared_ptr<Texture>> Texture::mapping;
-
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
 std::shared_ptr<Texture> Texture::CreateTexture(const std::string& filepath) {
-	if (Texture::mapping.find(filepath) == Texture::mapping.end()) {
-		std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture(filepath));
-		mapping.insert({ filepath, texture });
-		return texture;
-	}
-	return Texture::mapping[filepath];
-}
-
-void Texture::Clear() {
-	Texture::mapping.clear();
+	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture(filepath));
+	return texture;
 }
 
 Texture::~Texture() {
@@ -29,7 +19,8 @@ Texture::~Texture() {
 
 void Texture::bind(uint32_t id) {
 	glActiveTexture(GL_TEXTURE0 + id);
-	glBindTexture(GL_TEXTURE_2D, id);
+	LOG_GL_ERROR;
+	glBindTexture(GL_TEXTURE_2D, this->id);
 	LOG_GL_ERROR;
 }
 
@@ -56,6 +47,8 @@ Texture::Texture(const std::string& filepath) {
 	assert(internalFormat & dataFormat);
 
 	glGenTextures(1, &this->id);
+	LOG_GL_ERROR;
+	glActiveTexture(GL_TEXTURE1);
 	LOG_GL_ERROR;
 	glBindTexture(GL_TEXTURE_2D, this->id);
 	LOG_GL_ERROR;

@@ -11,11 +11,12 @@
 #include <src/engine/graphics/vertex_array.h>
 #include <src/engine/graphics/shader.h>
 #include <src/engine/graphics/window.h>
-#include <src/engine/graphics/model_renderer.h>
+#include <src/engine/graphics/renderer.h>
+#include <src/engine/graphics/asset_manager.h>
 
 #include <src/engine/randgen/randomgen.h>
 
-//#define TESTING
+#define TESTING
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -30,16 +31,13 @@ using Clock = std::chrono::high_resolution_clock;
 constexpr int count = 8192;
 class TempState : GameState {
 
-	Camera camera;
-	ModelRenderer renderer = ModelRenderer(camera);
-	
+	Camera orthoCamera{1280.0f, 720.0f};
+	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
 	glm::mat4 transforms[count];
 
-	std::shared_ptr<Model> model = Model::CreateModel("./resources/models/spacepod.obj");
 public:
 	TempState(const std::string& name) : GameState(name) {
-		LOG_GL_ERROR;
 		for (int i = 0; i < count; i++) {
 			transforms[i] = glm::translate(glm::scale(glm::identity<glm::mat4>(), { .1f, .1f, .1f }), { RandomGen::RangedRandomFloat(-12, 12), -.9f, RandomGen::RangedRandomFloat(-7, 7)});
 		}
@@ -48,11 +46,18 @@ public:
 	virtual void update(float delta) override { }
 
 	virtual void render(float delta) override {
-		renderer.submitLight({{0.0f, 10.0f, 0.0f, 1.0f}});
-		for (int i = 0; i < count; i++) {
-			renderer.submitModel(model, transforms[i]);
+		Renderer::Begin2DScene(orthoCamera);
+		{
+			Renderer::SubmitQuad({ 0.0f, 0.0f }, { 3.6f, 2.0f }, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
 		}
-		renderer.draw();
+		Renderer::End2DScene();
+
+		Renderer::Begin3DScene(perspectiveCamera);
+		{
+			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/spacepod.obj"), transforms[0]);
+		}
+		Renderer::End3DScene();
 	}
 
 	virtual bool onKeyPressed(const Key& key) { return false; }
@@ -71,10 +76,10 @@ public:
 
 int main(int argc, char** args) {
 	// Test();
+	std::shared_ptr<GameState> state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
 	LOG_GL_ERROR;
-	std::shared_ptr<GameState> state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
-	LOG_GL_ERROR;
+	
 	State::ChangeState(state);
 
 	LOG_GL_ERROR;
@@ -107,7 +112,8 @@ int main(int argc, char** args) {
 		}
 	}
 	State::RestoreState();
-	Texture::Clear();
+	AssetManager::Clear();
+	Renderer::Shutdown();
 	state.~shared_ptr();
 	return 0;
 }

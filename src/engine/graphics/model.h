@@ -29,12 +29,12 @@ struct ModelVertex {
 #pragma pack()
 
 struct Material {
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-	float specExponent;
-	float idxRefraction;
-	std::shared_ptr<Texture> texture;
+	glm::vec3 ambient{1.0f};
+	glm::vec3 diffuse{ 1.0f };
+	glm::vec3 specular{ 1.0f };
+	float specExponent = 1.0f;
+	float idxRefraction = 1.0f;
+	std::shared_ptr<Texture> texture = nullptr;
 };
 
 constexpr uint64_t getVertexFloatSize() { return sizeof(ModelVertex) / sizeof(float); }
@@ -53,7 +53,7 @@ public:
 private:
 	std::shared_ptr<IndexBuffer> indexBuffer;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
-	std::array<std::shared_ptr<Texture>, 31> textures;
+	std::array<std::shared_ptr<Texture>, 31> textures = {nullptr};
 	Model() = default;
 
 	static const std::map<std::string, Material> CreateMaterial(const std::string& filepath);

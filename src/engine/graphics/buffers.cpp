@@ -6,13 +6,13 @@
 
 std::shared_ptr<VertexBuffer> VertexBuffer::CreateVertexBuffer(uint64_t size, const void* data) {
 	std::shared_ptr<VertexBuffer> buffer = std::shared_ptr<VertexBuffer>(new VertexBuffer(size));
-	if (data) buffer->updateBuffer(size, data);
+	if (data) buffer->updateFromSeparateBuffer(size, data);
 	return buffer;
 }
 
 std::shared_ptr<IndexBuffer> IndexBuffer::CreateIndexBuffer(uint64_t size, const uint32_t* data) {
 	std::shared_ptr<IndexBuffer> buffer = std::shared_ptr<IndexBuffer>(new IndexBuffer(size));
-	if (data) buffer->updateBuffer(size, data);
+	if (data) buffer->updateFromSeparateBuffer(size, data);
 	return buffer;
 }
 
@@ -61,7 +61,7 @@ void VertexBuffer::updateFromSeparateBuffer(uint64_t size, const void* subdata, 
 	assert(size + offset >= size && size + offset >= offset && size + offset <= this->size);
 	glBindBuffer(GL_ARRAY_BUFFER, this->id);
 	LOG_GL_ERROR;
-	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+	glBufferSubData(GL_ARRAY_BUFFER, offset, size, subdata);
 	LOG_GL_ERROR;
 }
 
@@ -110,7 +110,7 @@ void IndexBuffer::updateFromSeparateBuffer(uint64_t size, const uint32_t* subdat
 	assert(size + offset >= size && size + offset >= offset && size + offset <= this->size);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
 	LOG_GL_ERROR;
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, subdata);
 	LOG_GL_ERROR;
 }
 
@@ -137,8 +137,11 @@ void UniformBuffer::updateBuffer(const void* data) {
 	assert(data);
 	this->data = data;
 	glBindBuffer(GL_UNIFORM_BUFFER, this->id);
+	LOG_GL_ERROR;
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, this->count * this->elemSize, data);
+	LOG_GL_ERROR;
 	glBindBufferRange(GL_UNIFORM_BUFFER, blockBinding, this->id, 0, count * elemSize);
+	LOG_GL_ERROR;
 }
 
 void UniformBuffer::bind() {

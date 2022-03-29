@@ -2,6 +2,6 @@
 
 #include <glm/glm.hpp>
 
-struct LightData {
+struct LightSource {
 	glm::vec4 position;
 };

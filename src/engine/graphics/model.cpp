@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <sstream>
 #include <tuple>
@@ -75,7 +76,6 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 
 	std::vector<uint32_t> indices;
 	std::vector<ModelVertex> vertices;
-	std::vector<std::shared_ptr<Texture>> textures;
 
 	uint64_t uniqueVertices = 0;
 	std::map<std::tuple<uint64_t, uint64_t, uint64_t>, uint64_t> vertexMap;
@@ -94,9 +94,10 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 		std::getline(obj, line);
 		if (line.rfind("mtllib ") == 0) {
 			mtls = Model::CreateMaterial(filepath.substr(0, filepath.find_last_of('/') + 1) + line.substr(7));
+			uint32_t count = 0;
 			for (auto&[_, material] : mtls) {
-				auto found = std::find(textures.begin(), textures.end(), material.texture);
-				if (found == textures.end()) textures.push_back(material.texture);
+				auto found = std::find(model->textures.begin(), model->textures.end(), material.texture);
+				if (found == model->textures.end()) model->textures[count++] = material.texture;
 			}
 		} else if (line.rfind("usemtl ") == 0) {
 			currentMaterial = &mtls[line.substr(7)];
@@ -124,9 +125,10 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 				std::tuple vertex{ fpoints[i], fuvs[i], fnormals[i] };
 				if (vertexMap.find(vertex) == vertexMap.end()) {
 					vertexMap.insert({ vertex, uniqueVertices });
+					int textureSlot = (std::find(model->textures.begin(), model->textures.end(), currentMaterial->texture) - model->textures.begin()) + 1;
 					vertices.emplace_back(
 						points[fpoints[i] - 1], uvs[fuvs[i] - 1], normals[fnormals[i] - 1],
-						std::find(textures.begin(), textures.end(), currentMaterial->texture) - textures.begin(),
+						currentMaterial->texture == nullptr ? 0 : textureSlot,
 						currentMaterial->ambient, currentMaterial->diffuse, currentMaterial->specular, currentMaterial->specExponent
 					);
 					indices.push_back(uniqueVertices++);
@@ -136,7 +138,6 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 			}
 		}
 	}
-
 	
 	model->indexBuffer = IndexBuffer::CreateIndexBuffer(indices.size() * sizeof(uint32_t), indices.data());
 	model->vertexBuffer = VertexBuffer::CreateVertexBuffer(vertices.size() * sizeof(ModelVertex), vertices.data());
@@ -147,4 +148,9 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 void Model::bind() const {
 	this->indexBuffer->bind();
 	this->vertexBuffer->bind();
+	for (uint32_t i = 0; i < 31; i++) {
+		if (this->textures[i] != nullptr) {
+			this->textures[i]->bind(i + 1);
+		}
+	}
 }

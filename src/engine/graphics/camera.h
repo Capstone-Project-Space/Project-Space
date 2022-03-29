@@ -4,7 +4,8 @@
 
 class Camera {
 public:
-	Camera();
+	Camera(float width, float height);
+	Camera(float width, float height, float fov, float near, float far);
 
 	const inline glm::mat4& getProjection() const { return projection; }
 	const inline glm::mat4& getView() const { return view; }

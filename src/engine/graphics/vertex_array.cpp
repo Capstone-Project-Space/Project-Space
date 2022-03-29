@@ -82,8 +82,8 @@ void VertexArray::bind() {
 }
 
 void VertexArray::addVertexBuffer(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> vertices) {
-	if (buffers.find(vertices) != buffers.end()) return;
-	buffers.insert(vertices);
+	/*if (buffers.find(vertices) != buffers.end()) return;
+	buffers.insert(vertices);*/
 	glBindVertexArray(this->id);
 	LOG_GL_ERROR;
 	vertices->bind();

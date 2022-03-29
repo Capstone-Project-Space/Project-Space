@@ -2,10 +2,6 @@
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-// TODO: Make the Model class be a VBO and IBO, then in the Renderer we just have a map which 
-//		Maps std::shared_ptr<Model> -> uint64_t(count)
-//		Once total of counts is > someNumber(based on uniform buffer size) draw();
-
 const VertexLayout layout = {
 	{"a_Vertex", ShaderDataType::Type::FLOAT3},
 	{"a_UV", ShaderDataType::Type::FLOAT2},
@@ -17,11 +13,13 @@ const VertexLayout layout = {
 	{"a_SpecExponent", ShaderDataType::Type::FLOAT}
 };
 
-ModelRenderer::ModelRenderer(const Camera& camera) : camera(&camera) {
+ModelRenderer::ModelRenderer() : camera(NULL) {}
+
+void ModelRenderer::init() {
 	this->vArray = VertexArray::CreateVertexArray(layout, nullptr);
 	LOG_GL_ERROR;
 
-	this->lightsBuffer = UniformBuffer::CreateUniformBuffer(1, sizeof(uint32_t) + (MAX_LIGHTS * sizeof(LightData)));
+	this->lightsBuffer = UniformBuffer::CreateUniformBuffer(1, sizeof(uint32_t) + (MAX_LIGHTS * sizeof(LightSource)));
 	LOG_GL_ERROR;
 
 	this->matricesBuffer = UniformBuffer::CreateUniformBuffer(MAX_INSTANCES * 2, sizeof(glm::mat4));
@@ -31,17 +29,21 @@ ModelRenderer::ModelRenderer(const Camera& camera) : camera(&camera) {
 	LOG_GL_ERROR;
 
 	this->program->bind();
-	for (uint32_t i = 1; i < 32; i++) {
+	for (uint32_t i = 0; i < 32; i++) {
 		program->uploadInt("u_Texture" + std::to_string(i), i);
 	}
 	LOG_GL_ERROR;
 }
 
-void ModelRenderer::init() {}
+void ModelRenderer::destroy() {
+	this->vArray = nullptr;
+	this->lightsBuffer = nullptr;
+	this->matricesBuffer = nullptr;
+	this->program = nullptr;
+	this->modelsToRender.clear();
+}
 
-void ModelRenderer::destroy() {}
-
-void ModelRenderer::submitLight(const LightData& lightData) {
+void ModelRenderer::submitLight(const LightSource& lightData) {
 	if (this->lightBufferData.count >= MAX_LIGHTS) {
 		fprintf(stderr, "Cannot add more than %llu lights...Skipping.\n", MAX_LIGHTS);
 	} else {
@@ -51,7 +53,6 @@ void ModelRenderer::submitLight(const LightData& lightData) {
 
 void ModelRenderer::submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform) {
 	auto& submissions = modelsToRender[model];
-	vArray->addVertexBuffer(layout, model->getVertices());
 	submissions.push_back(modelTransform);
 }
 
@@ -63,6 +64,7 @@ void ModelRenderer::draw() {
 	for (auto& [model, submissions] : modelsToRender) {
 		uint64_t globalIndex = 0;
 		uint64_t count = submissions.size();
+		vArray->addVertexBuffer(layout, model->getVertices());
 		model->bind();
 		program->bind();
 		program->bindUniformBuffer("Matrices", matricesBuffer);
