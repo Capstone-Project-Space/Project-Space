@@ -20,7 +20,7 @@ template<typename T>
 struct Event {
 	
 	const EventType type;
-	T eventData;
+	T eventData = {0};
 	Event(EventType type, T eventData) : type(type) {
 		if constexpr(std::is_pointer<T>::value || std::is_array<T>::value) {
 			memcpy(this->eventData, eventData, sizeof(T));

@@ -14,6 +14,9 @@
 #include <src/engine/graphics/renderer.h>
 #include <src/engine/graphics/asset_manager.h>
 
+#include <src/engine/graphics/ui/text_component.h>
+#include <src/engine/graphics/ui/constraint_layout.h>
+
 #include <src/engine/randgen/randomgen.h>
 
 #define TESTING
@@ -29,18 +32,25 @@ using Clock = std::chrono::high_resolution_clock;
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
 constexpr int count = 64;
-class TempState : GameState {
+class TempState : public GameState {
 
-	Camera orthoCamera{-640.0f, 640.0f, -360.0f, 360.0f};
+	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
 	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
 	glm::mat4 transforms[count];
 
 public:
-	TempState(const std::string& name) : GameState(name) {
+	TempState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		for (int i = 0; i < count; i++) {
 			transforms[i] = glm::translate(glm::scale(glm::identity<glm::mat4>(), { .1f, .1f, .1f }), { RandomGen::RangedRandomFloat(-12, 12), -.9f, RandomGen::RangedRandomFloat(-7, 7)});
 		}
+
+		componentManager.addComponent(new TextComponent(
+			std::string_view{ "simple_text" },
+			new ConstraintLayout(std::string_view{"window:top"}, std::string_view{""}, std::string_view{""}, std::string_view{"window:right"}, std::string_view{"window"}),
+			std::string{ "This is some text." },
+			AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf")
+		));
 	}
 
 	virtual void update(float delta) override { }
@@ -48,39 +58,26 @@ public:
 	virtual void render(float delta) override {
 		Renderer::Begin2DScene(orthoCamera);
 		{
-			Renderer::SubmitQuad({ 0.0f, 0.0f }, { 1280.0f, 720.0f }, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
+			Renderer::SubmitQuad({ 0.0f, 0.0f }, window->getData().size, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
 		}
 		Renderer::End2DScene();
 
 		Renderer::Begin3DScene(perspectiveCamera);
 		{
 			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/spacepod.obj"), transforms[0]);
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/freight.obj"), transforms[0]);
 		}
 		Renderer::End3DScene();
 
-		Renderer::Begin2DScene(orthoCamera);
-		{
-			Renderer::SubmitText("This is a text render test.", { 0.0f, 0.0f }, { 0.3f, 0.7f, 0.9f });
+		
+		componentManager.drawComponents(delta, orthoCamera);
 
-			Renderer::SubmitText("This text is larger.", { 0.0f, 52.0f }, { 0.3f, 0.7f, 0.9f }, 3.0f);
-
-			Renderer::SubmitText("This text is rotated.", { 200.0f, 300.0f }, { 0.3f, 0.7f, 0.9f }, 1.0f, 30.0f);
-		}
-		Renderer::End2DScene();
 	}
 
-	virtual bool onKeyPressed(const Key& key) { return false; }
-
-	virtual bool onKeyReleased(const Key& key) { return false; }
-
-	virtual bool onKeyRepeated(const Key& key) { return false; }
-
-	virtual bool onMouseButtonPressed(const MouseButton& button) { return false; }
-
-	virtual bool onMouseButtonReleased(const MouseButton& button) { return false; }
-
-	virtual bool onMouseMoved(const float x, const float y, const float dx, const float dy) {return false;}
+	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
+		this->orthoCamera = {newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f};
+		this->perspectiveCamera = { newWidth, newHeight, 70.0f, .01f, 1000.0f };
+	}
 
 };
 
@@ -88,11 +85,10 @@ int main(int argc, char** args) {
 	// Test();
 	std::shared_ptr<GameState> state = nullptr;
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
-	state = GameState::CreateState<TempState>(std::string{ "Temporary State" });
+	state = GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
 	LOG_GL_ERROR;
 	
 	State::ChangeState(state);
-	//std::shared_ptr<Text> text = Text::CreateText("Movement.ttf");
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -105,30 +101,31 @@ int main(int argc, char** args) {
 	LOG_GL_ERROR;
 	double lastTime = Clock::now().time_since_epoch().count();
 	double currentTime, timeSpent = 0;
-	uint32_t frames = 0;
+	double frames = 0.0;
 
-	while (window->isOpen) {
+	while (window->getData().isOpen) {
 		currentTime = Clock::now().time_since_epoch().count();
 		double delta = (currentTime - lastTime) / 1000000000.0;
 		lastTime = currentTime;
 		timeSpent += delta;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		LOG_GL_ERROR;
-		State::Draw(delta);
 
-		//text->RenderText("This is a text render test", 0.0f, 0.0f, 1.0f, glm::vec3(0.3f, 0.7f, 0.9f));
+		State::Draw(delta);
 
 		glfwPollEvents();
 		window->flush();
 		frames++;
 		if (timeSpent >= 1.0) {
-			window->updateTitle(" Frames: " + std::to_string(frames));
+			double fps = frames / timeSpent;
+			const std::string frameRate = std::to_string(fps);
+			window->updateTitle(" Frames: " + frameRate.substr(0, frameRate.find_first_of('.') + 3));
 			timeSpent -= 1.0;
-			frames = 0;
+			frames -= fps;
 		}
 	}
 
-	State::RestoreState();
+	State::Close();
 	AssetManager::Clear();
 	Renderer::Shutdown();
 	return 0;

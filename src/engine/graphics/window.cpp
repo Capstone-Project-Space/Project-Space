@@ -1,14 +1,16 @@
 #include "window.h"
 
+#include "src/engine/io/event.h"
+
 std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int width, int height, std::shared_ptr<Window> share) {
 	std::shared_ptr<Window> window = std::shared_ptr<Window>(new Window(name, width, height, share));
 
-	glfwSetWindowUserPointer(window->window, window.get());
+	glfwSetWindowUserPointer(window->window, &window->data);
 
 	glfwSetWindowCloseCallback(window->window,
 		[](GLFWwindow* glfwWindow) {
-			Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
-			window->isOpen = false;
+			WindowData* data = (WindowData*)glfwGetWindowUserPointer(glfwWindow);
+			data->isOpen = false;
 		}
 	);
 
@@ -59,10 +61,10 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 
 	glfwSetWindowSizeCallback(window->window,
 		[](GLFWwindow* glfwWindow, int width, int height) {
-			Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
-			float vals[4] = { window->width, window->height, width, height };
-			window->width = width;
-			window->height = height;
+			WindowData* data = (WindowData*) glfwGetWindowUserPointer(glfwWindow);
+			float vals[4] = { data->size.x, data->size.y, width, height };
+			data->size.x = width;
+			data->size.y = height;
 			glViewport(0, 0, width, height);
 			Events::DispatchEvent(Event<float[4]>{ EventType::WINDOW_RESIZE, vals });
 		}
@@ -72,7 +74,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 }
 
 void Window::updateTitle(const std::string& appendage) {
-	glfwSetWindowTitle(this->window, (this->baseTitle + appendage).c_str());
+	glfwSetWindowTitle(this->window, (this->data.title + appendage).c_str());
 }
 
 void Window::flush() {
@@ -81,7 +83,7 @@ void Window::flush() {
 }
 
 Window::Window(const std::string& title, int width, int height, std::shared_ptr<Window> share) 
-	: baseTitle(title), width(width), height(height) {
+	: data({ false, title, { width, height }, { 0.0f } }) {
 	static bool glfwInited = false;
 	if (!glfwInited) {
 		glfwSetErrorCallback([](int code, const char* msg) {
@@ -108,11 +110,7 @@ Window::Window(const std::string& title, int width, int height, std::shared_ptr<
 		exit(1);
 	}
 	glfwSwapInterval(0);
-	this->isOpen = true;
-}
-
-GLFWwindow* Window::getWindowPtr() {
-	return this->window;
+	this->data.isOpen = true;
 }
 
 Window::~Window() {

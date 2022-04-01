@@ -141,7 +141,7 @@ void Test() {
 			successful += (size_t) results.back().succeeded;
 		}
 		size_t total = results.size(), failed = total - successful;
-		fprintf(stderr, "    \x1b[1;32mSucceeded:\x1b[32m %llu \x1b[0m/ %llu (\x1b[32m%llu%%\x1b[0m)\n", successful, total, (size_t) ((float) successful / (float) total * 100.0f));
-		fprintf(stderr, "    \x1b[1;31mFailed:\x1b[31m    %llu \x1b[0m/ %llu (\x1b[31m%llu%%\x1b[0m)\n", failed, total, (size_t) ((float) failed / (float) total * 100.0f));
+		fprintf(stderr, "    \x1b[1;32mSucceeded:\x1b[32m %llu \x1b[0m/ %llu (\x1b[32m%llu%%\x1b[0m)\n", successful, total, (size_t) ((double) successful / (double) total * 100.0f));
+		fprintf(stderr, "    \x1b[1;31mFailed:\x1b[31m    %llu \x1b[0m/ %llu (\x1b[31m%llu%%\x1b[0m)\n", failed, total, (size_t) ((double) failed / (double) total * 100.0f));
 	}
 }

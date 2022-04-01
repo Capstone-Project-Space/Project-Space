@@ -1,17 +1,29 @@
 #pragma once
+
 #include <src/engine/data_storage/filestorage.h>
-#include <src/engine/graphics/ui.h>
 #include <src/engine/io/event_receiver.h>
+#include <src/engine/graphics/window.h>
+#include <src/engine/graphics/ui/component_manager.h>
 
 #include <stack>
 
 class GameState : public FileStorage, public EventReceiver {
 public:
 	GameState(const std::string& saveFileName);
+	GameState(const std::shared_ptr<Window> window, const std::string& saveFileName);
 	virtual ~GameState();
+
+	virtual void onResume(std::shared_ptr<Window> window) {
+		if (window) this->window = window;
+		componentManager.applyLayouts(this->window);
+	}
 
 	virtual void update(float delta) = 0;
 	virtual void render(float delta) = 0;
+
+	virtual void onPause() {}
+
+	void changeWindow(std::shared_ptr<Window> window);
 
 	template<typename T, typename... Args>
 	static std::shared_ptr<GameState> CreateState(Args&&... args) {
@@ -19,9 +31,10 @@ public:
 		return std::shared_ptr<GameState>(reinterpret_cast<GameState*>(t));
 	}
 
-private:
-	std::vector<UI> uis;
-	void renderUIs(float delta);
+protected:
+	friend struct State;
+	std::shared_ptr<Window> window;
+	ComponentManager componentManager;
 };
 
 struct State {
@@ -31,6 +44,7 @@ struct State {
 	static void ChangeState(std::shared_ptr<GameState> state);
 	static void RestoreState();
 	static void ResetStateTo(std::shared_ptr<GameState> state);
+	static void Close();
 
 	static void Draw(float delta);
 };

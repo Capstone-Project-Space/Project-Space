@@ -3,12 +3,14 @@
 #include <src/engine/graphics/texture.h>
 #include <src/engine/graphics/model.h>
 #include <src/engine/graphics/shader.h>
+#include <src/engine/graphics/font.h>
 
 #include <unordered_map>
 #include <filesystem>
 
 struct AssetManager {
 	
+	static std::unordered_map<std::string, std::shared_ptr<Font>> fonts;
 	static std::unordered_map<std::string, std::shared_ptr<Model>> models;
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 
@@ -31,6 +33,14 @@ struct AssetManager {
 		if (textures.find(key) != textures.end())
 			return textures.at(key);
 		return (textures[key] = Texture::CreateTexture(filepath));
+	}
+
+	template<>
+	static std::shared_ptr<Font> GetOrCreate(const std::string& filepath) {
+		const std::string key = std::filesystem::absolute(filepath).generic_string();
+		if (fonts.find(key) != fonts.end())
+			return fonts.at(key);
+		return (fonts[key] = Font::CreateFont(filepath, 0, 256));
 	}
 
 };

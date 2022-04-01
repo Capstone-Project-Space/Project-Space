@@ -12,7 +12,7 @@ public:
 
 	const std::string n;
 
-	TestState(const std::string& name) : GameState(name), n(name) {}
+	TestState(const std::string& name) : GameState(nullptr, name), n(name) {}
 	
 	virtual void render(float delta) { }
 

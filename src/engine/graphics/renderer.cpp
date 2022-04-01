@@ -6,8 +6,9 @@ bool Renderer::ModelRendererInitialized = false;
 ModelRenderer Renderer::ModelRenderer;
 
 bool Renderer::BatchRendererInitialized = false;
+std::shared_ptr<Font> Renderer::CurrentFont = nullptr;
 BatchRenderer Renderer::BatchRenderer;
-TextRenderer Renderer::TextRenderer{1280.0f, 720.0f};
+TextRenderer Renderer::TextRenderer;
 
 Renderer::Mode Renderer::mode;
 
@@ -38,7 +39,7 @@ void Renderer::End3DScene() {
 }
 
 
-void Renderer::Begin2DScene(const Camera& camera) {
+void Renderer::Begin2DScene(const Camera& camera, std::shared_ptr<Font> font) {
 	assert(Renderer::mode == Mode::NONE && "Renderer is already in a scene; missing end scene.");
 	if (!Renderer::BatchRendererInitialized) {
 		Renderer::BatchRenderer.init();
@@ -47,6 +48,8 @@ void Renderer::Begin2DScene(const Camera& camera) {
 	}
 	Renderer::mode = Mode::BATCH;
 	Renderer::BatchRenderer.setCamera(camera);
+	Renderer::TextRenderer.setCamera(camera);
+	Renderer::CurrentFont = font;
 	glDisable(GL_DEPTH_TEST);
 }
 
@@ -60,15 +63,23 @@ void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const std
 	Renderer::BatchRenderer.submitQuad(pos, size, texture, rotation);
 }
 
-void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, float scale, float rotation) {
+void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
 	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
-	Renderer::TextRenderer.submitText(text, pos, color, scale, rotation);
+	assert(font);
+	Renderer::TextRenderer.submitText(text, pos, color, font, gravity, scale, rotation);
+}
+
+void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, Gravity gravity, float scale, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	assert(Renderer::CurrentFont);
+	Renderer::TextRenderer.submitText(text, pos, color, Renderer::CurrentFont, gravity, scale, rotation);
 }
 
 void Renderer::End2DScene() {
 	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
 	Renderer::BatchRenderer.draw();
 	Renderer::TextRenderer.draw();
+	Renderer::CurrentFont = nullptr;
 	glEnable(GL_DEPTH_TEST);
 	Renderer::mode = Mode::NONE;
 }

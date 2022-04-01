@@ -34,9 +34,9 @@ private:
 
 	std::map<std::shared_ptr<Model>, std::vector<glm::mat4>> modelsToRender;
 	
-	glm::mat4 matricesBufferData[MAX_INSTANCES + 2];
+	glm::mat4 matricesBufferData[MAX_INSTANCES + 2] = { glm::mat4{glm::vec4{0.0f}, glm::vec4{0.0f}, glm::vec4{0.0f}, glm::vec4{0.0f}} };
 	struct {
-		LightSource lightsData[MAX_LIGHTS];
+		LightSource lightsData[MAX_LIGHTS] = {{}};
 		int32_t count = 0;
 	} lightBufferData;
 	std::shared_ptr<UniformBuffer> lightsBuffer = nullptr;

@@ -12,10 +12,10 @@
 
 #include <glad/glad.h>
 
-#define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
-
 ModelVertex::ModelVertex()
-	: vertex(glm::vec3(0.0f)), normal(glm::vec3(0.0f)), uv(glm::vec2(0.0f)) {}
+	: vertex({0.0f}), normal({0.0f}), uv({0.0f}), texture(0), ambientColor({0.0f}),
+	  diffuseColor({0.0f}), specularColor({0.0f}), specularExponent(0.0f)
+{}
 
 ModelVertex::ModelVertex(
 	glm::vec3 vertex, glm::vec2 uv, glm::vec3 normal, int texture,
@@ -71,7 +71,6 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 }
 
 std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
-	LOG_GL_ERROR;
 	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
 
 	std::vector<uint32_t> indices;
@@ -84,11 +83,17 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> uvs;
 
-	Material* currentMaterial;
+	Material* currentMaterial = NULL;
 	auto mtls = std::map<std::string, Material>();
 
-	std::string line;
-	std::ifstream obj{ filepath };
+	std::string line, fileText;
+	std::ifstream file{ filepath };
+	file.seekg(0, std::ios::end);
+	auto size = file.tellg();
+	fileText.reserve(size);
+	file.read(&fileText[0], size);
+	std::stringstream obj{fileText};
+
 	float f1, f2, f3;
 	while (!obj.eof()) {
 		std::getline(obj, line);
@@ -121,6 +126,7 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 				&fpoints[2], &fuvs[2], &fnormals[2]
 			);
 			if (count != 9) throw "parsing face in wavefront obj model: " + filepath;
+			if (!currentMaterial) throw "currentMaterial is NULL when parsing face in wavefront obj model: " + filepath;
 			for (uint64_t i = 0; i < 3; i++) {
 				std::tuple vertex{ fpoints[i], fuvs[i], fnormals[i] };
 				if (vertexMap.find(vertex) == vertexMap.end()) {
@@ -141,7 +147,6 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 	
 	model->indexBuffer = IndexBuffer::CreateIndexBuffer(indices.size() * sizeof(uint32_t), indices.data());
 	model->vertexBuffer = VertexBuffer::CreateVertexBuffer(vertices.size() * sizeof(ModelVertex), vertices.data());
-	LOG_GL_ERROR;
 	return model;
 }
 
