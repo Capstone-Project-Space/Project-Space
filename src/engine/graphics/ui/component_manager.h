@@ -20,7 +20,7 @@ public:
 	template<typename T, typename...Args>
 	void modifyComponent(const std::string_view& id, std::function<bool(std::shared_ptr<T>, Args...)> modification, Args... args) {
 		if (componentMapping.find(id) != componentMapping.end()) {
-			std::shared_ptr<T> casted = reinterpret_cast<std::shared_ptr<T>>(componentMapping[id]);
+			std::shared_ptr<T> casted = std::dynamic_pointer_cast<T>(componentMapping[id]);
 			assert(casted && "Type mismatch between components.");
 			if (modification(casted, args...))
 				applyLayouts(this->window);
@@ -30,7 +30,7 @@ public:
 	template<typename T, typename... Args>
 	void modifyComponent(std::shared_ptr<UIComponent> component, std::function<bool(std::shared_ptr<T>, Args...)> modification, Args... args) {
 		if (componentMapping.find(component->getID()) != componentMapping.end()) {
-			std::shared_ptr<T> casted = reinterpret_cast<std::shared_ptr<T>>(component);
+			std::shared_ptr<T> casted = std::dynamic_pointer_cast<T>(component);
 			assert(casted && "Type mismatch between components.");
 			if (modification(casted, args...))
 				applyLayouts(this->window);
