@@ -13,23 +13,11 @@ body::body() {
      this->height = 0.f;
      this->heliocentricAngle = 0.f;
      this->currentAngle = 0.f;
-//     this->orbitPeriod = 0.f;     //Seconds
-//     this->currentOrbit = 0.f;
-//     this->DrawEllipseOn = 1;
 }
 
 body::~body() {
 
 }
-
-/*void body::Animate(float dt) {
-     currentOrbit += dt;
-     if (currentOrbit >= orbitPeriod) {
-          currentOrbit -= orbitPeriod;
-     }
-     float orbitAngle = (currentOrbit / orbitPeriod) * 360.f;
-     SetPosition(orbitAngle);
-}*/
 
 void body::SetPosition(float angle) {
      position.x = width * cosf(angle * (M_PI / 180.f)) + (width - periapsis);

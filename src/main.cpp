@@ -7,6 +7,7 @@
 #include <src/engine/states/game_state.h>
 
 #include <src/engine/graphics/model.h>
+#include <src/engine/body_systems/Sphere.h>
 #include <src/engine/graphics/buffers.h>
 #include <src/engine/graphics/vertex_array.h>
 #include <src/engine/graphics/shader.h>
@@ -71,6 +72,10 @@ public:
 		{
 			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/freight.obj"), transforms[0]);
+
+			//HOW CAN I RENDER A SIMPLE SPHERE USING A CUSTOM SPHERE OBJECT???
+			// src/engine/body_systems/Sphere.h
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Sphere>(1., 32), transforms[0]);
 		}
 		Renderer::End3DScene();
 
@@ -84,6 +89,14 @@ public:
 		this->perspectiveCamera = { newWidth, newHeight, 70.0f, .01f, 1000.0f };
 	}
 
+	//Handle Single Button Press
+	virtual bool onKeyPressed(const Key& key) {
+		if (key == GLFW_KEY_ESCAPE) {
+			printf("Escape Key Was Pressed\n");
+			//HOW DO I ESCAPE THE PROGRAM!?
+		}
+		return true;
+	}
 };
 
 int main(int argc, char** args) {

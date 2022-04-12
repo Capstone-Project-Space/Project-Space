@@ -24,12 +24,9 @@ public:
      float height;
      float heliocentricAngle;
      float currentAngle;
-//     float orbitPeriod;
-//     float currentOrbit;
 
      body();
      ~body();
-//     void Animate(float dt);
      void SetPosition(float angle);
 };
 #endif BODY_H
