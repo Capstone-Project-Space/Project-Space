@@ -54,12 +54,7 @@ public:
 		));
 	}
 
-	virtual void update(float delta) override {
-		static float totalTime = 0.0f;
-		totalTime += delta;
-		if (totalTime >= 5.0f)
-			componentManager.modifyComponent<TextComponent, const std::string&>("simple_text", std::function{ TextComponent::SetText }, "Smol text.");
-	}
+	virtual void update(float delta) override { }
 
 	virtual void render(float delta) override {
 		Renderer::Begin2DScene(orthoCamera);

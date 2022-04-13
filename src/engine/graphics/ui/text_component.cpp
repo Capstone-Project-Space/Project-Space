@@ -17,7 +17,7 @@ void TextComponent::draw(float delta) {
 	Renderer::SubmitText(text, this->position.value(), {1.0f, 1.0f, 1.0f, 1.0f}, this->font);
 }
 
-bool TextComponent::SetText(std::shared_ptr<TextComponent> component, const std::string& text) {
+bool TextComponent::setText(std::shared_ptr<TextComponent> component, const std::string& text) {
 	component->text = text;
 	return true;
 }

@@ -53,9 +53,7 @@ void TextRenderer::destroy() {
 }
 
 void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
-	float height = font->getTextHeight(text);
-	float x = pos.x, y = pos.y - height;
-
+	float x = pos.x, y = pos.y;
 
 	if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
 		x -= (font->getTextWidth(text) * scale) / 2.0f;
@@ -63,10 +61,10 @@ void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, con
 		x -= (font->getTextWidth(text) * scale);
 	}
 	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
-		y += (height * scale) / 2.0f;
+		y += (font->getTextHeight(text) * scale) / 2.0f;
 	}
 	else if (gravity & Gravity::TOP) {
-		y -= (height * scale);
+		y -= (font->getTextHeight(text) * scale);
 	}
 
 	// Don't overflow the texture buffer.
@@ -101,13 +99,13 @@ void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, con
 		float ypos = y - (ch.size.y - ch.offset.y) * scale;
 
 		float wpos = xpos + ch.size.x * scale;
-		float hpos = ypos + ch.size.y * scale;
-		
+		float hpos = ypos - ch.size.y * scale;
+
 		this->quads[count++] = TextQuad{
-			TextVertex{ { xpos, hpos, pos.z }, { ch.stpq.s, ch.stpq.t }, (uint32_t) idx, color, transform },
-			TextVertex{ { xpos, ypos, pos.z }, { ch.stpq.s, ch.stpq.q }, (uint32_t) idx, color, transform },
-			TextVertex{ { wpos, ypos, pos.z }, { ch.stpq.p, ch.stpq.q }, (uint32_t) idx, color, transform },
-			TextVertex{ { wpos, hpos, pos.z }, { ch.stpq.p, ch.stpq.t }, (uint32_t) idx, color, transform }
+			TextVertex{ { xpos, ypos, pos.z }, { ch.stpq.s, ch.stpq.t }, (uint32_t) idx, color, transform },
+			TextVertex{ { xpos, hpos, pos.z }, { ch.stpq.s, ch.stpq.q }, (uint32_t) idx, color, transform },
+			TextVertex{ { wpos, hpos, pos.z }, { ch.stpq.p, ch.stpq.q }, (uint32_t) idx, color, transform },
+			TextVertex{ { wpos, ypos, pos.z }, { ch.stpq.p, ch.stpq.t }, (uint32_t) idx, color, transform }
 		};
 		x += ch.advance * scale;
 	}
