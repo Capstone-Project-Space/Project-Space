@@ -9,6 +9,7 @@ in float	  v_SpecExponent;
 flat in vec3  v_Normal;
 flat in vec3  v_ECPosition;
 flat in vec3  v_EyePos;
+flat in int   v_InstanceID;
 
 out vec4 color;
 
@@ -53,6 +54,17 @@ struct LightData {
 layout(std140) uniform Lights {
 	LightData u_Lights[64];
 	int u_Count;
+};
+
+struct UniformData {
+	mat4 transform;
+	vec4 color;
+};
+
+layout(std140) uniform Matrices {
+	mat4 u_ProjectionMatrix;
+	mat4 u_ViewMatrix;
+	UniformData u_ModelMatrices[512];
 };
 
 void main() {
@@ -175,6 +187,6 @@ void main() {
 		}
 		vec3 specular = .1 * s * v_Specular;
 
-		color = vec4(ambient + diffuse + specular, 1.0);
+		color = vec4(ambient + diffuse + specular, 1.0) * u_ModelMatrices[v_InstanceID].color;
 	}
 }

@@ -18,15 +18,21 @@ out float	  v_SpecExponent;
 flat out vec3 v_Normal;
 flat out vec3 v_ECPosition;
 flat out vec3 v_EyePos;
+flat out int  v_InstanceID;
 
 
 // vec3 EyeLightPos = vec3(0, 10, 0);
 
 
+struct UniformData {
+	mat4 transform;
+	vec4 color;
+};
+
 layout(std140) uniform Matrices {
 	mat4 u_ProjectionMatrix;
 	mat4 u_ViewMatrix;
-	mat4 u_ModelMatrices[512];
+	UniformData u_ModelMatrices[512];
 };
 
 
@@ -37,11 +43,12 @@ void main() {
 	v_Diffuse = a_Diffuse;
 	v_Specular = a_Specular;
 	v_SpecExponent = a_SpecExponent;
+	v_InstanceID = gl_InstanceID;
 
-	mat3 normalMatrix = mat3(transpose(inverse(u_ModelMatrices[gl_InstanceID])));
+	mat3 normalMatrix = mat3(transpose(inverse(u_ModelMatrices[gl_InstanceID].transform)));
 	v_Normal = normalize((normalMatrix * a_Normal));
 	
-	vec4 ECPosition = u_ModelMatrices[gl_InstanceID] * vec4(a_Vertex.x, a_Vertex.y, a_Vertex.z, 1.0);
+	vec4 ECPosition = u_ModelMatrices[gl_InstanceID].transform * vec4(a_Vertex.x, a_Vertex.y, a_Vertex.z, 1.0);
 	v_ECPosition = ECPosition.xyz;
 
 	v_EyePos = vec3(0, 0, 0) - ECPosition.xyz;
