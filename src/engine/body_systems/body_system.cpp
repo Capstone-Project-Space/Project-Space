@@ -11,20 +11,14 @@ BodySystem::BodySystem(int systemID) {
      generateSystem();
 }
 
-BodySystem::BodySystem(std::string name, int starClass, bool isNebula, int bodyCount, int systemID) {
+BodySystem::BodySystem(const std::string& name, StarClass starClass, bool isNebula, int bodyCount, int systemID) {
      setName(name);
-     setStar((StarClass)starClass, systemID);
+     setStar(starClass, systemID);
      setIsNebula(isNebula);
      setBodyCount(bodyCount);
      setSystemID(systemID);
 
      generateSystem();
-}
-
-BodySystem::~BodySystem() {
-     if (!this->bodyList.empty()) {
-          this->bodyList.clear();
-     }
 }
 
 void BodySystem::generateSystem() {
@@ -65,7 +59,7 @@ void BodySystem::generateSystem() {
      }
 }
 
-void BodySystem::setName(std::string name) {
+void BodySystem::setName(const std::string& name) {
      this->name = name;
 }
 
@@ -74,9 +68,6 @@ std::string BodySystem::getName() {
 }
 
 void BodySystem::setStar(StarClass starClass, unsigned int systemID) {
-     this->star = Star(starClass, systemID);
-}
-void BodySystem::setStar(int starClass, unsigned int systemID) {
      this->star = Star(starClass, systemID);
 }
 
@@ -100,7 +91,7 @@ int BodySystem::getBodyCount() {
      return this->bodyCount;
 }
 
-void BodySystem::setBodyList(std::vector<std::shared_ptr<Body>> bodyList) {
+void BodySystem::setBodyList(std::vector<std::shared_ptr<Body>>& bodyList) {
      if (!this->bodyList.empty()) {
           this->bodyList.clear();
      }
@@ -123,13 +114,13 @@ int BodySystem::getSystemID() {
 }
 
 void BodySystem::printDebugInfo() {
-     printf("\tSystem - NAME: ''%s'' ID: %s\n", this->getName(), std::to_string(this->getSystemID()));
-     printf("\t\tNebula?: %s\n", this->getIsNebula() ? "true" : "false");
+     printf("\tSystem - NAME: ''%s'' ID: %s\n", this->name.c_str(), std::to_string(this->systemID).c_str());
+     printf("\t\tNebula?: %s\n", this->isNebula ? "true" : "false");
      printf("\t\tOribiting Bodies: %d\n", this->getBodyCount());
      printf("\t\tBodies:\n");
 
      for (auto i : this->getBodyList()) {
-          i->printDebugInfo();
+          if (i) i->printDebugInfo();
      }
 }
 
@@ -139,7 +130,6 @@ std::string intToNumeral(int x) {
      std::string return_numerals = "";
      int integers[] = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
 
-     std::string result = "";
      int i = 0;
      while (x > 0) {
           int d = x / integers[i];

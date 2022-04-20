@@ -20,13 +20,13 @@ public:
      //Default Constructor
      Body();
      //Custom Constructor (Should be used when reading file data)
-     Body(std::string, int, int, glm::vec3, float, glm::vec3, int);
+     Body(const std::string&, int, int, const glm::vec3&, float, const glm::vec3&, int);
      //Destructor
      ~Body();
 
      //Name Get Set
      void setName(std::string);
-     std::string getName();
+     const std::string& getName();
 
      //BodyType Get Set
      void setBodyType(BodyType);
@@ -37,16 +37,16 @@ public:
      HabitType getHabitType();
 
      //Position Get Set
-     void setPosition(glm::vec3);
-     glm::vec3 getPosition();
+     void setPosition(const glm::vec3&);
+     const glm::vec3& getPosition();
 
      //Scale Get Set
      void setScale(float);
      float getScale();
 
      //Color Get Set
-     void setColor(glm::vec3);
-     glm::vec3 getColor();
+     void setColor(const glm::vec3&);
+     const glm::vec3& getColor();
 
      //MoonCount Get Set
      void setMoonCount(int);
@@ -54,11 +54,11 @@ public:
 
      //Moon List Get Set
      void setMoonList(std::vector<std::shared_ptr<Body>>);
-     std::vector<std::shared_ptr<Body>> getMoonList();
+     const std::vector<std::shared_ptr<Body>>& getMoonList();
 
      //BodyID Get Set
      void setBodyID(std::string);
-     std::string getBodyID();
+     const std::string& getBodyID();
 
      void printDebugInfo();
 

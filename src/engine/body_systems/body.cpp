@@ -12,7 +12,7 @@ Body::Body() {
 }
 
 //Used when reading save game data
-Body::Body(std::string name, int bodyType, int habitType, glm::vec3 position, float scale, glm::vec3 color, int moonCount) {
+Body::Body(const std::string& name, int bodyType, int habitType, const glm::vec3& position, float scale, const glm::vec3& color, int moonCount) {
      setName(name);
      setBodyType((BodyType)bodyType);
      setHabitType((HabitType)habitType);
@@ -31,7 +31,7 @@ Body::~Body() {
 void Body::setName(std::string name) {
      this->name = name;
 }
-std::string Body::getName() {
+const std::string& Body::getName() {
      return this->name;
 }
 
@@ -49,10 +49,10 @@ HabitType Body::getHabitType() {
      return this->habitType;
 }
 
-void Body::setPosition(glm::vec3 position) {
+void Body::setPosition(const glm::vec3& position) {
      this->position = position;
 }
-glm::vec3 Body::getPosition() {
+const glm::vec3& Body::getPosition() {
      return this->position;
 }
 
@@ -63,10 +63,10 @@ float Body::getScale() {
      return this->scale;
 }
 
-void Body::setColor(glm::vec3 color) {
+void Body::setColor(const glm::vec3& color) {
      this->color = color;
 }
-glm::vec3 Body::getColor() {
+const glm::vec3& Body::getColor() {
      return this->color;
 }
 
@@ -87,7 +87,7 @@ void Body::setMoonList(std::vector<std::shared_ptr<Body>> moonList) {
      }
 }
 
-std::vector<std::shared_ptr<Body>> Body::getMoonList() {
+const std::vector<std::shared_ptr<Body>>& Body::getMoonList() {
      return moonList;
 }
 
@@ -95,14 +95,14 @@ void Body::setBodyID(std::string bodyID) {
      this->bodyID = bodyID;
 }
 
-std::string Body::getBodyID() {
+const std::string& Body::getBodyID() {
      return bodyID;
 }
 
 void Body::printDebugInfo() {
-     printf("\t\t\tBody - NAME: ''%s'' ID: %s\n", (const std::string)this->getName(), (const std::string)this->getBodyID());
-     printf("\t\t\t\tBodyType: %d\n", this->getBodyType());
-     printf("\t\t\t\tHabitable: %d\n", this->getHabitType());
+     printf("\t\t\tBody - NAME: ''%s'' ID: %s\n", this->getName().c_str(), this->getBodyID().c_str());
+     printf("\t\t\t\tBodyType: %d\n", (int) this->getBodyType());
+     printf("\t\t\t\tHabitable: %d\n", (int)this->getHabitType());
      printf("\t\t\t\tPosition:  %f   %f   %f\n", this->getPosition().x,
                                                  this->getPosition().y,
                                                  this->getPosition().z);

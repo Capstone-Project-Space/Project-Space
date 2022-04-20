@@ -65,44 +65,6 @@ struct Star {
           }
      }
 
-     Star(int starClass, unsigned int systemID) {
-          this->starClass = (StarClass)starClass;
-          this->starID = std::to_string(systemID) + "I";
-
-          this->star = std::shared_ptr<Body>(new Body());
-          this->star->setPosition(glm::vec3(0.0f));
-
-          switch (starClass) {
-          case 0:
-               this->star->setColor({ 0.0f, 0.7f, 0.8f });
-               this->star->setScale(2.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
-               break;
-          case 1:
-               this->star->setColor({ 0.5f, 0.4f, 0.8f });
-               this->star->setScale(2.0f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
-               break;
-          case 2:
-               this->star->setColor({ 0.9f, 0.8f, 0.0f });
-               this->star->setScale(1.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
-               break;
-          case 3:
-               this->star->setColor({ 0.9f, 0.6f, 0.0f });
-               this->star->setScale(1.0f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
-               break;
-          case 4:
-               this->star->setColor({ 0.9f, 0.1f, 0.1f });
-               this->star->setScale(0.5f + RandomGen::RangedRandomFloat(0.0f, 0.44f));
-               break;
-          default:
-               this->star->setColor({ 0.9f, 0.6f, 0.0f });
-               this->star->setScale(1.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
-               break;
-          }
-     }
-
-     ~Star() {
-          star.~shared_ptr();
-     }
 };
 
 class BodySystem {
@@ -110,17 +72,12 @@ public:
      //systemID
      BodySystem(int);
      //name, starClass, isNebula, bodyCount, systemID
-     BodySystem(std::string, int, bool, int, int);
+     BodySystem(const std::string&, StarClass, bool, int, int);
 
-     ~BodySystem();
-
-     void generateSystem();
-
-     void setName(std::string);
+     void setName(const std::string&);
      std::string getName();
 
      void setStar(StarClass, unsigned int);
-     void setStar(int, unsigned int);
      Star getStar();
 
      void setIsNebula(bool);
@@ -129,7 +86,7 @@ public:
      void setBodyCount(int);
      int getBodyCount();
 
-     void setBodyList(std::vector<std::shared_ptr<Body>>);
+     void setBodyList(std::vector<std::shared_ptr<Body>>&);
      std::vector<std::shared_ptr<Body>> getBodyList();
 
      void setSystemID(int);
@@ -144,7 +101,8 @@ private:
      int                 bodyCount;     //How many bodies orbit the center
      std::vector<std::shared_ptr<Body>>  bodyList;      //List of bodies
      unsigned int        systemID;      //Identitification for this system
+
+     void generateSystem();
 };
 
 std::string intToNumeral(int x);
-char* StrToChar(std::string str);
