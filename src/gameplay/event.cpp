@@ -113,63 +113,63 @@ GameEvent readEvent(GameEvent eventObject, int eventNumber) {
 
 void printEvent(GameEvent eventObject) {
 
-	std::cout << "Event Name: " << eventObject.name << std::endl;
-	std::cout << "Event Description: " << eventObject.description << std::endl;
+	std::cout << "==Event Name: " << eventObject.name << std::endl;
+	std::cout << "==Event Description: " << eventObject.description << std::endl;
 
 	if (eventObject.needed[1].value == 0) { // Needed
 		if (eventObject.needed[0].value - 48 != 0)
-			std::cout << "Needed To Defend \n\tSkill: " << eventObject.needed[0].symbol
-			<< "\n\tLevel: " << eventObject.needed[0].value - 48 << std::endl;
+			std::cout << "==Needed To Defend \n\t-Skill: " << eventObject.needed[0].symbol
+			<< "\n\t-Level: " << eventObject.needed[0].value - 48 << std::endl;
 		else
-			std::cout << "Needed To Defend \n\tThere is no need for defending" << std::endl;
+			std::cout << "==Needed To Defend \n\t-There is no need for defending" << std::endl;
 	}
 	else {
-		std::cout << "Needed To Defend \n\tSkill: " << eventObject.needed[0].symbol
-			<< "\n\tLevel: " << eventObject.needed[0].value - 48
-			<< "\n\tAND\n\tSkill: " << eventObject.needed[1].symbol
-			<< "\n\tLevel: " << eventObject.needed[1].value - 48 << std::endl;
+		std::cout << "==Needed To Defend \n\t-Skill: " << eventObject.needed[0].symbol
+			<< "\n\t-Level: " << eventObject.needed[0].value - 48
+			<< "\n\tAND\n\t-Skill: " << eventObject.needed[1].symbol
+			<< "\n\t-Level: " << eventObject.needed[1].value - 48 << std::endl;
 	}
 
 	if (eventObject.cost[1].value == 0) { // Cost
 		if (eventObject.cost[0].value != 0)
-			std::cout << "Cost for Defending \n\tResource: " << eventObject.cost[0].symbol
-			<< "\n\tAmount: " << eventObject.cost[0].value - 48 << std::endl;
+			std::cout << "==Cost for Defending \n\t-Resource: " << eventObject.cost[0].symbol
+			<< "\n\t-Amount: " << eventObject.cost[0].value - 48 << std::endl;
 		else
-			std::cout << "Cost for Defending \n\tThere is nothing to pay" << std::endl;
+			std::cout << "==Cost for Defending \n\t-There is nothing to pay" << std::endl;
 	}
 	else {
-		std::cout << "Cost for Defending \n\tResource: " << eventObject.cost[0].symbol
-			<< "\n\tAmount: " << eventObject.cost[0].value - 48
-			<< "\n\tAND\n\tResource: " << eventObject.cost[1].symbol
-			<< "\n\tAmount: " << eventObject.cost[1].value - 48 << std::endl;
+		std::cout << "==Cost for Defending \n\t-Resource: " << eventObject.cost[0].symbol
+			<< "\n\t-Amount: " << eventObject.cost[0].value - 48
+			<< "\n\tAND\n\t-Resource: " << eventObject.cost[1].symbol
+			<< "\n\t-Amount: " << eventObject.cost[1].value - 48 << std::endl;
 	}
 
 	if (eventObject.reward[1].value == 0) { // Reward
-		std::cout << "Reward \n\tResource: " << eventObject.reward[0].symbol
-			<< "\n\tAmount: " << eventObject.reward[0].value - 48 << std::endl;
+		std::cout << "==Reward \n\t-Resource: " << eventObject.reward[0].symbol
+			<< "\n\t-Amount: " << eventObject.reward[0].value - 48 << std::endl;
 	}
 	else {
-		std::cout << "Cost for Defending \n\tResource: " << eventObject.reward[0].symbol
-			<< "\n\tAmount: " << eventObject.reward[0].value - 48
-			<< "\n\tAND\n\tResource: " << eventObject.reward[1].symbol
-			<< "\n\tAmount: " << eventObject.reward[1].value - 48 << std::endl;
+		std::cout << "==Cost for Defending \n\t-Resource: " << eventObject.reward[0].symbol
+			<< "\n\t-Amount: " << eventObject.reward[0].value - 48
+			<< "\n\tAND\n\t-Resource: " << eventObject.reward[1].symbol
+			<< "\n\t-Amount: " << eventObject.reward[1].value - 48 << std::endl;
 	}
 
 	if (eventObject.consequense[1].value == 0) { // Consequense
 		if (eventObject.consequense[0].value != 0)
-			std::cout << "Cost for Failing to Defend \n\tResource: " << eventObject.consequense[0].symbol
-			<< "\n\tAmount: " << eventObject.consequense[0].value - 48 << std::endl;
+			std::cout << "==Cost for Failing to Defend \n\t-Resource: " << eventObject.consequense[0].symbol
+			<< "\n\t-Amount: " << eventObject.consequense[0].value - 48 << std::endl;
 		else
-			std::cout << "Cost for Failing to Defend \n\tThere is no consequence" << std::endl;
+			std::cout << "==Cost for Failing to Defend \n\t-There is no consequence" << std::endl;
 	}
 	else {
-		std::cout << "Cost for Failing to Defend \n\tResource: " << eventObject.consequense[0].symbol
-			<< "\n\tAmount: " << eventObject.consequense[0].value - 48
-			<< "\n\tAND\n\tResource: " << eventObject.consequense[1].symbol
-			<< "\n\tAmount: " << eventObject.consequense[1].value - 48 << std::endl;
+		std::cout << "==Cost for Failing to Defend \n\t-Resource: " << eventObject.consequense[0].symbol
+			<< "\n\t-Amount: " << eventObject.consequense[0].value - 48
+			<< "\n\tAND\n\t-Resource: " << eventObject.consequense[1].symbol
+			<< "\n\t-Amount: " << eventObject.consequense[1].value - 48 << std::endl;
 	}
 
-	std::cout << "Event Alignment: " << eventObject.evilEvent << std::endl;
+	std::cout << "==Event Alignment: " << eventObject.evilEvent << std::endl;
 
 	std::cout << std::endl;
 }
