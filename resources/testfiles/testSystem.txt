@@ -1,0 +1,39 @@
+System{
+	"Sol"
+	0
+	4
+	Star{
+		'G'
+	}
+	Body{
+		"Mars"
+		0
+		0
+		x, y, z
+		r, g, b
+		Moon{
+			"Phobos"
+			1
+			1
+			x, y, z
+			x.xxx
+			r, g, b
+		}
+	}
+	Body{
+		"Earth"
+		0
+		0
+		x, y, z
+		x.xxx
+		r, g, b
+		Moon{
+			"Luna"
+			1
+			1
+			x, y, z
+			x.xxx
+			r, g, b
+		}
+	}
+}

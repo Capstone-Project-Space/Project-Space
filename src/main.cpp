@@ -7,7 +7,6 @@
 #include <src/engine/states/game_state.h>
 
 #include <src/engine/graphics/model.h>
-#include <src/engine/body_systems/Sphere.h>
 #include <src/engine/graphics/buffers.h>
 #include <src/engine/graphics/vertex_array.h>
 #include <src/engine/graphics/shader.h>
@@ -20,6 +19,8 @@
 
 #include <src/engine/randgen/randomgen.h>
 
+#include <src/engine/body_systems/body_system.h>
+
 #define TESTING
 
 using Clock = std::chrono::high_resolution_clock;
@@ -31,6 +32,9 @@ using Clock = std::chrono::high_resolution_clock;
 #define SIZE_DUMP(type) fprintf(stderr, "sizeof(%s): %llu\n", #type, sizeof(type))
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
+
+
+std::shared_ptr<GameState> menuState = nullptr, playState = nullptr;
 
 constexpr int count = 64;
 class TempState : public GameState {
@@ -67,10 +71,6 @@ public:
 		{
 			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/freight.obj"), transforms[0]);
-
-			//HOW CAN I RENDER A SIMPLE SPHERE USING A CUSTOM SPHERE OBJECT???
-			// src/engine/body_systems/Sphere.h
-//			Renderer::SubmitModel(AssetManager::GetOrCreate<Sphere>(1., 32), transforms[0]);
 		}
 		Renderer::End3DScene();
 
@@ -89,6 +89,69 @@ public:
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("Escape Key Was Pressed\n");
 			//HOW DO I ESCAPE THE PROGRAM!?
+			State::Close();	//Causes a crash at game_state.cpp:49
+		}
+		if (key == GLFW_KEY_SPACE) {
+			printf("Space Key Was Pressed\n");
+			State::ChangeState(playState);
+		}
+		return true;
+	}
+};
+
+class PlayState : public GameState {
+	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
+	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
+
+	std::shared_ptr<BodySystem> system;
+public:
+	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
+		system = std::shared_ptr<BodySystem>(new BodySystem(0));
+	}
+
+	virtual void update(float delta) override { }
+
+	virtual void render(float delta) override {
+		Renderer::Begin3DScene(perspectiveCamera);
+		{
+			//Render Light source at star
+			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
+			
+			//Render Sun
+			Star star = system->getStar();
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
+				glm::translate(
+					glm::scale(
+						glm::identity<glm::mat4>(),
+						glm::vec3(star.star->getScale())),
+					star.star->getPosition()));
+
+			//Render all system bodies
+			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
+			for (auto i : bodies) {
+				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
+					glm::translate(
+						glm::scale(
+							glm::identity<glm::mat4>(),
+							glm::vec3(i->getScale())),
+						i->getPosition()));
+			}
+		}
+		Renderer::End3DScene();
+
+
+		componentManager.drawComponents(delta, orthoCamera);
+	}
+
+	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
+		this->orthoCamera = { newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f };
+		this->perspectiveCamera = { newWidth, newHeight, 70.0f, .01f, 1000.0f };
+	}
+
+	virtual bool onKeyPressed(const Key& key) {
+		if (key == GLFW_KEY_ESCAPE) {
+			printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
+			State::ResetStateTo(menuState);
 		}
 		return true;
 	}
@@ -96,12 +159,13 @@ public:
 
 int main(int argc, char** args) {
 	// Test();
-	std::shared_ptr<GameState> state = nullptr;
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
-	state = GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
+
+	menuState = GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
+	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
 	LOG_GL_ERROR;
 	
-	State::ChangeState(state);
+	State::ChangeState(menuState);
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
