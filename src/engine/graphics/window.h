@@ -22,6 +22,10 @@ public:
 	void updateTitle(const std::string& appendage);
 	void flush();
 
+	inline void close() {
+		glfwSetWindowShouldClose(this->window, 1);
+		this->data.isOpen = false;
+	}
 	inline const WindowData& getData() const { return data; }
 
 private:
