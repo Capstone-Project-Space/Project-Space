@@ -29,7 +29,7 @@ void TextComponent::draw(float delta) {
 	Renderer::SubmitText(text, pos, color, this->font, textGravity, scale);
 }
 
-bool TextComponent::setText(std::shared_ptr<TextComponent> component, const std::string& text) {
+bool TextComponent::SetText(std::shared_ptr<TextComponent> component, const std::string& text) {
 	component->text = text;
 	return true;
 }
