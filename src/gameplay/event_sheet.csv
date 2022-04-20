@@ -1,0 +1,19 @@
+Meteor Swarm,Blazing orbs of fire and rock are plummeting towards your empire! This can cause some of the population to die and some structures to get damaged! What do you do?,1=2=D,2=R=C=5=M,1=R=T,2=R=O=R=S,1
+Water Contamination,Oh no! The water has been polluted with some mysterious substance. This can cause some some of the population to die! What do you do?,1=2=M,2=R=W=5=M,1=R=N,1=R=K,1
+Livestock Sick,Some of the livestock have been acting really sick lately! This can cause some of the population to die and some food to be lost! What will you do?,2=1=H=1=F,1=R=P,1=R=N,2=R=K=R=P,1
+Livestock Lost,Some of the livestock have run away and no one is able to find them. This can cause some of the food to be lost! What will you do?,1=2=F,1=R=P,1=R=C,1=R=P,1
+Crops Destroyed,Some animal has trampled over the growing crops hopefully you can salvage whats left and regrow! This can cause some of the food to be lost! What will you do?,1=2=F,1=R=P,1=R=T,1=R=P,1
+Neighbors Attack,The enemy empires have come to attack the empire! This can cause some materials to be stolen and the lives in the military to be lost. What will you do?,2=2=D=1=W,2=R=C=R=S,2=R=T=R=I,2=R=K=R=C,1
+Gas Storm,There is a gas storm approaching the empire! TThis can cause some of the population to die and for herbs to be lost. What will you do?,2=2=D=2=H,2=R=C=5=M,2=R=T=R=N,2=R=K=R=N,1
+New Diesease,Some members of the empire have reported having strange symptoms! This might be a new diesease. This can cause some of the population to die. What will you do?,1=2=H,1=R=N,2=R=C=R=N,1=R=K,1
+New Medicine,Doctors of the empire have done research into a new medicine and have found it to be very useful! ,0,1=R=N,0,0,0
+Technology Developed,Some of the engineers of the empire have worked hard to create some new effective technology!,0,1=1=Z,0,0,0
+PTSD Strikes Military,The military have seen a sudden surge of PTSD growing in their ranks. This can cause some members to die. What will you do?,1=2=H,1=R=S,1=R=N,1=R=K,1
+Academy Average Falls,The average on the academy has taken a sharp decline in their average test scores!,0,0,0,1=4=M,1
+Relaxation Facility ,The has been a request for a relaxation facility to be built in tthe empire and it has been built and the population is grateful!,0,1=5=M,0,0,0
+Inflation,Some sudden changes in the universe has caused inflation in the general population!,0,0,0,2=R=C=4=M,1
+General Store Robbed,Some young members of the population have stolen a lot from the general store and it needs a quick restock. This can cause in food and clean water to be stolen! What will you do?,1=1=F,1=5=M,1=R=T,2=R=W=R=P,1
+General Store Destroyed,Someone has destroyed the general store in a rage and it needs to be rebuilt and restocked! This may cause water and medicine to be lost. What will you do?,2=1=C=1=H,2=5=M=R=C,2=R=T=R=S,2=R=W=R=N,1
+Magic Discovered,Magic has been discovered and it is able to make some tasks easier!,0,1=1=Z,0,0,0
+Academy Average Rises,The average of the academy has risen to be more than normal test scores!,0,1=5=M,0,0,0
+Trade Blocked,There has been some trade blocking due to space traveling and the cargo was lost! This may cause some materials to be lost! What will you do? ,1=2=S,1=R=A,1=R=C,2=R=A=R=A,1
