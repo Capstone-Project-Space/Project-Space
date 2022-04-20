@@ -25,9 +25,24 @@ void BodySystem::generateSystem() {
      for (int i = 0; i < getBodyCount(); i++) {
           std::shared_ptr<Body> body = std::shared_ptr<Body>(new Body());
 
-          body->setName(this->getName() + " " + intToNumeral(i));
+          body->setName(this->getName() + " " + intToNumeral(i + 1));
           body->setBodyType((BodyType)RandomGen::RangedRandomUnSignedInt(0, 2));
           body->setHabitType((HabitType)RandomGen::RangedRandomUnSignedInt(0, 1));
+
+          switch (body->getBodyType()) {
+          case BodyType::Planet:
+               body->setScale(RandomGen::RangedRandomFloat(0.3f, 0.9f));
+               break;
+          case BodyType::Moon:
+               body->setScale(RandomGen::RangedRandomFloat(0.1f, 0.3f));
+               break;
+          case BodyType::GasGiant:
+               body->setScale(RandomGen::RangedRandomFloat(0.7f, 1.4f));
+               break;
+          default:
+               //body->setScale(RandomGen::RangedRandomFloat(0.4f, 0.8f));
+               break;
+          }
 
           //Set ID, e.g. 0.0, 4.6, 120.3
           body->setBodyID(std::to_string(this->getSystemID()) + "." + std::to_string(i));
@@ -40,7 +55,7 @@ void BodySystem::generateSystem() {
 
           //Generate random angle and distance
           float angle = RandomGen::RangedRandomFloat(0.0f, (float)(2 * M_PI));
-          float distance = getStar().star->getScale() + RandomGen::RangedRandomFloat((float)(i + 1.0f), (float)(i + 1.4f));
+          float distance = getStar().star->getScale() + RandomGen::RangedRandomFloat((float)(i * 2.0f), (float)(i * 2.5f));
           
           //Calculate and set position from angle and distance
           body->setPosition(glm::vec3(

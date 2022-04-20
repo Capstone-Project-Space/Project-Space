@@ -37,7 +37,7 @@ using Clock = std::chrono::high_resolution_clock;
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-
+int height = 1020, width = 720;
 std::shared_ptr<GameState> menuState = nullptr, playState = nullptr;
 
 constexpr int count = 64;
@@ -126,40 +126,69 @@ public:
 };
 
 class PlayState : public GameState {
+	
 	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
 	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
+	CameraObject gameCamera{glm::vec3(10.0f), glm::vec3(0.0f)};
+
 	std::shared_ptr<BodySystem> system;
+	bool mouse1Down = false, lShiftMod = false, lAltMod = false;
 public:
 	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		system = std::shared_ptr<BodySystem>(new BodySystem(0));
+		//perspectiveCamera.setView(glm::lookAt(gameCamera.getPosition(), gameCamera.getTarget(), gameCamera.getCameraUp()));
 
 #if defined(DEBUG)
-		printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
-		system->printDebugInfo();
+	printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
+	system->printDebugInfo();
 #endif
 	}
 
-	virtual void update(float delta) override { }
+	virtual void update(float delta) override { 
+		if (Keyboard::isKeyDown(GLFW_KEY_W)) {
+			gameCamera.moveCamera(0.5f * delta, gameCamera.getCameraFront());
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_A)) {
+			gameCamera.moveCamera(0.5f * delta, glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_S)) {
+			gameCamera.moveCamera(0.5f * delta, glm::vec3(-1.0f) * gameCamera.getCameraFront());
+		}
+		if (Keyboard::isKeyDown(GLFW_KEY_D)) {
+			gameCamera.moveCamera(0.5f * delta, glm::vec3(-1.0f) * glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+		}
+
+		perspectiveCamera.setView(glm::lookAt(gameCamera.getPosition(), gameCamera.getTarget(), gameCamera.getCameraUp()));
+	}
 
 	virtual void render(float delta) override {
+		Renderer::Begin2DScene(orthoCamera); {
+			//Render Skybox
+			//front
+			Renderer::SubmitQuad({0.0f, 0.0f, -25.0f}, {window->getData().size.x, window->getData().size.y}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"), 0.0f);
+			//left
+			//Renderer::SubmitQuad({-25.0f, 0.0f, 0.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp"), 270.0f);
+			//right
+			//Renderer::SubmitQuad({25.0f, 0.0f, 0.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp"), 90.0f);
+			//back
+			//Renderer::SubmitQuad({0.0f, 0.0f, 25.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp"), 180.0f);
+		}
+		Renderer::End2DScene();
+
 		Renderer::Begin3DScene(perspectiveCamera);
 		{
 			//Render Light source at star
 			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
+
 			
+
+
 			//Render Sun
 			Star star = system->getStar();
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
-				glm::scale(
-					glm::translate(
-						glm::identity<glm::mat4>(),
-						star.star->getPosition()
-					),
-					glm::vec3{ star.star->getScale() }
-				),
-				glm::vec4{1.0f, .227, 0.0f, 1.0f}
-			);
+				glm::scale(glm::translate(glm::identity<glm::mat4>(),star.star->getPosition()),
+					glm::vec3{ star.star->getScale() }),glm::vec4{star.star->getColor(), 1.0f});
 
 			//Render all system bodies
 			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
@@ -171,12 +200,12 @@ public:
 							i->getPosition()
 						),
 						glm::vec3(i->getScale())
-					)
+					),
+					glm::vec4{ i->getColor(), 1.0f }
 				);
 			}
 		}
 		Renderer::End3DScene();
-
 
 		componentManager.drawComponents(delta, orthoCamera);
 	}
@@ -190,6 +219,37 @@ public:
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
 			State::ResetStateTo(menuState);
+		}
+		if (key == GLFW_KEY_LEFT_SHIFT) {
+			lShiftMod = true;
+		}
+		if (key == GLFW_KEY_LEFT_ALT) {
+			lAltMod = true;
+		}
+		return true;
+		return true;
+	}
+
+	virtual bool onKeyReleased(const Key& key) {
+		if (key == GLFW_KEY_LEFT_SHIFT) {
+			lShiftMod = false;
+		}
+		if (key == GLFW_KEY_LEFT_ALT) {
+			lAltMod = false;
+		}
+		return true;
+	}
+
+	virtual bool onMouseButtonPressed(const MouseButton& button) {
+		if (button == GLFW_MOUSE_BUTTON_1) {
+			mouse1Down = true;
+		}
+		return true;
+	}
+
+	virtual bool onMouseButtonReleased(const MouseButton& button) {
+		if (button == GLFW_MOUSE_BUTTON_1) {
+			mouse1Down = false;
 		}
 		return true;
 	}
