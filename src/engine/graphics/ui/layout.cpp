@@ -17,3 +17,11 @@ void UIComponent::applyLayout(const std::shared_ptr<Window> window, const std::u
 	}
 	this->evaluating = false;
 }
+
+bool UIComponent::ChangeLayout(std::shared_ptr<UIComponent> component, Layout* layout) {
+	if (layout) {
+		component->layout = std::shared_ptr<Layout>(layout);
+		return true;
+	}
+	return false;
+}

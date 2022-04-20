@@ -53,7 +53,7 @@ void TextRenderer::destroy() {
 }
 
 void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
-	float height = font->getTextHeight(text);
+	float height = font->getTextHeight(text) * scale;
 	float x = pos.x, y = pos.y - height;
 
 
@@ -63,10 +63,9 @@ void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, con
 		x -= (font->getTextWidth(text) * scale);
 	}
 	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
-		y += (height * scale) / 2.0f;
-	}
-	else if (gravity & Gravity::TOP) {
-		y -= (height * scale);
+		y += (height) / 2.0f;
+	} else if (gravity & Gravity::TOP) {
+		y -= (height);
 	}
 
 	// Don't overflow the texture buffer.

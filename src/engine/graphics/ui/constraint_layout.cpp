@@ -1,6 +1,6 @@
 #include "constraint_layout.h"
 
-ConstraintLayout::ConstraintLayout(const std::string_view& top, const std::string_view& bottom, const std::string_view& left, const std::string_view& right, const std::string_view& infront)
+ConstraintLayout::ConstraintLayout(const std::string_view& left, const std::string_view& top, const std::string_view& right, const std::string_view& bottom, const std::string_view& infront)
 	: top(top), bottom(bottom), left(left), right(right), infront(infront.empty() ? "window" : infront) {
 	assert(!top.empty() || !bottom.empty() && "Missing vertical constraint.");
 	assert(!left.empty() || !right.empty() && "Missing horizontal constraint.");

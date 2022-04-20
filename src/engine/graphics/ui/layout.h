@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -54,18 +55,31 @@ public:
 	inline const std::string_view& getID() const { return id; }
 	inline const std::shared_ptr<Layout> getLayout() const { return layout; }
 
-	inline const glm::vec3& getPosition() const { return position.value(); }
-	inline const glm::vec2& getSize() const { return size.value(); }
+	virtual inline const glm::vec3& getPosition() const { return position.value(); }
+	virtual inline const glm::vec2& getSize() const { return size.value(); }
 
-	inline float getX() const { return position.value().x; }
-	inline float getY() const { return position.value().y; }
-	inline float getZ() const { return position.value().z; }
+	virtual inline float getX() const { return position.value().x; }
+	virtual inline float getY() const { return position.value().y; }
+	virtual inline float getZ() const { return position.value().z; }
 
-	inline float getWidth() const { return size.value().x; }
-	inline float getHeight() const { return size.value().y; }
+	virtual inline float getWidth() const { return size.value().x; }
+	virtual inline float getHeight() const { return size.value().y; }
 
-	inline bool isVisible() const { return visible; }
-	inline void setVisible(bool visible) { this->visible = visible; }
+	virtual inline bool isVisible() const { return visible; }
+	virtual inline void setVisible(bool visible) { this->visible = visible; }
+
+	
+	static bool ChangeLayout(std::shared_ptr<UIComponent> component, Layout* layout);
+	template<typename T>
+	static bool ChangeLayout(std::shared_ptr<T> component, std::function<Layout*(std::shared_ptr<T>)> func) {
+		static_assert(std::is_base_of<UIComponent, T>);
+		auto layout = func(component);
+		if (layout) {
+			component->layout = layout;
+			return true;
+		}
+		return false;
+	}
 
 protected:
 	const std::string_view id;

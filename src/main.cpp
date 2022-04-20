@@ -16,6 +16,7 @@
 
 #include <src/engine/graphics/ui/text_component.h>
 #include <src/engine/graphics/ui/constraint_layout.h>
+#include <src/engine/graphics/ui/explicit_layout.h>
 
 #include <src/engine/randgen/randomgen.h>
 
@@ -47,17 +48,35 @@ public:
 
 		componentManager.addComponent(new TextComponent(
 			std::string_view{ "simple_text" },
-			new ConstraintLayout(std::string_view{"window:top"}, std::string_view{""}, std::string_view{""}, std::string_view{"window:right"}, std::string_view{"window"}),
+			new ConstraintLayout("", "window:top", "window:right", "", "window"),
 			std::string{ "This is some text." },
 			AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf")
+		));
+
+		componentManager.addComponent(new TextComponent(
+			"explicit_text",
+			new ExplicitLayout("300", "50%", "100%", ""),
+			"This text is explicit.",
+			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
+		));
+
+		componentManager.addComponent(new TextComponent(
+			"colored_text",
+			new ConstraintLayout("", "", "simple_text:left", "window:bottom", "window"),
+			"This text changes color.",
+			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
 		));
 	}
 
 	virtual void update(float delta) override {
 		static float totalTime = 0.0f;
 		totalTime += delta;
-		if (totalTime >= 5.0f)
+		if (totalTime >= 5.0f && totalTime <= 5.2f) {
 			componentManager.modifyComponent<TextComponent, const std::string&>("simple_text", std::function{ TextComponent::SetText }, "Smol text.");
+			componentManager.modifyComponent<TextComponent, Gravity>("explicit_text", std::function{ TextComponent::SetTextGravity }, Gravity::CENTER);
+		}
+		componentManager.modifyComponent<TextComponent, glm::vec4>("colored_text", std::function((bool(*)(std::shared_ptr<TextComponent>, glm::vec4))TextComponent::SetColor), glm::vec4{delta * 500.0f, delta * 200.0f, delta * 700.0f, 1.0f});
+		componentManager.modifyComponent<TextComponent, float>("simple_text", std::function(TextComponent::SetScale), std::clamp(totalTime, .1f, 1.4f));
 	}
 
 	virtual void render(float delta) override {
