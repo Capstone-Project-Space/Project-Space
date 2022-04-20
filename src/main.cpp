@@ -60,18 +60,20 @@ public:
 		));
 
 		componentManager.addComponent(new TextComponent(
+			"colored_text",
+			new ConstraintLayout("", "", "simple_text:left", "window:bottom", "window"),
+			"This text changes color.",
+			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
+		));
+
+		componentManager.addComponent(new TextComponent(
 			"explicit_text",
 			new ExplicitLayout("300", "50%", "100%", ""),
 			"This text is explicit.",
 			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
 		));
 
-		componentManager.addComponent(new TextComponent(
-			"colored_text",
-			new ConstraintLayout("", "", "simple_text:left", "window:bottom", "window"),
-			"This text changes color.",
-			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
-		));
+		
 	}
 
 	virtual void update(float delta) override {
@@ -95,13 +97,11 @@ public:
 		Renderer::Begin3DScene(perspectiveCamera);
 		{
 			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/freight.obj"), transforms[0]);
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/spacepod.obj"), transforms[0]);
 		}
 		Renderer::End3DScene();
-
 		
 		componentManager.drawComponents(delta, orthoCamera);
-
 	}
 
 	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
@@ -113,8 +113,7 @@ public:
 	virtual bool onKeyPressed(const Key& key) {
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("Escape Key Was Pressed\n");
-			//HOW DO I ESCAPE THE PROGRAM!?
-			State::Close();	//Causes a crash at game_state.cpp:49
+			window->close();
 		}
 		if (key == GLFW_KEY_SPACE) {
 			printf("Space Key Was Pressed\n");
@@ -150,21 +149,28 @@ public:
 			//Render Sun
 			Star star = system->getStar();
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
-				glm::translate(
-					glm::scale(
+				glm::scale(
+					glm::translate(
 						glm::identity<glm::mat4>(),
-						glm::vec3(star.star->getScale())),
-					star.star->getPosition()));
+						star.star->getPosition()
+					),
+					glm::vec3{ star.star->getScale() }
+				),
+				glm::vec4{1.0f, .227, 0.0f, 1.0f}
+			);
 
 			//Render all system bodies
 			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
 			for (auto i : bodies) {
 				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
-					glm::translate(
-						glm::scale(
+					glm::scale(
+						glm::translate(
 							glm::identity<glm::mat4>(),
-							glm::vec3(i->getScale())),
-						i->getPosition()));
+							i->getPosition()
+						),
+						glm::vec3(i->getScale())
+					)
+				);
 			}
 		}
 		Renderer::End3DScene();
