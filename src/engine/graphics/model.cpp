@@ -10,6 +10,8 @@
 #include <vector>
 #include <variant>
 
+#include "src/engine/graphics/asset_manager.h"
+
 #include <glad/glad.h>
 
 ModelVertex::ModelVertex()
@@ -66,6 +68,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			assert(mat);
 			mat->texture = Texture::CreateTexture("./resources/textures/" + line.substr(7));
 		}
+		if (mat && !mat->texture) mat->texture = Texture::GetWhiteTexture();
 	}
 	return map;
 }
@@ -86,13 +89,11 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 	Material* currentMaterial = NULL;
 	auto mtls = std::map<std::string, Material>();
 
-	std::string line, fileText;
+	std::string line;
 	std::ifstream file{ filepath };
-	file.seekg(0, std::ios::end);
-	auto size = file.tellg();
-	fileText.reserve(size);
-	file.read(&fileText[0], size);
-	std::stringstream obj{fileText};
+	assert(file, "File does not exist.");
+	std::stringstream obj;
+	obj << file.rdbuf();
 
 	float f1, f2, f3;
 	while (!obj.eof()) {
@@ -131,10 +132,10 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 				std::tuple vertex{ fpoints[i], fuvs[i], fnormals[i] };
 				if (vertexMap.find(vertex) == vertexMap.end()) {
 					vertexMap.insert({ vertex, uniqueVertices });
-					int textureSlot = (std::find(model->textures.begin(), model->textures.end(), currentMaterial->texture) - model->textures.begin()) + 1;
+					int textureSlot = (std::find(model->textures.begin(), model->textures.end(), currentMaterial->texture) - model->textures.begin());
 					vertices.emplace_back(
 						points[fpoints[i] - 1], uvs[fuvs[i] - 1], normals[fnormals[i] - 1],
-						currentMaterial->texture == nullptr ? 0 : textureSlot,
+						textureSlot,
 						currentMaterial->ambient, currentMaterial->diffuse, currentMaterial->specular, currentMaterial->specExponent
 					);
 					indices.push_back(uniqueVertices++);
@@ -153,9 +154,9 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 void Model::bind() const {
 	this->indexBuffer->bind();
 	this->vertexBuffer->bind();
-	for (uint32_t i = 0; i < 31; i++) {
+	for (uint32_t i = 0; i < 32; i++) {
 		if (this->textures[i] != nullptr) {
-			this->textures[i]->bind(i + 1);
+			this->textures[i]->bind(i);
 		}
 	}
 }

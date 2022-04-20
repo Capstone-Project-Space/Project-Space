@@ -51,16 +51,16 @@ void ModelRenderer::submitLight(const LightSource& lightData) {
 	}
 }
 
-void ModelRenderer::submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform) {
+void ModelRenderer::submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color) {
 	auto& submissions = modelsToRender[model];
-	submissions.push_back(modelTransform);
+	submissions.push_back({ modelTransform, color });
 }
 
 void ModelRenderer::draw() {
 	lightsBuffer->updateBuffer(&this->lightBufferData);
 	program->bindUniformBuffer("Lights", lightsBuffer);
-	matricesBufferData[0] = this->camera->getProjection();
-	matricesBufferData[1] = this->camera->getView();
+	matricesBufferData.projection = this->camera->getProjection();
+	matricesBufferData.view = this->camera->getView();
 	for (auto& [model, submissions] : modelsToRender) {
 		uint64_t globalIndex = 0;
 		uint64_t count = submissions.size();
@@ -70,9 +70,9 @@ void ModelRenderer::draw() {
 		program->bindUniformBuffer("Matrices", matricesBuffer);
 		while (count > MAX_INSTANCES) {
 			for (uint64_t i = 0; i < MAX_INSTANCES; i++) {
-				matricesBufferData[i + 2] = submissions[i + globalIndex];
+				matricesBufferData.modelData[i] = submissions[i + globalIndex];
 			}
-			matricesBuffer->updateBuffer(matricesBufferData);
+			matricesBuffer->updateBuffer(&matricesBufferData);
 			glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, MAX_INSTANCES);
 			LOG_GL_ERROR;
 			count -= MAX_INSTANCES;
@@ -80,9 +80,9 @@ void ModelRenderer::draw() {
 		}
 		if (count > 0) {
 			for (uint64_t i = 0; i < count; i++) {
-				matricesBufferData[i + 2] = submissions[i + globalIndex];
+				matricesBufferData.modelData[i] = submissions[i + globalIndex];
 			}
-			matricesBuffer->updateBuffer(matricesBufferData);
+			matricesBuffer->updateBuffer(&matricesBufferData);
 			glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, count);
 			LOG_GL_ERROR;
 		}

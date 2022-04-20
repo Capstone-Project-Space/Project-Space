@@ -23,7 +23,7 @@ public:
 	void destroy();
 
 	void submitLight(const LightSource& lightData);
-	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform);
+	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
 	void draw();
 
@@ -32,9 +32,16 @@ public:
 private:
 	const Camera* camera;
 
-	std::map<std::shared_ptr<Model>, std::vector<glm::mat4>> modelsToRender;
+	struct UniformData {
+		glm::mat4 transform = glm::mat4{0.0f};
+		glm::vec4 color = glm::vec4{0.0f};
+	};
+	std::map<std::shared_ptr<Model>, std::vector<UniformData>> modelsToRender;
 	
-	glm::mat4 matricesBufferData[MAX_INSTANCES + 2] = { glm::mat4{glm::vec4{0.0f}, glm::vec4{0.0f}, glm::vec4{0.0f}, glm::vec4{0.0f}} };
+	struct UniformMatrixBuffer {
+		glm::mat4 projection = glm::mat4{0.0f}, view = glm::mat4{ 0.0f };
+		UniformData modelData[MAX_INSTANCES];
+	} matricesBufferData;
 	struct {
 		LightSource lightsData[MAX_LIGHTS] = {{}};
 		int32_t count = 0;

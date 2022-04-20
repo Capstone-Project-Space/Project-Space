@@ -53,7 +53,7 @@ public:
 private:
 	std::shared_ptr<IndexBuffer> indexBuffer;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
-	std::array<std::shared_ptr<Texture>, 31> textures = {nullptr};
+	std::array<std::shared_ptr<Texture>, 32> textures = {nullptr};
 	Model() = default;
 
 	static const std::map<std::string, Material> CreateMaterial(const std::string& filepath);
