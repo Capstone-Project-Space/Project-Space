@@ -22,6 +22,8 @@
 
 #include <src/engine/body_systems/body_system.h>
 
+#include <src/gameplay/event.h>
+
 #define TESTING
 #define DEBUG
 
@@ -196,6 +198,13 @@ public:
 int main(int argc, char** args) {
 	// Test();
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
+
+	GameEvent gameEvents[TOTAL_EVENTS];
+	for (int i = 0; i < TOTAL_EVENTS; i++) {
+		gameEvents[i] = cleanEvent(gameEvents[i]);
+		gameEvents[i] = readEvent(gameEvents[i], i);
+		printEvent(gameEvents[i]);
+	}
 
 	menuState = GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
 	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });

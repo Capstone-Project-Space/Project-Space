@@ -1,5 +1,12 @@
 #include "event.h"
 
+std::string getCurrentDir() {
+	char buff[MAX_PATH];
+	GetModuleFileName(NULL, buff, MAX_PATH);
+	std::string::size_type position = std::string(buff).find_last_of("\\/");
+	return std::string(buff).substr(0, position);
+}
+
 GameEvent cleanEvent(GameEvent eventObject) {
 	eventObject.name = "";
 	eventObject.description = "";
@@ -33,7 +40,11 @@ GameEvent readEvent(GameEvent eventObject, int eventNumber) {
 	int fill = 0;
 	int numberOfDataPoints = 0;
 
-	myFile.open("event_sheet.csv");
+	std::filesystem::path p = { getCurrentDir() };
+	std::string pathName = p.parent_path().string() + "\\src\\gameplay\\event_sheet.csv";
+	std::replace(pathName.begin(), pathName.end(), '\\', '/');
+
+	myFile.open(pathName);
 	if (myFile.is_open()) {
 		for (int i = 0; i <= eventNumber; i++)
 			getline(myFile, row);
@@ -101,6 +112,7 @@ GameEvent readEvent(GameEvent eventObject, int eventNumber) {
 }
 
 void printEvent(GameEvent eventObject) {
+
 	std::cout << "Event Name: " << eventObject.name << std::endl;
 	std::cout << "Event Description: " << eventObject.description << std::endl;
 
