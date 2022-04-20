@@ -98,3 +98,19 @@ void Body::setBodyID(std::string bodyID) {
 std::string Body::getBodyID() {
      return bodyID;
 }
+
+void Body::printDebugInfo() {
+     printf("\t\t\tBody - NAME: ''%s'' ID: %s\n", (const std::string)this->getName(), (const std::string)this->getBodyID());
+     printf("\t\t\t\tBodyType: %d\n", this->getBodyType());
+     printf("\t\t\t\tHabitable: %d\n", this->getHabitType());
+     printf("\t\t\t\tPosition:  %f   %f   %f\n", this->getPosition().x,
+                                                 this->getPosition().y,
+                                                 this->getPosition().z);
+     printf("\t\t\t\tScale:  %f\n", this->getScale());
+     printf("\t\t\t\tMoonCount: %d\n", this->getMoonCount());
+
+     if (this->getMoonCount() > 0) {
+          printf("\t\t\t\tMoons:\n");
+          printf("\t\t\t\tThere are no moons here.\n");
+     }
+}

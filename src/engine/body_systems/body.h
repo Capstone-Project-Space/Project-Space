@@ -60,6 +60,8 @@ public:
      void setBodyID(std::string);
      std::string getBodyID();
 
+     void printDebugInfo();
+
 private:
      std::string         name;          //Name of Body
      BodyType            bodyType;      //What type of body

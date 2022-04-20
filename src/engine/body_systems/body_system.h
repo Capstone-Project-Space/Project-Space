@@ -135,6 +135,8 @@ public:
      void setSystemID(int);
      int getSystemID();
 
+     void printDebugInfo();
+
 private:
      std::string         name;          //Name of System
      Star                star;          //System Star

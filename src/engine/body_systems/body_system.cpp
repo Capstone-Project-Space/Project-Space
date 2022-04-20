@@ -122,7 +122,16 @@ int BodySystem::getSystemID() {
      return this->systemID;
 }
 
+void BodySystem::printDebugInfo() {
+     printf("\tSystem - NAME: ''%s'' ID: %s\n", this->getName(), std::to_string(this->getSystemID()));
+     printf("\t\tNebula?: %s\n", this->getIsNebula() ? "true" : "false");
+     printf("\t\tOribiting Bodies: %d\n", this->getBodyCount());
+     printf("\t\tBodies:\n");
 
+     for (auto i : this->getBodyList()) {
+          i->printDebugInfo();
+     }
+}
 
 
 std::string intToNumeral(int x) {

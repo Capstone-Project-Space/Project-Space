@@ -22,6 +22,7 @@
 #include <src/engine/body_systems/body_system.h>
 
 #define TESTING
+#define DEBUG
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -107,6 +108,11 @@ class PlayState : public GameState {
 public:
 	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		system = std::shared_ptr<BodySystem>(new BodySystem(0));
+
+#if defined(DEBUG)
+		printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
+		system->printDebugInfo();
+#endif
 	}
 
 	virtual void update(float delta) override { }
