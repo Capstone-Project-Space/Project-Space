@@ -1,5 +1,8 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <glm/glm.hpp>
 
 class Camera {
@@ -24,7 +27,17 @@ public:
 	CameraObject(glm::vec3 position, glm::vec3 target);
 
 	const inline glm::vec3& getPosition() const { return position; }
-	const inline void setPosition(glm::vec3 position) { this->position = position; }
+	const inline void setPosition(glm::vec3 position) {
+
+		if((position.x < 25.0f && position.x > -25.0f) && (position.y < 25.0f && position.y > -25.0f))this->position = position;
+
+		if (this->position.x < -25.0f) this->position.x = -25.0f;
+		if (this->position.x >  25.0f) this->position.x =  25.0f;
+		if (this->position.y < -25.0f) this->position.y = -25.0f;
+		if (this->position.y >  25.0f) this->position.y =  25.0f;
+		if (this->position.z < -25.0f) this->position.z = -25.0f;
+		if (this->position.z >  25.0f) this->position.z =  25.0f;
+	}
 	const inline glm::vec3& getTarget() const { return target; }
 	const inline void setTarget(glm::vec3 target) { this->target = target; }
 	const inline glm::vec3& getDirection() const { return direction; }
@@ -36,9 +49,28 @@ public:
 	const inline glm::vec3& getCameraFront() const { return cameraFront; }
 	const inline void setCameraFront(glm::vec3 cameraFront) { this->cameraFront = cameraFront; }
 	const inline float getCameraSpeed() { return cameraSpeed; }
-	const inline void setCameraSpeed(float cameraSpeed) { this->cameraSpeed = cameraSpeed; }
+	const inline void setCameraSpeed(float cameraSpeed) {
+		this->cameraSpeed = cameraSpeed;
+		if (this->cameraSpeed <= 0.1f) this->cameraSpeed = 0.1f;
+		if (this->cameraSpeed >= 5.0f) this->cameraSpeed = 5.0f;
+	}
+	const inline float getCameraFOV() { return cameraFOV; }
+	const inline void setCameraFOV(float cameraFOV) {
+		this->cameraFOV = cameraFOV;
+		if (this->cameraFOV <= 15.0f) this->cameraFOV = 15.0f;
+		if (this->cameraFOV >= 110.0f) this->cameraFOV = 110.0f;
+	}
+	const inline float getCameraYaw() { return cameraYaw; }
+	const inline void setCameraYaw(float cameraYaw) {
+		this->cameraYaw = cameraYaw;
+		if (this->cameraYaw <= 0.0f) this->cameraYaw += (2 * M_PI);
+		if (this->cameraYaw >= (2 * M_PI)) this->cameraYaw -= (2 * M_PI);
+	}
+	const inline bool getCameraLock() { return cameraLock; }
+	const inline void setCameraLock(bool cameraLock) { this->cameraLock = cameraLock; }
 
 	void moveCamera(float, glm::vec3);
+	void moveCameraMouse(float, float, float);
 
 private:
 	glm::vec3 position;
@@ -49,4 +81,8 @@ private:
 	glm::vec3 cameraFront;
 
 	float cameraSpeed;
+	float cameraFOV;
+	float cameraYaw;
+
+	bool cameraLock;
 };

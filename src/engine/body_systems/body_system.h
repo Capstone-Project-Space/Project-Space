@@ -40,27 +40,27 @@ struct Star {
           switch (starClass) {
           case StarClass::A:
                this->star->setColor({ 0.0f, 0.7f, 0.8f });
-               this->star->setScale(2.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
+               this->star->setScale(1.25f + RandomGen::RangedRandomFloat(-0.01f, 0.24f));
                break;
           case StarClass::F:
                this->star->setColor({ 0.5f, 0.4f, 0.8f });
-               this->star->setScale(2.0f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
+               this->star->setScale(1.0f + RandomGen::RangedRandomFloat(-0.01f, 0.24f));
                break;
           case StarClass::G:
                this->star->setColor({ 0.9f, 0.8f, 0.0f });
-               this->star->setScale(1.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
+               this->star->setScale(0.75f + RandomGen::RangedRandomFloat(-0.01f, 0.24f));
                break;
           case StarClass::K:
                this->star->setColor({ 0.9f, 0.6f, 0.0f });
-               this->star->setScale(1.0f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
+               this->star->setScale(0.5f + RandomGen::RangedRandomFloat(-0.01f, 0.24f));
                break;
           case StarClass::M:
                this->star->setColor({ 0.9f, 0.1f, 0.1f });
-               this->star->setScale(0.5f + RandomGen::RangedRandomFloat(0.0f, 0.44f));
+               this->star->setScale(0.25f + RandomGen::RangedRandomFloat(0.0f, 0.24f));
                break;
           default:
                this->star->setColor({ 0.9f, 0.6f, 0.0f });
-               this->star->setScale(1.5f + RandomGen::RangedRandomFloat(-0.44f, 0.44f));
+               this->star->setScale(0.5f + RandomGen::RangedRandomFloat(-0.01f, 0.24f));
                break;
           }
      }

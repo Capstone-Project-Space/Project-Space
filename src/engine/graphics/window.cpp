@@ -50,6 +50,13 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 		}
 	);
 
+	glfwSetScrollCallback(window->window,
+		[](GLFWwindow* window, double xoffset, double yoffset) {
+			float vals[2] = { xoffset, yoffset };
+			Events::DispatchEvent(Event<float[2]>{EventType::MOUSE_WHEEL_SCROLL, vals});
+		}
+	);
+
 	glfwSetCursorPosCallback(window->window,
 		[](GLFWwindow* window, double xpos, double ypos) {
 			float vals[4] = { xpos, ypos, xpos - Mouse::x, ypos - Mouse::y };

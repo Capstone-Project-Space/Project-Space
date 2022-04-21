@@ -6,7 +6,7 @@ Body::Body() {
      setBodyType(BodyType::Planet);
      setHabitType(HabitType::Habitable);
      setPosition(glm::vec3(0.0f));
-     setScale(1.0f);
+     setScale(0.3f);
      setColor(glm::vec3(0.5f));
      setMoonCount(0);
 }

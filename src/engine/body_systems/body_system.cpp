@@ -31,13 +31,13 @@ void BodySystem::generateSystem() {
 
           switch (body->getBodyType()) {
           case BodyType::Planet:
-               body->setScale(RandomGen::RangedRandomFloat(0.3f, 0.9f));
+               body->setScale(RandomGen::RangedRandomFloat(0.06f, 0.2f));
                break;
           case BodyType::Moon:
-               body->setScale(RandomGen::RangedRandomFloat(0.1f, 0.3f));
+               body->setScale(RandomGen::RangedRandomFloat(0.01f, 0.06f));
                break;
           case BodyType::GasGiant:
-               body->setScale(RandomGen::RangedRandomFloat(0.7f, 1.4f));
+               body->setScale(RandomGen::RangedRandomFloat(0.2f, 0.5f));
                break;
           default:
                //body->setScale(RandomGen::RangedRandomFloat(0.4f, 0.8f));
@@ -55,7 +55,7 @@ void BodySystem::generateSystem() {
 
           //Generate random angle and distance
           float angle = RandomGen::RangedRandomFloat(0.0f, (float)(2 * M_PI));
-          float distance = getStar().star->getScale() + RandomGen::RangedRandomFloat((float)(i * 2.0f), (float)(i * 2.5f));
+          float distance = getStar().star->getScale() + RandomGen::RangedRandomFloat((float)((i+1) * 1.5f), (float)((i+1) * 2.0f));
           
           //Calculate and set position from angle and distance
           body->setPosition(glm::vec3(
