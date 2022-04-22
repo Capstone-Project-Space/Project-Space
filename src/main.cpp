@@ -22,9 +22,11 @@
 
 #include <src/engine/body_systems/body_system.h>
 
+#include <src/engine/console/console.h>
+
 #include <src/gameplay/event.h>
 
-//#define DEBUG
+#define DEBUG
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -36,6 +38,7 @@ using Clock = std::chrono::high_resolution_clock;
 
 int height = 1020, width = 720;
 std::shared_ptr<GameState> menuState = nullptr, playState = nullptr;
+std::shared_ptr<Console> console = nullptr;
 
 constexpr int count = 64;
 class TempState : public GameState {
@@ -145,24 +148,25 @@ public:
 #endif
 	}
 
-	virtual void update(float delta) override { 
-		if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
-			gameCamera.setCameraLock(false);
-			gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, gameCamera.getCameraFront());
+	virtual void update(float delta) override {
+		if (!console->getVisible()) {
+			if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
+				gameCamera.setCameraLock(false);
+				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, gameCamera.getCameraFront());
+			}
+			if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
+				gameCamera.setCameraLock(false);
+				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+			}
+			if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
+				gameCamera.setCameraLock(false);
+				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * gameCamera.getCameraFront());
+			}
+			if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
+				gameCamera.setCameraLock(false);
+				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+			}
 		}
-		if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
-			gameCamera.setCameraLock(false);
-			gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
-		}
-		if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
-			gameCamera.setCameraLock(false);
-			gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * gameCamera.getCameraFront());
-		}
-		if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
-			gameCamera.setCameraLock(false);
-			gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
-		}
-
 		perspectiveCamera.setView(glm::lookAt(gameCamera.getPosition(), gameCamera.getTarget(), gameCamera.getCameraUp()));
 		this->delta = delta;
 	}
@@ -216,6 +220,15 @@ public:
 				+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
 				  (window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+
+			if (console->getVisible()) {
+				Renderer::SubmitQuad({ 0.0f, 0.4f, 0.0f }, { window->getData().size.x, (int)(window->getData().size.y * (3.0f / 5.0f))}, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
+			
+				for (int i = 0; i < console->getArchiveSize(); i++) {
+
+				}
+			}
+
 		}
 		Renderer::End2DScene();
 
@@ -228,15 +241,54 @@ public:
 	}
 
 	virtual bool onKeyPressed(const Key& key) {
-		if (key == GLFW_KEY_ESCAPE) {
-			printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
-			State::ResetStateTo(menuState);
-		}
 		if (key == GLFW_KEY_LEFT_SHIFT) {
 			lShiftMod = true;
 		}
 		if (key == GLFW_KEY_LEFT_ALT) {
 			lAltMod = true;
+		}
+
+		if (lShiftMod && key == GLFW_KEY_GRAVE_ACCENT) {
+			printf("PlayState: Grave Accent Pressed -- Swapping Console Visibility\n");
+#if defined(DEBUG)
+			printf("\tConsole Visibility: ");
+			printf(console->getVisible() ? "True -> " : "False -> ");
+#endif
+			console->setVisible(!console->getVisible());
+#if defined(DEBUG)
+			printf(console->getVisible() ? "True\n" : "False\n");
+#endif
+		}
+
+		if (console->getVisible()) {
+			if (key >= 'A' && key <= 'Z') {
+				lShiftMod ? console->pushChar(key) : console->pushChar(key + 32);
+#if defined(DEBUG)
+				printf("PlayState: Console -- Character Added: ");
+				lShiftMod ? printf("%c", key) : printf("%c", (key + 32));
+				printf("\tNew Command: %s\n", console->getCmdLine());
+#endif
+			}
+			if (key == GLFW_KEY_BACKSPACE) {
+				console->popChar();
+#if defined(DEBUG)
+				printf("PlayState: Console -- Character Removed\n");
+#endif
+			}
+			if (key == GLFW_KEY_ENTER) {
+				if (console->getCmdLine() != "") {
+#if defined(DEBUG)
+					printf("PlayState: Console -- Command Pushed:\n%s\n", (std::string)console->getCmdLine());
+#endif
+					console->pushString(console->getCmdLine());
+				}
+			}
+		}
+		else {
+			if (key == GLFW_KEY_ESCAPE) {
+				printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
+				State::ResetStateTo(menuState);
+			}
 		}
 		return true;
 	}
@@ -307,6 +359,8 @@ int main(int argc, char** args) {
 	// Test();
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
 
+	console = std::shared_ptr<Console>(new Console());
+
 	GameEvent gameEvents[TOTAL_EVENTS];
 	for (int i = 0; i < TOTAL_EVENTS; i++) {
 		gameEvents[i] = cleanEvent(gameEvents[i]);
@@ -354,6 +408,8 @@ int main(int argc, char** args) {
 			frames -= fps;
 		}
 	}
+
+	console.~shared_ptr();
 
 	State::Close();
 	AssetManager::Clear();
