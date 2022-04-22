@@ -128,9 +128,9 @@ public:
 class PlayState : public GameState {
 	
 	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
-	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
+	// Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
-	CameraObject gameCamera{glm::vec3(10.0f), glm::vec3(0.0f)};
+	CameraObject gameCamera{ {1280.0f, 720.0f}, 70.0f, .01f, 1000.0f, glm::vec3(10.0f), glm::vec3{0.0f}, glm::vec3(50.0f) };
 
 	std::shared_ptr<BodySystem> system;
 	bool mouse1Down = false, mouse2Down = false, lShiftMod = false, rShiftMod = false, lAltMod = false;
@@ -151,23 +151,18 @@ public:
 	virtual void update(float delta) override {
 		if (!console->getVisible()) {
 			if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
-				gameCamera.setCameraLock(false);
-				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, gameCamera.getCameraFront());
+				gameCamera.move(.5 * delta, MoveDirection::FORWARDS);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
-				gameCamera.setCameraLock(false);
-				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+				gameCamera.move(.5 * delta, MoveDirection::LEFT);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
-				gameCamera.setCameraLock(false);
-				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::vec3(-1.0f) * gameCamera.getCameraFront());
+				gameCamera.move(.5 * delta, MoveDirection::BACKWARDS);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
-				gameCamera.setCameraLock(false);
-				gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, glm::normalize(glm::cross(gameCamera.getCameraFront(), gameCamera.getCameraUp())));
+				gameCamera.move(.5 * delta, MoveDirection::RIGHT);
 			}
 		}
-		perspectiveCamera.setView(glm::lookAt(gameCamera.getPosition(), gameCamera.getTarget(), gameCamera.getCameraUp()));
 		this->delta = delta;
 	}
 
@@ -185,7 +180,7 @@ public:
 		}
 		Renderer::End2DScene();
 
-		Renderer::Begin3DScene(perspectiveCamera);
+		Renderer::Begin3DScene(gameCamera.getCamera());
 		{
 			//Render Light source at star
 			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
@@ -243,7 +238,7 @@ public:
 
 	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
 		this->orthoCamera = { newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f };
-		this->perspectiveCamera = { newWidth, newHeight, 70.0f, .01f, 1000.0f };
+		this->gameCamera.updateProjection({ newWidth, newHeight }, 70.0f, .1f, 1000.0f);
 	}
 
 	virtual bool onKeyPressed(const Key& key) {
@@ -309,6 +304,9 @@ public:
 				printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
 				State::ResetStateTo(menuState);
 			}
+			if (key == GLFW_KEY_F) {
+				gameCamera.focusOn(this->system->getStar().star->getPosition());
+			}
 		}
 		return true;
 	}
@@ -347,26 +345,28 @@ public:
 	}
 
 	virtual bool onMouseWheelScroll(float xOffset, float yOffset) {
+		gameCamera.scale += yOffset / 12.0f;
+		gameCamera.setYaw(gameCamera.getYaw());
 		if (lAltMod == true) {
-			gameCamera.setCameraFOV(gameCamera.getCameraFOV() - yOffset);
+			// gameCamera.setCameraFOV(gameCamera.getCameraFOV() - yOffset);
 		}
 		if (lShiftMod == true) {
-			gameCamera.setCameraSpeed(gameCamera.getCameraSpeed() + yOffset);
+			// gameCamera.setCameraSpeed(gameCamera.getCameraSpeed() + yOffset);
 		}
 		return true;
 	}
 
 	virtual bool onMouseMoved(float x, float y, float dx, float dy) {
-		if (mouse1Down == true && mouse2Down == true) {
-			//gameCamera.moveCamera(gameCamera.getCameraSpeed() * delta, gameCamera.getCameraFront());
-			gameCamera.moveCameraMouse(dx, dy, gameCamera.getCameraSpeed() * delta);
+		if (mouse1Down == true) {
+			gameCamera.setPitch(gameCamera.getPitch() + -dy * .4f);
+			gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
 		}
 		else {
 			if (mouse1Down == true) {
 
 			}
 			if (mouse2Down == true) {
-				gameCamera.setCameraYaw(gameCamera.getCameraYaw() + dx);
+				//gameCamera.setCameraYaw(gameCamera.getCameraYaw() + dx);
 			}
 		}
 
