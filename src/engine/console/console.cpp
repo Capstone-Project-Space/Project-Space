@@ -2,35 +2,36 @@
 
 Console::Console() {
      visible = false;
-     cmdLine = "";
+     cmdLine = new std::string("");
      archive.empty();
 }
 
 Console::~Console() {
-     cmdLine.clear();
+     cmdLine->clear();
+     delete cmdLine;
 }
 
 void Console::pushChar(char c) {
-     if (cmdLine.empty()) {
-          cmdLine = "";
+     if (cmdLine == nullptr) {
+          cmdLine = new std::string("");
      }
-     setCmdLine(getCmdLine() + c);
+     cmdLine->push_back(c);
 }
 
 void Console::popChar() {
      if (getCmdLine() != "") {
-          cmdLine.pop_back();
+          cmdLine->pop_back();
      }
-     else if (!cmdLine.empty()) {
-          cmdLine.clear();
+     else if (!cmdLine->empty()) {
+          cmdLine->clear();
      }
 }
 
 void Console::pushString(std::string str) {
      //trim command archive if needed
      if (archive.size() > 32) {
-          archive.pop();
+          archive.pop_back();
      }
-     archive.push(str);
+     archive.push_front(str);
      setCmdLine("");
 }

@@ -133,7 +133,7 @@ class PlayState : public GameState {
 	CameraObject gameCamera{glm::vec3(10.0f), glm::vec3(0.0f)};
 
 	std::shared_ptr<BodySystem> system;
-	bool mouse1Down = false, mouse2Down = false, lShiftMod = false, lAltMod = false;
+	bool mouse1Down = false, mouse2Down = false, lShiftMod = false, rShiftMod = false, lAltMod = false;
 	float delta;
 
 	float mouseX, mouseY, mouseDX, mouseDY;
@@ -206,29 +206,35 @@ public:
 		}
 		Renderer::End3DScene();
 
+		
 		Renderer::Begin2DScene(orthoCamera); {
 			Renderer::ChangeFont(AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"));
-			//Render GameState Information
-			Renderer::SubmitText("Camera Position:  x = " + std::to_string(gameCamera.getPosition().x)
-				+ ";  y = " + std::to_string(gameCamera.getPosition().y)
-				+ ";  z = " + std::to_string(gameCamera.getPosition().z),
-				{ -(window->getData().size.x / 2.f) + 1.0f,
-				  (window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+				
+			if (!console->getVisible()) {
+				//Render GameState Information
+				Renderer::SubmitText("Camera Position:  x = " + std::to_string(gameCamera.getPosition().x)
+					+ ";  y = " + std::to_string(gameCamera.getPosition().y)
+					+ ";  z = " + std::to_string(gameCamera.getPosition().z),
+					{ -(window->getData().size.x / 2.f) + 1.0f,
+						(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
 
-			//Render Mouse Information
-			Renderer::SubmitText("Mouse:  x - " + std::to_string(mouseX) + ";  y - " + std::to_string(mouseY)
-				+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
-				{ -(window->getData().size.x / 2.f) + 1.0f,
-				  (window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+				//Render Mouse Information
+				Renderer::SubmitText("Mouse:  x - " + std::to_string(mouseX) + ";  y - " + std::to_string(mouseY)
+					+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
+					{ -(window->getData().size.x / 2.f) + 1.0f,
+						(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+			}
+			else {
+				Renderer::SubmitQuad({ 0.0f, 0.4f, 0.0f }, { window->getData().size.x, (int)(window->getData().size.y * (3.0f / 5.0f)) }, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
 
-			if (console->getVisible()) {
-				Renderer::SubmitQuad({ 0.0f, 0.4f, 0.0f }, { window->getData().size.x, (int)(window->getData().size.y * (3.0f / 5.0f))}, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
-			
-				for (int i = 0; i < console->getArchiveSize(); i++) {
+				Renderer::SubmitText("> " + console->getCmdLine(),
+					{ -(window->getData().size.x / 2.f) + 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
 
+				for (int i = 1; i <= console->getArchiveSize(); i++) {
+					Renderer::SubmitText(console->getArchiveAt(i - 1),
+						{ -(window->getData().size.x / 2.f) + 14.0f, i * 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
 				}
 			}
-
 		}
 		Renderer::End2DScene();
 
@@ -244,11 +250,14 @@ public:
 		if (key == GLFW_KEY_LEFT_SHIFT) {
 			lShiftMod = true;
 		}
+		if (key == GLFW_KEY_RIGHT_SHIFT) {
+			rShiftMod = true;
+		}
 		if (key == GLFW_KEY_LEFT_ALT) {
 			lAltMod = true;
 		}
 
-		if (lShiftMod && key == GLFW_KEY_GRAVE_ACCENT) {
+		if ((lShiftMod || rShiftMod) && key == GLFW_KEY_GRAVE_ACCENT) {
 			printf("PlayState: Grave Accent Pressed -- Swapping Console Visibility\n");
 #if defined(DEBUG)
 			printf("\tConsole Visibility: ");
@@ -262,13 +271,24 @@ public:
 
 		if (console->getVisible()) {
 			if (key >= 'A' && key <= 'Z') {
-				lShiftMod ? console->pushChar(key) : console->pushChar(key + 32);
+				(lShiftMod || rShiftMod) ? console->pushChar(key) : console->pushChar(key + 32);
 #if defined(DEBUG)
 				printf("PlayState: Console -- Character Added: ");
-				lShiftMod ? printf("%c", key) : printf("%c", (key + 32));
-				printf("\tNew Command: %s\n", console->getCmdLine());
+				(lShiftMod || rShiftMod) ? printf("%c", key) : printf("%c", (key + 32));
+				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
 #endif
 			}
+
+			if ((key >= '0' && key <= '9') || (key == ' ') || (key == '.')) {
+				console->pushChar(key);
+#if defined(DEBUG)
+				printf("PlayState: Console -- Character Added: ");
+				printf("%c", key);
+				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
+#endif
+			}
+
+
 			if (key == GLFW_KEY_BACKSPACE) {
 				console->popChar();
 #if defined(DEBUG)
@@ -278,9 +298,9 @@ public:
 			if (key == GLFW_KEY_ENTER) {
 				if (console->getCmdLine() != "") {
 #if defined(DEBUG)
-					printf("PlayState: Console -- Command Pushed:\n%s\n", (std::string)console->getCmdLine());
+					printf("PlayState: Console -- Command Pushed:\n%s\n", console->getCmdLine().c_str());
 #endif
-					console->pushString(console->getCmdLine());
+					console->pushString(console->getCmdLine().c_str());
 				}
 			}
 		}
@@ -296,6 +316,9 @@ public:
 	virtual bool onKeyReleased(const Key& key) {
 		if (key == GLFW_KEY_LEFT_SHIFT) {
 			lShiftMod = false;
+		}
+		if (key == GLFW_KEY_RIGHT_SHIFT) {
+			rShiftMod = false;
 		}
 		if (key == GLFW_KEY_LEFT_ALT) {
 			lAltMod = false;
