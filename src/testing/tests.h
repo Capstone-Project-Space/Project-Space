@@ -21,10 +21,10 @@ struct PerfMetric {
 };
 
 struct Pair {
-	std::variant<std::string, TestResult> result;
+	std::variant<std::string, TestResult*> result;
 	PerfMetric metric;
 	Pair(const std::string& error, const PerfMetric& metric);
-	Pair(const TestResult& result, const PerfMetric& metric);
+	Pair(TestResult* result, const PerfMetric& metric);
 };
 
 using hr_clock = std::chrono::high_resolution_clock;
@@ -33,10 +33,10 @@ struct Exception {
 	bool isErr = false;
 	union {
 		const char* error = NULL;
-		void* result;
+		TestResult* result;
 	};
 	Exception();
-	Exception(Exception& e);
+	//Exception(Exception& e);
 };
 
 Exception PerfHelper(TestResult(*func)());

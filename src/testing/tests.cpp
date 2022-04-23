@@ -23,36 +23,33 @@ TestResult::TestResult(const std::string& name, const std::string& msg, bool suc
 Pair::Pair(const std::string& error, const PerfMetric& metric)
 	: result(error), metric(metric) {}
 
-Pair::Pair(const TestResult& result, const PerfMetric& metric) 
+Pair::Pair(TestResult* result, const PerfMetric& metric) 
 	: result(result), metric(metric) {}
 
 Exception::Exception() {}
-Exception::Exception(Exception& e) {
-	this->isErr = e.isErr;
-	if (isErr) this->error = e.error;
-	else this->result = e.result;
-}
+//Exception::Exception(Exception& e) {
+//	this->isErr = e.isErr;
+//	if (isErr) this->error = e.error;
+//	else this->result = e.result;
+//}
 
-Exception PerfHelper(TestResult(*func)()) {
+Exception PerfHelper(TestResult*(*func)()) {
 	Exception ex;
-	ex.result = malloc(sizeof(TestResult));
 	try {
-		if (ex.result)
-			memcpy(ex.result, &(func()), sizeof(TestResult));
-		else throw "Out of Memory";
+		ex.result = func();
 	} catch (const char* s) {
-		free(ex.result);
+		if (ex.result) delete ex.result;
 		ex.error = s;
 		ex.isErr = true;
 	} catch (const std::exception& e) {
-		free(ex.result);
+		if (ex.result) delete ex.result;
 		ex.error = e.what();
 		ex.isErr = true;
 	}
 	return ex;
 }
 
-Exception PerfExcept(TestResult(*func)()) {
+Exception PerfExcept(TestResult*(*func)()) {
 	Exception e;
 	__try {
 		return PerfHelper(func);
@@ -82,14 +79,14 @@ Exception PerfExcept(TestResult(*func)()) {
 			e.error = "Stack Overflow Exception";
 			break;
 		default:
-			e.error = "Unknown Exceptioon";
+			e.error = "Unknown Exception";
 			break;
 		}
 	}
 	return e;
 }
 
-Pair MeasurePerf(TestResult(*func)()) {
+Pair MeasurePerf(TestResult*(*func)()) {
 	hr_clock::time_point start = hr_clock::now();
 	Exception e = PerfExcept(func);
 	hr_clock::duration elapsed = hr_clock::now() - start;
@@ -99,7 +96,7 @@ Pair MeasurePerf(TestResult(*func)()) {
 	p.nano = (elapsed.count() - (p.seconds * 1000000000) - (p.milli / 1000000));
 
 	if (e.isErr) return Pair{ std::string(e.error), p };
-	else return Pair{ *((TestResult*)e.result), p };
+	else return Pair{ ((TestResult*)e.result), p };
 }
 
 void PrintTestResult(const TestResult& result, const PerfMetric& metrics) {
@@ -116,7 +113,7 @@ void PrintTestResult(const TestResult& result, const PerfMetric& metrics) {
 	}
 }
 
-std::map<std::string, std::vector<TestResult (*)()>> Tests {
+std::map<std::string, std::vector<TestResult*(*)()>> Tests {
 	{ "FileStorage", { FS_TestAllDataTypes, FS_TestMultipleSaveables, FS_TestLargeFileSaveable, FS_TestManySmallSaveable } },
 	{ "RandomGen", { RG_TestRandomSignedInt, RG_TestRandomUnSignedInt, RG_TestRandomFloat, RG_TestRandomDouble} },
 	{ "NoiseMap", { NM_TestNoiseMapDefaultConstructor,  NM_TestNoiseMapCustomConstructor, NM_TestNoiseMapDestructor, NM_TestNoiseMapGetterSetter, NM_TestNoiseMapGeneration } },
@@ -133,9 +130,11 @@ void Test() {
 		size_t successful = 0;
 		for (const auto func : funcs) {
 			auto[either, metrics] = MeasurePerf(func);
-			if (either.index() == 1)
-				results.push_back(std::get<TestResult>(either));
-			else
+			if (either.index() == 1) {
+				TestResult* ptr = std::get<TestResult*>(either);
+				results.push_back(*ptr);
+				delete ptr;
+			} else
 				results.emplace_back("Unknown", std::get<std::string>(either), false);
 			PrintTestResult(results.back(), metrics);
 			successful += (size_t) results.back().succeeded;

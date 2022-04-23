@@ -2,4 +2,4 @@
 
 #include "tests.h"
 
-TestResult WN_Test_Creation();
+TestResult* WN_Test_Creation();

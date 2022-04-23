@@ -2,5 +2,5 @@
 
 #include "tests.h"
 
-TestResult GS_TestStateChanges();
-TestResult GS_TestEventReceiving();
+TestResult* GS_TestStateChanges();
+TestResult* GS_TestEventReceiving();

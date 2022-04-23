@@ -94,8 +94,8 @@ struct DataTestStats : Saveable {
 
 };
 
-TestResult FS_TestAllDataTypes() {
-    TestResult result{ "All Data Types" };
+TestResult* FS_TestAllDataTypes() {
+    TestResult* result = new TestResult{ "All Data Types" };
     FileStorage storage{ "test_alldata_types.data" };
     std::shared_ptr<Saveable> saveable = std::make_shared<DataTestAllTypes>(
         std::string{ "all_data" }, DataTestAllTypes::Data(
@@ -108,11 +108,11 @@ TestResult FS_TestAllDataTypes() {
     storage.addSaveable(saveable);
 
     if (storage.save("./test/")) {
-        result.msg = "FileStorage failed to save.";
+        result->msg = "FileStorage failed to save.";
         return result;
     }
     if (storage.load("./test/")) {
-        result.msg = "FileStorage failed to load.";
+        result->msg = "FileStorage failed to load.";
         return result;
     }
     if (remove("./test/test_alldata_types.data")) {
@@ -121,61 +121,61 @@ TestResult FS_TestAllDataTypes() {
 
     while (1) {
         if (data->data.b != -128) {
-            result.msg = "int8_t was not written or read correctly.";
+            result->msg = "int8_t was not written or read correctly.";
             break;
         }
         if (data->data.ub != 255) {
-            result.msg = "uint8_t was not written or read correctly.";
+            result->msg = "uint8_t was not written or read correctly.";
             break;
         }
         if (data->data.s != SHRT_MIN) {
-            result.msg = "int16_t was not written or read correctly.";
+            result->msg = "int16_t was not written or read correctly.";
             break;
         }
         if (data->data.us != USHRT_MAX) {
-            result.msg = "uint16_t was not written or read correctly.";
+            result->msg = "uint16_t was not written or read correctly.";
             break;
         }
         if (data->data.i != INT_MIN) {
-            result.msg = "int32_t was not written or read correctly.";
+            result->msg = "int32_t was not written or read correctly.";
             break;
         }
         if (data->data.ui != UINT_MAX) {
-            result.msg = "uint32_t was not written or read correctly.";
+            result->msg = "uint32_t was not written or read correctly.";
             break;
         }
         if (data->data.l != LLONG_MIN) {
-            result.msg = "int64_t was not written or read correctly.";
+            result->msg = "int64_t was not written or read correctly.";
             break;
         }
         if (data->data.ul != ULLONG_MAX) {
-            result.msg = "uint64_t was not written or read correctly.";
+            result->msg = "uint64_t was not written or read correctly.";
             break;
         }
         if (data->data.f != 32.3634f) {
-            result.msg = "float was not written or read correctly.";
+            result->msg = "float was not written or read correctly.";
             break;
         }
         if (data->data.d != 6346436.543734) {
-            result.msg = "double was not written or read correctlly.";
+            result->msg = "double was not written or read correctlly.";
             break;
         }
         if (strncmp(data->data.cstr, "Hello World", 12)) {
-            result.msg = "C-String was not written or read correctly.";
+            result->msg = "C-String was not written or read correctly.";
             break;
         }
         if (data->data.str != std::string{ "Welcome to the World" }) {
-            result.msg = "std::string was not written or read correctly.";
+            result->msg = "std::string was not written or read correctly.";
             break;
         }
-        result.succeeded = true;
+        result->succeeded = true;
         break;
     }
     return result;
 }
 
-TestResult FS_TestMultipleSaveables() {
-    TestResult result{ "Multiple Saveables" };
+TestResult* FS_TestMultipleSaveables() {
+    TestResult* result = new TestResult{ "Multiple Saveables" };
     FileStorage storage{ "test_multiple_saveables.data" };
     std::shared_ptr<Saveable> character1 = std::make_shared<DataTestStats>(std::string{ "character1" }, 23, 11, 4, 6, 9, 12, 6);
     std::shared_ptr<Saveable> character2 = std::make_shared<DataTestStats>(std::string{ "character2" }, 223, 0, 23, 34, 14, 20, 15);
@@ -186,11 +186,11 @@ TestResult FS_TestMultipleSaveables() {
     storage.addSaveable(character2);
 
     if (storage.save("./test/")) {
-        result.msg = "FileStorage failed to save.";
+        result->msg = "FileStorage failed to save.";
         return result;
     }
     if (storage.load("./test/")) {
-        result.msg = "FileStorage failed to load.";
+        result->msg = "FileStorage failed to load.";
         return result;
     }
     if (remove("./test/test_multiple_saveables.data")) {
@@ -203,26 +203,26 @@ TestResult FS_TestMultipleSaveables() {
     for (size_t i = 0; i < 7; i++) {
         const auto& [name, value] = data1->stats[i];
         if (name != statNames[i]) {
-            result.msg = statNames[i] + "1 name was not written or read correctly.";
+            result->msg = statNames[i] + "1 name was not written or read correctly.";
             return result;
         } else if (value != stat1Values[i]) {
-            result.msg = statNames[i] + "1 value was not written or read correctly.";
+            result->msg = statNames[i] + "1 value was not written or read correctly.";
             return result;
         }
     }
     for (size_t i = 0; i < 7; i++) {
         const auto& [name, value] = data2->stats[i];
         if (name != statNames[i]) {
-            result.msg = statNames[i] + "2 name was not written or read correctly.";
+            result->msg = statNames[i] + "2 name was not written or read correctly.";
             return result;
         }
         else if (value != stat2Values[i]) {
-            result.msg = statNames[i] + "2 value was not written or read correctly.";
+            result->msg = statNames[i] + "2 value was not written or read correctly.";
             return result;
         }
     }
 
-    result.succeeded = true;
+    result->succeeded = true;
     return result;
 }
 
@@ -270,8 +270,8 @@ struct DataTestSmall : Saveable {
     }
 };
 
-TestResult FS_TestLargeFileSaveable() {
-    TestResult result{"Multiple Large Saveables"};
+TestResult* FS_TestLargeFileSaveable() {
+    TestResult* result = new TestResult{"Multiple Large Saveables"};
     std::vector<std::string> larges;
     std::vector<std::shared_ptr<DataTestLarge>> datas;
     FileStorage storage = FileStorage("test_large_filesize.data");
@@ -283,11 +283,11 @@ TestResult FS_TestLargeFileSaveable() {
     }
 
     if (storage.save("./test/")) {
-        result.msg = "FileStorage failed to save.";
+        result->msg = "FileStorage failed to save.";
         return result;
     }
     if (storage.load("./test/")) {
-        result.msg = "FileStorage failed to load.";
+        result->msg = "FileStorage failed to load.";
         return result;
     }
     if (remove("./test/test_large_filesize.data")) {
@@ -296,17 +296,17 @@ TestResult FS_TestLargeFileSaveable() {
 
     for (int i = 0; i < 5; i++) {
         if (larges[i] != datas[i]->content) {
-            result.msg = "Failed to read DataTestLarge at " + std::to_string(i) + ".";
+            result->msg = "Failed to read DataTestLarge at " + std::to_string(i) + ".";
             return result;
         }
     }
-    result.succeeded = true;
+    result->succeeded = true;
     return result;
 }
 
-TestResult FS_TestManySmallSaveable() {
+TestResult* FS_TestManySmallSaveable() {
     constexpr size_t COUNT = 1024 * 128;
-    TestResult result{"Many Small Saveables"};
+    TestResult* result = new TestResult{"Many Small Saveables"};
     std::vector<std::string> smalls;
     std::vector<std::shared_ptr<DataTestSmall>> datas;
     FileStorage storage{"test_many_smalls.data"};
@@ -317,11 +317,11 @@ TestResult FS_TestManySmallSaveable() {
         storage.addSaveable(ptr);
     }
     if (storage.save("./test/")) {
-        result.msg = "FileStorage failed to save.";
+        result->msg = "FileStorage failed to save.";
         return result;
     }
     if (storage.load("./test/")) {
-        result.msg = "FileStorage failed to load.";
+        result->msg = "FileStorage failed to load.";
         return result;
     }
     if (remove("./test/test_many_smalls.data")) {
@@ -330,10 +330,10 @@ TestResult FS_TestManySmallSaveable() {
 
     for (size_t i = 0; i < COUNT; i++) {
         if (smalls[i] != datas[i]->content) {
-            result.msg = "Failed to read DataTestSmall at " + std::to_string(i) + ".";
+            result->msg = "Failed to read DataTestSmall at " + std::to_string(i) + ".";
             return result;
         }
     }
-    result.succeeded = true;
+    result->succeeded = true;
     return result;
 }

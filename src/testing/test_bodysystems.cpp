@@ -1,8 +1,8 @@
 #include "test_bodysystems.h"
 
-TestResult BS_TestBodySystemConstructor() {
-     TestResult result{ "Body System Default Contructor" };
+TestResult* BS_TestBodySystemConstructor() {
+     TestResult* result = new TestResult{"Body System Default Contructor"};
 
-     result.succeeded = true;
+     result->succeeded = true;
      return result;
 }

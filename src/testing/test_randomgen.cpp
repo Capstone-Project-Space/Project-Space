@@ -13,8 +13,8 @@ constexpr double hidub = 1000.0;
 constexpr float lof = -1000.0;
 constexpr float hif = 1000.0;
 
-TestResult RG_TestRandomSignedInt() {
-     TestResult result{ "Random Signed Integer Generation" };
+TestResult* RG_TestRandomSignedInt() {
+     TestResult* result = new TestResult{ "Random Signed Integer Generation" };
      std::map<signed int, unsigned int> valuecount;
 
      for (int i = lo; i <= hi; i++) {
@@ -24,7 +24,7 @@ TestResult RG_TestRandomSignedInt() {
      for (int i = 0; i < 100; i++) {
           signed int x = RandomGen::RangedRandomSignedInt(lo, hi);
           if ((x < lo) || (x > hi)) {
-               result.msg = "signed int value not generated within correct range";
+               result->msg = "signed int value not generated within correct range";
                return result;
           }
           valuecount.at(x) += 1;
@@ -32,17 +32,17 @@ TestResult RG_TestRandomSignedInt() {
 
      for (auto [i, j] : valuecount) {
           if (j > 2) {
-               result.msg = "signed int value generated too much";
+               result->msg = "signed int value generated too much";
                return result;
           }
      }
 
-     result.succeeded = true;
+     result->succeeded = true;
      return result;
 }
 
-TestResult RG_TestRandomUnSignedInt() {
-     TestResult result{ "Random UnSigned Integer Generation" };
+TestResult* RG_TestRandomUnSignedInt() {
+     TestResult* result = new TestResult{ "Random UnSigned Integer Generation" };
      std::map<unsigned int, unsigned int> valuecount;
 
      for (int i = mid; i <= hi*2; i++) {
@@ -52,7 +52,7 @@ TestResult RG_TestRandomUnSignedInt() {
      for (int i = 0; i < 100; i++) {
           unsigned int x = RandomGen::RangedRandomUnSignedInt(mid, hi*2);
           if ((x < mid) || (x > hi*2)) {
-               result.msg = "unsigned int value not generated within correct range";
+               result->msg = "unsigned int value not generated within correct range";
                return result;
           }
           valuecount.at(x) += 1;
@@ -60,23 +60,23 @@ TestResult RG_TestRandomUnSignedInt() {
 
      for (auto [i, j] : valuecount) {
           if (j > 2) {
-               result.msg = "unsigned int value generated too much";
+               result->msg = "unsigned int value generated too much";
                return result;
           }
      }
 
-     result.succeeded = true;
+     result->succeeded = true;
      return result;
 }
 
-TestResult RG_TestRandomFloat() {
-     TestResult result{ "Random Float Generation" };
+TestResult* RG_TestRandomFloat() {
+     TestResult* result = new TestResult{ "Random Float Generation" };
      std::vector<float> record;
 
      for (int i = 0; i < 100; i++) {
           float x = RandomGen::RangedRandomFloat(lof, hif);
           if ((x < lof) || (x > hif)) {
-               result.msg = "float value not generated within correct range";
+               result->msg = "float value not generated within correct range";
                return result;
           }
 
@@ -84,7 +84,7 @@ TestResult RG_TestRandomFloat() {
                record.push_back(x);
           }
           else if (std::find(record.begin(), record.end(), x) != record.end()) {
-               result.msg = "float value already generated";
+               result->msg = "float value already generated";
                return result;
           }
           else {
@@ -92,18 +92,18 @@ TestResult RG_TestRandomFloat() {
           }
      }
 
-     result.succeeded = true;
+     result->succeeded = true;
      return result;
 }
 
-TestResult RG_TestRandomDouble() {
-     TestResult result{ "Random Float Generation" };
+TestResult* RG_TestRandomDouble() {
+     TestResult* result = new TestResult{ "Random Float Generation" };
      std::vector<double> record;
 
      for (int i = 0; i < 100; i++) {
           float x = RandomGen::RangedRandomDouble(lodub, hidub);
           if ((x < lodub) || (x > hidub)) {
-               result.msg = "float value not generated within correct range";
+               result->msg = "float value not generated within correct range";
                return result;
           }
 
@@ -111,7 +111,7 @@ TestResult RG_TestRandomDouble() {
                record.push_back(x);
           }
           else if (std::find(record.begin(), record.end(), x) != record.end()) {
-               result.msg = "float value already generated";
+               result->msg = "float value already generated";
                return result;
           }
           else {
@@ -119,6 +119,6 @@ TestResult RG_TestRandomDouble() {
           }
      }
 
-     result.succeeded = true;
+     result->succeeded = true;
      return result;
 }
