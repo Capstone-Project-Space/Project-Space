@@ -81,10 +81,10 @@ void CameraObject::move(float amount, MoveDirection direction) {
 			moveForward(-amount);
 			break;
 		case MoveDirection::LEFT:
-			moveStrafe(-amount);
+			moveStrafe(amount);
 			break;
 		case MoveDirection::RIGHT:
-			moveStrafe(amount);
+			moveStrafe(-amount);
 			break;
 		case MoveDirection::UP:
 			moveVertical(amount);
