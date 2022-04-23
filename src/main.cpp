@@ -17,6 +17,7 @@
 #include <src/engine/graphics/ui/text_component.h>
 #include <src/engine/graphics/ui/constraint_layout.h>
 #include <src/engine/graphics/ui/explicit_layout.h>
+#include <src/engine/graphics/ui/relative_layout.h>
 
 #include <src/engine/randgen/randomgen.h>
 
@@ -75,6 +76,12 @@ public:
 			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
 		));
 
+		componentManager.addComponent(new TextComponent(
+			"relative_text",
+			new RelativeLayout("window:left:200", "explicit_text:top:-100"),
+			"Relative",
+			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
+		));
 		
 	}
 
@@ -128,7 +135,6 @@ public:
 class PlayState : public GameState {
 	
 	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
-	// Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
 
 	CameraObject gameCamera{ {1280.0f, 720.0f}, 70.0f, .01f, 1000.0f, glm::vec3(10.0f), glm::vec3{0.0f}, glm::vec3(50.0f) };
 
@@ -140,7 +146,6 @@ class PlayState : public GameState {
 public:
 	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		system = std::shared_ptr<BodySystem>(new BodySystem(0));
-		//perspectiveCamera.setView(glm::lookAt(gameCamera.getPosition(), gameCamera.getTarget(), gameCamera.getCameraUp()));
 
 #if defined(DEBUG)
 	printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
