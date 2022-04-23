@@ -28,6 +28,7 @@
 #include <src/gameplay/event.h>
 
 #define DEBUG
+#define RUN_TESTS
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -156,16 +157,16 @@ public:
 	virtual void update(float delta) override {
 		if (!console->getVisible()) {
 			if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
-				gameCamera.move(.5 * delta, MoveDirection::FORWARDS);
+				gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
-				gameCamera.move(.5 * delta, MoveDirection::LEFT);
+				gameCamera.move(1.5 * delta, MoveDirection::LEFT);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
-				gameCamera.move(.5 * delta, MoveDirection::BACKWARDS);
+				gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
-				gameCamera.move(.5 * delta, MoveDirection::RIGHT);
+				gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
 			}
 		}
 		this->delta = delta;
@@ -384,7 +385,9 @@ public:
 };
 
 int main(int argc, char** args) {
-	// Test();
+#ifdef RUN_TESTS
+	Test();
+#endif
 	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
 
 	console = std::shared_ptr<Console>(new Console());
