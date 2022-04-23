@@ -91,19 +91,16 @@ void Window::flush() {
 
 Window::Window(const std::string& title, int width, int height, std::shared_ptr<Window> share) 
 	: data({ false, title, { width, height }, { 0.0f } }) {
-	static bool glfwInited = false;
-	if (!glfwInited) {
-		glfwSetErrorCallback([](int code, const char* msg) {
-			throw msg;
-		});
-		glfwInit();
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwInited = true;
-	}
+	
+	glfwSetErrorCallback([](int code, const char* msg) {
+		throw msg;
+	});
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
+this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
 	if (this->window == NULL) {
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
