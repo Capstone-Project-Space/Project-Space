@@ -144,9 +144,19 @@ class PlayState : public GameState {
 	float delta;
 
 	float mouseX, mouseY, mouseDX, mouseDY;
+
+	float mouse1DownTime, doubleClick1Time;
+	bool doubleClick1Check;
+
+	std::shared_ptr<void> targetObject;
 public:
 	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		system = std::shared_ptr<BodySystem>(new BodySystem(0));
+		gameCamera.focusOn({ 0.0f, 0.0f, 0.0f });
+
+		mouse1DownTime = 0.0f;
+		doubleClick1Time = 0.0f;
+		doubleClick1Check = false;
 
 #if defined(DEBUG)
 	printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
@@ -155,18 +165,45 @@ public:
 	}
 
 	virtual void update(float delta) override {
+		if (doubleClick1Check) {
+			if (doubleClick1Time > 0.15f) {
+				doubleClick1Check = false;
+				doubleClick1Time = 0.0f;
+			}
+			else {
+				doubleClick1Time += delta;
+			}
+		}
+
+		if (mouse1Down) {
+			if (mouse1DownTime < 1.0f) mouse1DownTime += delta;
+			if (mouse1DownTime > 1.0f) mouse1DownTime = 1.0f;
+		}
+
+
 		if (!console->getVisible()) {
 			if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
-				gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
+				if (gameCamera.getTarget() == std::nullopt) {
+					gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
+				}
+				else {
+
+				}
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
-				gameCamera.move(1.5 * delta, MoveDirection::LEFT);
+				if (gameCamera.getTarget() == std::nullopt) {
+					gameCamera.move(1.5 * delta, MoveDirection::LEFT);
+				}
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
-				gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
+				if (gameCamera.getTarget() == std::nullopt) {
+					gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
+				}
 			}
 			if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
-				gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
+				if (gameCamera.getTarget() == std::nullopt) {
+					gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
+				}
 			}
 		}
 		this->delta = delta;
@@ -176,7 +213,7 @@ public:
 		Renderer::Begin2DScene(orthoCamera); {
 			//Render Skybox
 			//front
-			Renderer::SubmitQuad({0.0f, 0.0f, -25.0f}, {window->getData().size.x, window->getData().size.y}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"), 0.0f);
+			//Renderer::SubmitQuad({0.0f, 0.0f, -25.0f}, {window->getData().size.x, window->getData().size.y}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"), 0.0f);
 			//left
 			//Renderer::SubmitQuad({-25.0f, 0.0f, 0.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp"), 270.0f);
 			//right
@@ -186,8 +223,33 @@ public:
 		}
 		Renderer::End2DScene();
 
-		Renderer::Begin3DScene(gameCamera.getCamera());
-		{
+		Renderer::Begin3DScene(gameCamera.getCamera());{
+			//Submit Skybox
+			//front
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+				//Need to add texture support to models
+				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"),
+				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
+					{0.0f, 0.0f, -25.0f}),				//position
+					glm::vec3{5.0f, 5.0f, 1.0f}),			//scale
+					90.0f, glm::vec3{1.0f, 0.0f, 0.0f}),	//x rotation
+			glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});			//color
+
+			//back
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+				//Need to add texture support to models
+				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp"),
+				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
+					{ 0.0f, 0.0f, 25.0f }),				//position
+					glm::vec3{ 5.0f, 5.0f, 1.0f }),		//scale
+					90.0f, glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });			//color
+
+
+
+
+
+
 			//Render Light source at star
 			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
 
@@ -224,6 +286,19 @@ public:
 					+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
 					{ -(window->getData().size.x / 2.f) + 1.0f,
 						(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+
+				Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
+					{ -(window->getData().size.x / 2.f) + 1.0f,
+						(window->getData().size.y / 2.f) - 28.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::LEFT, 0.3);
+
+				Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
+					{ -(window->getData().size.x / 2.f) + 1.0f,
+						(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+				if (doubleClick1Check) {
+					Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
+						{ -(window->getData().size.x / 2.f) + 1.0f,
+							(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+				}
 			}
 			else {
 				Renderer::SubmitQuad({ 0.0f, 0.4f, 0.0f }, { window->getData().size.x, (int)(window->getData().size.y * (3.0f / 5.0f)) }, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
@@ -343,6 +418,17 @@ public:
 	virtual bool onMouseButtonReleased(const MouseButton& button) {
 		if (button == GLFW_MOUSE_BUTTON_1) {
 			mouse1Down = false;
+			if (mouse1DownTime < 0.15f) {
+				if (!doubleClick1Check) {
+					doubleClick1Check = true;
+				}
+				else {
+					//On Double Click
+
+				}
+			}
+
+			mouse1DownTime = 0.0f;
 		}
 		if (button == GLFW_MOUSE_BUTTON_2) {
 			mouse2Down = false;
@@ -363,16 +449,17 @@ public:
 	}
 
 	virtual bool onMouseMoved(float x, float y, float dx, float dy) {
-		if (mouse1Down == true) {
-			gameCamera.setPitch(gameCamera.getPitch() + -dy * .4f);
-			gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
+		if (mouse1Down == true && mouse2Down == true) {
+			gameCamera.move(dx, MoveDirection::LEFT);
+			gameCamera.move(dy, MoveDirection::FORWARDS);
 		}
 		else {
 			if (mouse1Down == true) {
 
 			}
 			if (mouse2Down == true) {
-				//gameCamera.setCameraYaw(gameCamera.getCameraYaw() + dx);
+				gameCamera.setPitch(gameCamera.getPitch() + -dy * .4f);
+				gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
 			}
 		}
 

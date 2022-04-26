@@ -47,8 +47,8 @@ void CameraObject::setYaw(const float yaw) {
 
 void CameraObject::setPitch(const float pitch) {
 	this->pitch = pitch;
-	while (this->pitch < PITCH_MIN) this->pitch += 360.0f;
-	while (this->pitch > PITCH_MAX) this->pitch -= 360.0f;
+	while (this->pitch < PITCH_MIN) this->pitch = PITCH_MIN;
+	while (this->pitch > PITCH_MAX) this->pitch = PITCH_MAX;
 	setCameraView();
 }
 
@@ -95,6 +95,14 @@ void CameraObject::move(float amount, MoveDirection direction) {
 		default:
 			throw "Unknown MoveDirection";
 	}
+	if (this->position.x < -25.0f) this->position.x = -25.0f;
+	if (this->position.x > 25.0f) this->position.x = 25.0f;
+
+	if (this->position.y < -25.0f) this->position.y = -25.0f;
+	if (this->position.y > 25.0f) this->position.y = 25.0f;
+
+	if (this->position.z < -25.0f) this->position.z = -25.0f;
+	if (this->position.z > 25.0f) this->position.z = 25.0f;
 }
 
 void CameraObject::updateProjection(const glm::vec2& dimensions, const float fov, const float near, const float far) {

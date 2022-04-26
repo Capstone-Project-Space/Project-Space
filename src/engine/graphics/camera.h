@@ -28,7 +28,7 @@ private:
 enum class MoveDirection { FORWARDS, BACKWARDS, LEFT, RIGHT, UP, DOWN };
 
 constexpr float YAW_MIN = -180.0f, YAW_MAX = 180.0f;
-constexpr float PITCH_MIN = -180.0f, PITCH_MAX = 180.0f;
+constexpr float PITCH_MIN = -85.0f, PITCH_MAX = 85.0f;
 constexpr glm::vec3 DEFAULT_UP_DIR{ 0.0f, 1.0f, 0.0f };
 class CameraObject {
 public:
@@ -53,6 +53,9 @@ public:
 	const inline glm::vec3& getUp() const { return this->up; }
 
 	const inline Camera& getCamera() const { return this->camera; }
+
+	std::optional<glm::vec3> getTarget() { return this->focusTarget; }
+	void setTarget(std::optional<glm::vec3> focusTarget) { this->focusTarget = focusTarget; }
 
 	void focusOn(const glm::vec3& target);
 	void moveForward(float amount);
