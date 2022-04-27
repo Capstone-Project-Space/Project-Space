@@ -107,7 +107,6 @@ this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? shar
 		exit(1);
 	} 
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		fprintf(stderr, "Failed to initialize GLAD\n");
