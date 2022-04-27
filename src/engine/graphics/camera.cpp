@@ -58,17 +58,20 @@ void CameraObject::focusOn(const glm::vec3& target) {
 }
 
 void CameraObject::moveForward(float amount) {
-	this->position += this->front * amount;
+	glm::vec3 pos = this->position + this->front * amount;
+	this->setPosition(pos);
 	setCameraView();
 }
 
 void CameraObject::moveStrafe(float amount) {
-	this->position += this->right * amount;
+	glm::vec3 pos = this->position + this->right * amount;
+	this->setPosition(pos);
 	setCameraView();
 }
 
 void CameraObject::moveVertical(float amount) {
-	this->position += this->up * amount;
+	glm::vec3 pos = this->position + this->up * amount;
+	this->setPosition(pos);
 	setCameraView();
 }
 
@@ -95,14 +98,6 @@ void CameraObject::move(float amount, MoveDirection direction) {
 		default:
 			throw "Unknown MoveDirection";
 	}
-	if (this->position.x < -25.0f) this->position.x = -25.0f;
-	if (this->position.x > 25.0f) this->position.x = 25.0f;
-
-	if (this->position.y < -25.0f) this->position.y = -25.0f;
-	if (this->position.y > 25.0f) this->position.y = 25.0f;
-
-	if (this->position.z < -25.0f) this->position.z = -25.0f;
-	if (this->position.z > 25.0f) this->position.z = 25.0f;
 }
 
 void CameraObject::updateProjection(const glm::vec2& dimensions, const float fov, const float near, const float far) {
@@ -111,18 +106,23 @@ void CameraObject::updateProjection(const glm::vec2& dimensions, const float fov
 
 void CameraObject::setCameraView() {
 	if (this->focusTarget.has_value()) {
-		this->direction = this->focusTarget.value() - this->position;
-		this->front = glm::normalize(this->direction);
-		this->yaw = glm::degrees(std::atan2(this->front.x, this->front.z));
-		this->pitch = glm::degrees(std::asin(this->front.y));
+		this->direction = this->position - this->focusTarget.value();
+		this->front = -glm::normalize(this->direction);
+		glm::vec3 dir = this->front;
+		this->pitch = glm::degrees(std::asin(dir.y));
+		while (this->pitch < PITCH_MIN) this->pitch += PITCH_MAX * 2.;
+		while (this->pitch > PITCH_MAX) this->pitch += PITCH_MAX * 2.;
+		this->yaw = glm::degrees(std::atan2(dir.z, dir.x));
+		while (this->yaw < YAW_MIN) this->yaw += YAW_MAX * 2.;
+		while (this->yaw > YAW_MAX) this->yaw += YAW_MIN * 2.;
 	} else {
 		this->direction.x = std::cos(glm::radians(this->yaw)) * std::cos(glm::radians(this->pitch));
 		this->direction.y = std::sin(glm::radians(this->pitch));
 		this->direction.z = std::sin(glm::radians(this->yaw)) * std::cos(glm::radians(this->pitch));
 		this->front = glm::normalize(this->direction);
 	}
-	this->right = glm::normalize(glm::cross(DEFAULT_UP_DIR, this->direction));
-	this->up = glm::cross(this->direction, this->right);
+	this->right = glm::normalize(glm::cross(DEFAULT_UP_DIR, this->front));
+	this->up = glm::cross(this->front, this->right);
 	glm::mat4 lookAt = glm::lookAt(this->position, this->position + this->front, this->up);
 	this->camera.view = lookAt;
 }

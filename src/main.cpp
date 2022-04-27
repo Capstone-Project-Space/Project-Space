@@ -226,7 +226,7 @@ public:
 		Renderer::Begin3DScene(gameCamera.getCamera());{
 			//Submit Skybox
 			//front
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")),
 				//Need to add texture support to models
 				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"),
 				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
@@ -236,7 +236,7 @@ public:
 			glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});			//color
 
 			//back
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")),
 				//Need to add texture support to models
 				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp"),
 				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
@@ -452,8 +452,7 @@ public:
 		if (mouse1Down == true && mouse2Down == true) {
 			gameCamera.move(dx, MoveDirection::LEFT);
 			gameCamera.move(dy, MoveDirection::FORWARDS);
-		}
-		else {
+		} else {
 			if (mouse1Down == true) {
 
 			}

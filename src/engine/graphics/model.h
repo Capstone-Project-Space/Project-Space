@@ -41,7 +41,7 @@ constexpr uint64_t getVertexFloatSize() { return sizeof(ModelVertex) / sizeof(fl
 
 class Model {
 public:
-	static std::shared_ptr<Model> CreateModel(const std::string& filepath);
+	static std::shared_ptr<Model> CreateModel(const std::string& filepath, std::shared_ptr<Texture> texture=nullptr);
 
 	~Model() = default;
 

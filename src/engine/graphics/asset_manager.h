@@ -18,6 +18,8 @@ struct AssetManager {
 
 	template<typename T>
 	static std::shared_ptr<T> GetOrCreate(const std::string& filepath);
+	template<typename T>
+	static std::shared_ptr<T> GetOrCreate(const std::string& filepath, std::shared_ptr<Texture> texture);
 
 	template<>
 	static std::shared_ptr<Model> GetOrCreate(const std::string& filepath) {
@@ -25,6 +27,14 @@ struct AssetManager {
 		if (models.find(key) != models.end())
 			return models.at(key);
 		return (models[key] = Model::CreateModel(filepath));
+	}
+
+	template<>
+	static std::shared_ptr<Model> GetOrCreate(const std::string& filepath, std::shared_ptr<Texture> texture) {
+		const std::string key = std::filesystem::absolute(filepath).generic_string();
+		if (models.find(key) != models.end())
+			return models.at(key);
+		return (models[key] = Model::CreateModel(filepath, texture));
 	}
 
 	template<>

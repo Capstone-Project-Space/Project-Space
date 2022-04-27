@@ -73,7 +73,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 	return map;
 }
 
-std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
+std::shared_ptr<Model> Model::CreateModel(const std::string& filepath, std::shared_ptr<Texture> texture) {
 	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
 
 	std::vector<uint32_t> indices;
@@ -88,6 +88,11 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 
 	Material* currentMaterial = NULL;
 	auto mtls = std::map<std::string, Material>();
+	if (texture) {
+		// TODO: Maybe allow for full Material control instead of just Texture.
+		mtls["ForcedTexture"] = Material{ glm::vec3{1.0f}, glm::vec3{1.0f}, glm::vec3{1.0f}, 1.0f, 1.0f, texture };
+		model->textures[0] = texture;
+	}
 
 	std::string line;
 	std::ifstream file{ filepath };
@@ -100,10 +105,14 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath) {
 		std::getline(obj, line);
 		if (line.rfind("mtllib ") == 0) {
 			mtls = Model::CreateMaterial(filepath.substr(0, filepath.find_last_of('/') + 1) + line.substr(7));
-			uint32_t count = 0;
+			uint32_t count = texture ? 1 : 0;
 			for (auto&[_, material] : mtls) {
 				auto found = std::find(model->textures.begin(), model->textures.end(), material.texture);
 				if (found == model->textures.end()) model->textures[count++] = material.texture;
+			}
+			if (texture) {
+				// TODO: Maybe allow for full Material control instead of just Texture.
+				mtls["ForcedTexture"] = Material{ glm::vec3{1.0f}, glm::vec3{1.0f}, glm::vec3{1.0f}, 1.0f, 1.0f, texture };
 			}
 		} else if (line.rfind("usemtl ") == 0) {
 			currentMaterial = &mtls[line.substr(7)];
