@@ -22,6 +22,7 @@ public:
 
 	static void SubmitLightSource(const LightSource& light);
 	static void SubmitModel(const std::shared_ptr<Model> model, const glm::mat4& transform, const glm::vec4& color = glm::vec4{ 1.0f });
+	static void SubmitModel(const std::shared_ptr<Model> model, const glm::mat4& transform, const std::shared_ptr<ShaderProgram> program, const glm::vec4& color = glm::vec4{ 1.0f });
 
 	static void End3DScene();
 

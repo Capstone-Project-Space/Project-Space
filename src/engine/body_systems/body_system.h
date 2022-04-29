@@ -75,24 +75,24 @@ public:
      BodySystem(const std::string&, StarClass, bool, int, int);
 
      void setName(const std::string&);
-     std::string getName();
+     const std::string& getName() const;
 
      void setStar(StarClass, unsigned int);
-     Star getStar();
+     Star getStar() const;
 
      void setIsNebula(bool);
-     bool getIsNebula();
+     bool getIsNebula() const;
 
      void setBodyCount(int);
-     int getBodyCount();
+     int getBodyCount() const;
 
-     void setBodyList(std::vector<std::shared_ptr<Body>>&);
-     std::vector<std::shared_ptr<Body>> getBodyList();
+     void setBodyList(const std::vector<std::shared_ptr<Body>>&);
+     const std::vector<std::shared_ptr<Body>>& getBodyList() const;
 
      void setSystemID(int);
-     int getSystemID();
+     int getSystemID() const;
 
-     void printDebugInfo();
+     void printDebugInfo() const;
 
 private:
      std::string         name;          //Name of System

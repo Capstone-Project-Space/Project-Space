@@ -51,42 +51,46 @@ void ModelRenderer::submitLight(const LightSource& lightData) {
 	}
 }
 
-void ModelRenderer::submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color) {
-	auto& submissions = modelsToRender[model];
+void ModelRenderer::submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, std::shared_ptr<ShaderProgram> shader, const glm::vec4& color) {
+	auto& shaderSubmissions = modelsToRender[shader];
+	auto& submissions = shaderSubmissions[model];
 	submissions.push_back({ modelTransform, color });
 }
 
+
 void ModelRenderer::draw() {
-	lightsBuffer->updateBuffer(&this->lightBufferData);
-	program->bindUniformBuffer("Lights", lightsBuffer);
 	matricesBufferData.projection = this->camera->getProjection();
 	matricesBufferData.view = this->camera->getView();
-	for (auto& [model, submissions] : modelsToRender) {
-		uint64_t globalIndex = 0;
-		uint64_t count = submissions.size();
-		vArray->addVertexBuffer(layout, model->getVertices());
-		model->bind();
+	for (auto&[program, modelSubmissions] : this->modelsToRender) {
 		program->bind();
 		program->bindUniformBuffer("Matrices", matricesBuffer);
-		while (count > MAX_INSTANCES) {
-			for (uint64_t i = 0; i < MAX_INSTANCES; i++) {
-				matricesBufferData.modelData[i] = submissions[i + globalIndex];
+		lightsBuffer->updateBuffer(&this->lightBufferData);
+		program->bindUniformBuffer("Lights", lightsBuffer);
+		for (auto& [model, submissions] : modelSubmissions) {
+			uint64_t globalIndex = 0;
+			uint64_t count = submissions.size();
+			vArray->addVertexBuffer(layout, model->getVertices());
+			model->bind();
+			while (count > MAX_INSTANCES) {
+				for (uint64_t i = 0; i < MAX_INSTANCES; i++) {
+					matricesBufferData.modelData[i] = submissions[i + globalIndex];
+				}
+				matricesBuffer->updateBuffer(&matricesBufferData);
+				glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, MAX_INSTANCES);
+				LOG_GL_ERROR;
+				count -= MAX_INSTANCES;
+				globalIndex += MAX_INSTANCES;
 			}
-			matricesBuffer->updateBuffer(&matricesBufferData);
-			glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, MAX_INSTANCES);
-			LOG_GL_ERROR;
-			count -= MAX_INSTANCES;
-			globalIndex += MAX_INSTANCES;
-		}
-		if (count > 0) {
-			for (uint64_t i = 0; i < count; i++) {
-				matricesBufferData.modelData[i] = submissions[i + globalIndex];
+			if (count > 0) {
+				for (uint64_t i = 0; i < count; i++) {
+					matricesBufferData.modelData[i] = submissions[i + globalIndex];
+				}
+				matricesBuffer->updateBuffer(&matricesBufferData);
+				glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, count);
+				LOG_GL_ERROR;
 			}
-			matricesBuffer->updateBuffer(&matricesBufferData);
-			glDrawElementsInstanced(GL_TRIANGLES, model->getIndices()->getCount(), GL_UNSIGNED_INT, NULL, count);
-			LOG_GL_ERROR;
+			submissions.clear();
 		}
-		submissions.clear();
 	}
 	lightBufferData.count = 0;
 }

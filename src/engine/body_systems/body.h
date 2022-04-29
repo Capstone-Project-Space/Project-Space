@@ -21,46 +21,44 @@ public:
      Body();
      //Custom Constructor (Should be used when reading file data)
      Body(const std::string&, int, int, const glm::vec3&, float, const glm::vec3&, int);
-     //Destructor
-     ~Body();
-
+     
      //Name Get Set
-     void setName(std::string);
-     const std::string& getName();
+     void setName(const std::string&);
+     const std::string& getName() const;
 
      //BodyType Get Set
-     void setBodyType(BodyType);
-     BodyType getBodyType();
+     void setBodyType(const BodyType);
+     BodyType getBodyType() const;
      
      //HabitType Get Set
-     void setHabitType(HabitType);
-     HabitType getHabitType();
+     void setHabitType(const HabitType);
+     HabitType getHabitType() const;
 
      //Position Get Set
      void setPosition(const glm::vec3&);
-     const glm::vec3& getPosition();
+     const glm::vec3& getPosition() const;
 
      //Scale Get Set
-     void setScale(float);
-     float getScale();
+     void setScale(const float);
+     float getScale() const;
 
      //Color Get Set
      void setColor(const glm::vec3&);
-     const glm::vec3& getColor();
+     const glm::vec3& getColor() const;
 
      //MoonCount Get Set
-     void setMoonCount(int);
-     int getMoonCount();
+     void setMoonCount(const int);
+     int getMoonCount() const;
 
      //Moon List Get Set
-     void setMoonList(std::vector<std::shared_ptr<Body>>);
-     const std::vector<std::shared_ptr<Body>>& getMoonList();
+     void setMoonList(const std::vector<std::shared_ptr<Body>>&);
+     const std::vector<std::shared_ptr<Body>>& getMoonList() const;
 
      //BodyID Get Set
-     void setBodyID(std::string);
-     const std::string& getBodyID();
+     void setBodyID(const std::string&);
+     const std::string& getBodyID() const;
 
-     void printDebugInfo();
+     void printDebugInfo() const;
 
 private:
      std::string         name;          //Name of Body

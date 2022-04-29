@@ -149,6 +149,7 @@ class PlayState : public GameState {
 	bool doubleClick1Check;
 
 	std::shared_ptr<void> targetObject;
+
 public:
 	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
 		system = std::shared_ptr<BodySystem>(new BodySystem(0));
@@ -157,7 +158,6 @@ public:
 		mouse1DownTime = 0.0f;
 		doubleClick1Time = 0.0f;
 		doubleClick1Check = false;
-
 #if defined(DEBUG)
 	printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
 	system->printDebugInfo();
@@ -257,7 +257,7 @@ public:
 			Star star = system->getStar();
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
 				glm::scale(glm::translate(glm::identity<glm::mat4>(),star.star->getPosition()),
-					glm::vec3{ star.star->getScale() }),glm::vec4{star.star->getColor(), 1.0f});
+					glm::vec3{ star.star->getScale() }), glm::vec4{star.star->getColor(), 1.0f});
 
 			//Render all system bodies
 			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();

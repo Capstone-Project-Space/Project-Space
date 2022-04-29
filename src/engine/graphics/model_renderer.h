@@ -23,7 +23,10 @@ public:
 	void destroy();
 
 	void submitLight(const LightSource& lightData);
-	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+	inline void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f }) {
+		submitModel(model, modelTransform, this->program, color);
+	}
+	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, std::shared_ptr<ShaderProgram> shader, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
 	void draw();
 
@@ -36,7 +39,7 @@ private:
 		glm::mat4 transform = glm::mat4{0.0f};
 		glm::vec4 color = glm::vec4{0.0f};
 	};
-	std::map<std::shared_ptr<Model>, std::vector<UniformData>> modelsToRender;
+	std::map<std::shared_ptr<ShaderProgram>, std::map<std::shared_ptr<Model>, std::vector<UniformData>>> modelsToRender;
 	
 	struct UniformMatrixBuffer {
 		glm::mat4 projection = glm::mat4{0.0f}, view = glm::mat4{ 0.0f };

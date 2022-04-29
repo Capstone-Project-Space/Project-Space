@@ -32,6 +32,11 @@ void Renderer::SubmitModel(const std::shared_ptr<Model> model, const glm::mat4& 
 	Renderer::ModelRenderer.submitModel(model, transform, color);
 }
 
+void Renderer::SubmitModel(const std::shared_ptr<Model> model, const glm::mat4& transform, const std::shared_ptr<ShaderProgram> program, const glm::vec4& color) {
+	assert(Renderer::mode == Mode::MODEL && "Renderer did not begin a 3D scene");
+	Renderer::ModelRenderer.submitModel(model, transform, program, color);
+}
+
 void Renderer::End3DScene() {
 	assert(Renderer::mode == Mode::MODEL && "Renderer did not begin a 3D scene.");
 	Renderer::ModelRenderer.draw();

@@ -78,7 +78,7 @@ void BodySystem::setName(const std::string& name) {
      this->name = name;
 }
 
-std::string BodySystem::getName() {
+const std::string& BodySystem::getName() const {
      return this->name;
 }
 
@@ -86,7 +86,7 @@ void BodySystem::setStar(StarClass starClass, unsigned int systemID) {
      this->star = Star(starClass, systemID);
 }
 
-Star BodySystem::getStar() {
+Star BodySystem::getStar() const {
      return this->star;
 }
 
@@ -94,7 +94,7 @@ void BodySystem::setIsNebula(bool isNebula) {
      this->isNebula = isNebula;
 }
 
-bool BodySystem::getIsNebula() {
+bool BodySystem::getIsNebula() const {
      return this->isNebula;
 }
 
@@ -102,11 +102,11 @@ void BodySystem::setBodyCount(int bodyCount) {
      this->bodyCount = bodyCount;
 }
 
-int BodySystem::getBodyCount() {
+int BodySystem::getBodyCount() const {
      return this->bodyCount;
 }
 
-void BodySystem::setBodyList(std::vector<std::shared_ptr<Body>>& bodyList) {
+void BodySystem::setBodyList(const std::vector<std::shared_ptr<Body>>& bodyList) {
      if (!this->bodyList.empty()) {
           this->bodyList.clear();
      }
@@ -116,7 +116,7 @@ void BodySystem::setBodyList(std::vector<std::shared_ptr<Body>>& bodyList) {
      }
 }
 
-std::vector<std::shared_ptr<Body>> BodySystem::getBodyList() {
+const std::vector<std::shared_ptr<Body>>& BodySystem::getBodyList() const {
      return bodyList;
 }
 
@@ -124,11 +124,11 @@ void BodySystem::setSystemID(int systemID) {
      this->systemID = systemID;
 }
 
-int BodySystem::getSystemID() {
+int BodySystem::getSystemID() const {
      return this->systemID;
 }
 
-void BodySystem::printDebugInfo() {
+void BodySystem::printDebugInfo() const {
      printf("\tSystem - NAME: ''%s'' ID: %s\n", this->name.c_str(), std::to_string(this->systemID).c_str());
      printf("\t\tNebula?: %s\n", this->isNebula ? "true" : "false");
      printf("\t\tOribiting Bodies: %d\n", this->getBodyCount());

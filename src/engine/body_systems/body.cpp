@@ -22,62 +22,56 @@ Body::Body(const std::string& name, int bodyType, int habitType, const glm::vec3
      setMoonCount(moonCount);
 }
 
-Body::~Body() {
-     if (this->moonCount > 0) {
-          this->moonList.clear();
-     }
-}
-
-void Body::setName(std::string name) {
+void Body::setName(const std::string& name) {
      this->name = name;
 }
-const std::string& Body::getName() {
+const std::string& Body::getName() const {
      return this->name;
 }
 
 void Body::setBodyType(BodyType bodyType) {
      this->bodyType = bodyType;
 }
-BodyType Body::getBodyType() {
+BodyType Body::getBodyType() const {
      return this->bodyType;
 }
 
-void Body::setHabitType(HabitType habitType) {
+void Body::setHabitType(const HabitType habitType) {
      this->habitType = habitType;
 }
-HabitType Body::getHabitType() {
+HabitType Body::getHabitType() const {
      return this->habitType;
 }
 
 void Body::setPosition(const glm::vec3& position) {
      this->position = position;
 }
-const glm::vec3& Body::getPosition() {
+const glm::vec3& Body::getPosition() const {
      return this->position;
 }
 
-void Body::setScale(float scale) {
+void Body::setScale(const float scale) {
      this->scale = scale;
 }
-float Body::getScale() {
+float Body::getScale() const {
      return this->scale;
 }
 
 void Body::setColor(const glm::vec3& color) {
      this->color = color;
 }
-const glm::vec3& Body::getColor() {
+const glm::vec3& Body::getColor() const {
      return this->color;
 }
 
-void Body::setMoonCount(int moonCount) {
+void Body::setMoonCount(const int moonCount) {
      this->moonCount = moonCount;
 }
-int Body::getMoonCount() {
+int Body::getMoonCount() const {
      return this->moonCount;
 }
 
-void Body::setMoonList(std::vector<std::shared_ptr<Body>> moonList) {
+void Body::setMoonList(const std::vector<std::shared_ptr<Body>>& moonList) {
      if (!this->moonList.empty()) {
           this->moonList.clear();
      }
@@ -87,19 +81,19 @@ void Body::setMoonList(std::vector<std::shared_ptr<Body>> moonList) {
      }
 }
 
-const std::vector<std::shared_ptr<Body>>& Body::getMoonList() {
+const std::vector<std::shared_ptr<Body>>& Body::getMoonList() const {
      return moonList;
 }
 
-void Body::setBodyID(std::string bodyID) {
+void Body::setBodyID(const std::string& bodyID) {
      this->bodyID = bodyID;
 }
 
-const std::string& Body::getBodyID() {
+const std::string& Body::getBodyID() const {
      return bodyID;
 }
 
-void Body::printDebugInfo() {
+void Body::printDebugInfo() const {
      printf("\t\t\tBody - NAME: ''%s'' ID: %s\n", this->getName().c_str(), this->getBodyID().c_str());
      printf("\t\t\t\tBodyType: %d\n", (int) this->getBodyType());
      printf("\t\t\t\tHabitable: %d\n", (int)this->getHabitType());
