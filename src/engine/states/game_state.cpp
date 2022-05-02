@@ -9,6 +9,13 @@ GameState::~GameState() {
 	Events::RemoveReceiver(this);
 }
 
+void GameState::onResume(std::shared_ptr<Window> window) {
+	if (window) this->window = window;
+	componentManager.applyLayouts(this->window);
+}
+
+void GameState::onPause() {}
+
 void GameState::changeWindow(std::shared_ptr<Window> window) {
 	this->window = window;
 	this->componentManager.applyLayouts(window);

@@ -13,15 +13,12 @@ public:
 	GameState(const std::shared_ptr<Window> window, const std::string& saveFileName);
 	virtual ~GameState();
 
-	virtual void onResume(std::shared_ptr<Window> window) {
-		if (window) this->window = window;
-		componentManager.applyLayouts(this->window);
-	}
+	virtual void onResume(std::shared_ptr<Window> window);
 
 	virtual void update(float delta) = 0;
 	virtual void render(float delta) = 0;
 
-	virtual void onPause() {}
+	virtual void onPause();
 
 	void changeWindow(std::shared_ptr<Window> window);
 
