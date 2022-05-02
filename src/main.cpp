@@ -15,6 +15,7 @@
 #include <src/engine/graphics/asset_manager.h>
 
 #include <src/engine/graphics/ui/text_component.h>
+#include <src/engine/graphics/ui/button_component.h>
 #include <src/engine/graphics/ui/constraint_layout.h>
 #include <src/engine/graphics/ui/explicit_layout.h>
 #include <src/engine/graphics/ui/relative_layout.h>
@@ -56,7 +57,7 @@ public:
 			transforms[i] = glm::translate(glm::scale(glm::identity<glm::mat4>(), { .1f, .1f, .1f }), { RandomGen::RangedRandomFloat(-12, 12), -.9f, RandomGen::RangedRandomFloat(-7, 7)});
 		}
 
-		componentManager.addComponent(new TextComponent(
+		/*componentManager.addComponent(new TextComponent(
 			std::string_view{ "simple_text" },
 			new ConstraintLayout("", "window:top", "window:right", "", "window"),
 			std::string{ "This is some text." },
@@ -82,8 +83,16 @@ public:
 			new RelativeLayout("window:left:200", "explicit_text:top:-100"),
 			"Relative",
 			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
+		));*/
+
+		componentManager.addComponent(new ButtonComponent(
+			"test_button",
+			new RelativeLayout("window:right:0%", "window:bottom:30%"),
+			[](ButtonComponent& button) {std::cout << "Button Pressed" << std::endl; },
+			"New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
+			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
 		));
-		
+
 	}
 
 	virtual void update(float delta) override {
