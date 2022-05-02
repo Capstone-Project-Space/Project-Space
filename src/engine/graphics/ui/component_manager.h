@@ -8,7 +8,7 @@
 #include <src/engine/graphics/camera.h>
 #include <src/engine/graphics/ui/layout.h>
 
-class ComponentManager {
+class ComponentManager : public EventReceiver {
 public:
 	ComponentManager() = default;
 
@@ -48,6 +48,9 @@ public:
 
 	inline std::vector<std::shared_ptr<UIComponent>>::const_iterator cbegin() const { return components.cbegin(); }
 	inline std::vector<std::shared_ptr<UIComponent>>::const_iterator cend() const { return components.cend(); }
+
+	virtual bool onMouseButtonPressed(const MouseButton& button) override;
+	virtual bool onMouseButtonReleased(const MouseButton& button) override;
 
 private:
 	bool hasAppliedLayout = false;

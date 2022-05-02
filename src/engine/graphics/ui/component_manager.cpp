@@ -42,7 +42,20 @@ void ComponentManager::applyLayouts(std::shared_ptr<Window> window) {
 void ComponentManager::drawComponents(float delta, const Camera& camera) {
 	Renderer::Begin2DScene(camera);
 	for (auto& component : components) {
-		component->draw(delta);
+		if (component->isVisible()) component->draw(delta);
 	}
 	Renderer::End2DScene();
+}
+
+bool ComponentManager::onMouseButtonPressed(const MouseButton& button) {
+	for (auto component : components) {
+		if (component->onMouseButtonPressed(button)) return true;
+	}
+	return false;
+}
+bool ComponentManager::onMouseButtonReleased(const MouseButton& button) {
+	for (auto component : components) {
+		if (component->onMouseButtonReleased(button)) return true;
+	}
+	return false;
 }
