@@ -7,6 +7,7 @@
 
 class Camera {
 public:
+	Camera() = default;
 	Camera(float left, float right, float bottom, float top);
 	Camera(float width, float height, float fov, float near, float far);
 
