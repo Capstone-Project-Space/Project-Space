@@ -23,6 +23,7 @@ void BatchRenderer::init() {
 		{
 			{ "a_Position",		ShaderDataType::Type::FLOAT2 },
 			{ "a_UV",			ShaderDataType::Type::FLOAT2 },
+			{ "a_Color",		ShaderDataType::Type::FLOAT4 },
 			{ "a_Texture",		ShaderDataType::Type::INT },
 			{ "a_Transform",	ShaderDataType::Type::MAT4 }
 		}, this->vertices
@@ -68,14 +69,14 @@ void BatchRenderer::submitQuad(QuadData data, const std::shared_ptr<Texture> tex
 	this->quads[this->count++] = data;
 }
 
-void BatchRenderer::submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation) {
-	const glm::mat4 transform = glm::rotate(glm::translate(glm::scale(glm::identity<glm::mat4>(), { size, 0.0f }), { pos }), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+void BatchRenderer::submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation) {
+	const glm::mat4 transform = glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(), pos), { size, 0.0f }), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
 	submitQuad(QuadData
 		{
-			QuadVertex{ { -.5f, -.5f },	{ stpq.s, stpq.t }, 0, transform },
-			QuadVertex{ { 0.5f, -.5f },	{ stpq.p, stpq.t }, 0, transform },
-			QuadVertex{ { 0.5f, 0.5f },	{ stpq.p, stpq.q }, 0, transform },
-			QuadVertex{ { -.5f, 0.5f },	{ stpq.s, stpq.q }, 0, transform }
+			QuadVertex{ { -.5f, -.5f },	{ stpq.s, stpq.t }, tintColor, 0, transform },
+			QuadVertex{ { 0.5f, -.5f },	{ stpq.p, stpq.t }, tintColor, 0, transform },
+			QuadVertex{ { 0.5f, 0.5f },	{ stpq.p, stpq.q }, tintColor, 0, transform },
+			QuadVertex{ { -.5f, 0.5f },	{ stpq.s, stpq.q }, tintColor, 0, transform }
 		}, texture
 	);
 }

@@ -18,6 +18,7 @@ constexpr uint32_t MAX_VERTICES = MAX_QUADS * 4;
 struct QuadVertex {
 	glm::vec2 position;
 	glm::vec2 uv;
+	glm::vec4 tint;
 	uint32_t texture;
 	glm::mat4 transform;
 };
@@ -27,7 +28,8 @@ struct QuadData {
 };
 #pragma pack()
 
-const glm::vec4 FULL_UV{ 0.0f, 0.0f, 1.0f, 1.0f };
+constexpr glm::vec4 FULL_UV{ 0.0f, 0.0f, 1.0f, 1.0f };
+constexpr glm::vec4 WHITE_COLOR = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 class BatchRenderer {
 public:
@@ -37,26 +39,50 @@ public:
 	void destroy();
 
 	void submitQuad(QuadData data, const std::shared_ptr<Texture> texture);
-	void submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation = 0.0f);
+	void submitQuad(const glm::vec3&, const glm::vec2&, const glm::vec4&, const std::shared_ptr<Texture>, const glm::vec4&, float = 0.0f);
 
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
-		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, rotation);
-	}
-	
-	inline void submitQuad(const glm::vec2& position, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
-		submitQuad(glm::vec3{ position, 0.0f }, size, FULL_UV, texture, rotation);
+		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, WHITE_COLOR, rotation);
 	}
 
-	inline void submitQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec2& st, const glm::vec2& pq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
-		submitQuad(glm::vec3{ position, 0.0f }, size, glm::vec4(st, pq), texture, rotation);
+	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
+		submitQuad(pos, size, stpq, texture, WHITE_COLOR, rotation);
 	}
 
-	inline void submitQuad(const glm::vec3& position, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
-		submitQuad(position, size, FULL_UV, texture, rotation);
+	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
+		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, WHITE_COLOR, rotation);
 	}
 
-	inline void submitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec2& st, const glm::vec2& pq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
-		submitQuad(position, size, glm::vec4(st, pq), texture, rotation);
+	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
+		submitQuad(pos, size, FULL_UV, texture, WHITE_COLOR, rotation);
+	}
+
+	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
+		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, tintColor, rotation);
+	}
+
+	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
+		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, tintColor, rotation);
+	}
+
+	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
+		submitQuad(pos, size, FULL_UV, texture, tintColor, rotation);
+	}
+
+	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
+		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, glm::vec4{ tintColor, 1.0f }, rotation);
+	}
+
+	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
+		submitQuad(pos, size, stpq, texture, glm::vec4{ tintColor, 1.0f }, rotation);
+	}
+
+	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
+		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, glm::vec4{ tintColor, 1.0f }, rotation);
+	}
+
+	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
+		submitQuad(pos, size, FULL_UV, texture, glm::vec4{ tintColor, 1.0f }, rotation);
 	}
 
 	void draw();

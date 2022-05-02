@@ -68,6 +68,56 @@ void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const std
 	Renderer::BatchRenderer.submitQuad(pos, size, texture, rotation);
 }
 
+void Renderer::SubmitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, tintColor, rotation);
+}
+
+void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation) {
+	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
+	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, tintColor, rotation);
+}
+
 void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
 	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
 	assert(font);

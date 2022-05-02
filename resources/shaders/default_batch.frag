@@ -1,6 +1,7 @@
 #version 330 core
 
 in vec2 v_UV;
+in vec4 v_TintColor;
 flat in int v_Texture;
 
 out vec4 color;
@@ -140,4 +141,5 @@ void main() {
 			color = texture(u_Texture0, v_UV);
 			break;
 	}
+	color *= v_TintColor;
 }
