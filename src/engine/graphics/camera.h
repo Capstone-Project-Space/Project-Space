@@ -57,6 +57,7 @@ public:
 
 	std::optional<glm::vec3> getTarget() { return this->focusTarget; }
 	void setTarget(std::optional<glm::vec3> focusTarget) { this->focusTarget = focusTarget; }
+	bool hasTarget() { return (getTarget() == std::nullopt ? false : true); }
 
 	void focusOn(const glm::vec3& target);
 	void moveForward(float amount);

@@ -87,13 +87,22 @@ public:
 		));*/
 
 		componentManager.addComponent(new ButtonComponent(
-			"test_button",
+			"newgame_button",
 			new RelativeLayout("window:right:0%", "window:bottom:30%"),
-			[](ButtonComponent& button) {std::cout << "Button Pressed" << std::endl; },
+			[](ButtonComponent& button) { std::cout << "MainMenu: newgame_button clicked\n\tSwitching States\n" << std::endl;
+									State::ChangeState(playState); },
 			"New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
 			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
 		));
 
+		componentManager.addComponent(new ButtonComponent(
+			"exit_button",
+			new RelativeLayout("window:right:0%", "window:bottom:50%"),
+			[&](ButtonComponent& button) {	std::cout << "MainMenu: exit_button clicked\n\tExiting Application\n" << std::endl;
+										window->close(); },
+			"Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
+			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
+		));
 	}
 
 	virtual void update(float delta) override {
@@ -134,6 +143,7 @@ public:
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("Escape Key Was Pressed\n");
 			window->close();
+
 		}
 		if (key == GLFW_KEY_SPACE) {
 			printf("Space Key Was Pressed\n");
@@ -235,25 +245,68 @@ public:
 
 		Renderer::Begin3DScene(gameCamera.getCamera());{
 			//Submit Skybox
+
 			//front
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")),
-				//Need to add texture support to models
-				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"),
-				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
-					{0.0f, 0.0f, -25.0f}),				//position
-					glm::vec3{5.0f, 5.0f, 1.0f}),			//scale
-					90.0f, glm::vec3{1.0f, 0.0f, 0.0f}),	//x rotation
-			glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});			//color
+				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+					{ 0.0f, 0.0f, -50.0f }),										//position
+					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
 
 			//back
 			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")),
-				//Need to add texture support to models
-				//AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp"),
-				glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(),
-					{ 0.0f, 0.0f, 25.0f }),				//position
-					glm::vec3{ 5.0f, 5.0f, 1.0f }),		//scale
-					90.0f, glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });			//color
+				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+					{ 0.0f, 0.0f, 50.0f }),										//position
+					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+
+			//left
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")),
+				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+					{ -50.0f, 0.0f, 0.0f }),										//position
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
+					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+
+			//right
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")),
+				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+					{ 50.0f, 0.0f, 0.0f }),										//position
+					(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
+					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+
+
+/*			//Test Solar Plane
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+				glm::scale(glm::translate(glm::identity<glm::mat4>(),
+					{ 0.0f, 0.0f, 0.0f }),				//position
+					glm::vec3{ 25.0f, 1.0f, 25.0f }),			//scale
+				glm::vec4{ 1.0f, 1.0f, 1.0f, 0.5f });			//color
+				*/
+				//Render Camera Target Location
+			if (gameCamera.getTarget() != std::nullopt) {
+				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+					glm::scale(glm::translate(glm::identity<glm::mat4>(),
+						gameCamera.hasTarget() ? gameCamera.getTarget().value()
+						: glm::vec3{ 0.0f, 0.0f, 0.0f }),				//position
+						glm::vec3{ 1.0f, 1.0f, 1.0f }),			//scale
+					glm::vec4{ 1.0f, 0.45f, 0.45f, 1.0f });			//color
+			}
+
+
+
+
 
 
 
