@@ -8,8 +8,8 @@
 #include <limits.h>
 #include <filesystem>
 
-const int TOTAL_EVENTS = 19;
-const int MAX_NUMBER_OF_RESOURCES = 2;
+constexpr int TOTAL_EVENTS = 19;
+constexpr int MAX_NUMBER_OF_RESOURCES = 2;
 
 class Handler {
 public:

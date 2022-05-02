@@ -41,8 +41,7 @@ GameEvent readEvent(GameEvent eventObject, int eventNumber) {
 	int numberOfDataPoints = 0;
 
 	std::filesystem::path p = { getCurrentDir() };
-	std::string pathName = p.parent_path().string() + "\\src\\gameplay\\event_sheet.csv";
-	std::replace(pathName.begin(), pathName.end(), '\\', '/');
+	std::string pathName = p.parent_path().string() + "./resources/gameplay/event_sheet.csv";
 
 	myFile.open(pathName);
 	if (myFile.is_open()) {
