@@ -25,3 +25,8 @@ bool UIComponent::ChangeLayout(std::shared_ptr<UIComponent> component, Layout* l
 	}
 	return false;
 }
+
+bool UIComponent::ChangeVisibility(std::shared_ptr<UIComponent> component, bool visible) {
+	component->visible = visible;
+	return false;
+}

@@ -66,8 +66,13 @@ public:
 	virtual inline float getHeight() const { return size.value().y; }
 
 	virtual inline bool isVisible() const { return visible; }
-	virtual inline void setVisible(bool visible) { this->visible = visible; }
+	// virtual inline void setVisible(bool visible) { this->visible = visible; }
 
+	virtual inline bool isWithin(const glm::vec2& pos) const {
+		const glm::vec3 position = this->position.value();
+		const glm::vec2 size = this->size.value();
+		return pos.x >= position.x && pos.y >= position.y && pos.x < position.x + size.x && pos.y < position.y + size.y;
+	}
 	
 	static bool ChangeLayout(std::shared_ptr<UIComponent> component, Layout* layout);
 	template<typename T>
@@ -78,6 +83,15 @@ public:
 			component->layout = layout;
 			return true;
 		}
+		return false;
+	}
+
+	static bool ChangeVisibility(std::shared_ptr<UIComponent> component, bool visibility);
+	template<typename T>
+	static bool ChangeVisibility(std::shared_ptr<UIComponent> component, std::function<bool(std::shared_ptr<T>)> func) {
+		static_assert(std::is_base_of<UIComponent, T>);
+		bool visible = func(component);
+		component->visible = visible;
 		return false;
 	}
 
