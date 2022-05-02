@@ -25,6 +25,9 @@ public:
 	virtual bool onMouseButtonPressed(const MouseButton& button) override;
 	virtual bool onMouseButtonReleased(const MouseButton& button) override;
 
+	virtual void addState(std::shared_ptr<GameState> gameState) { states.push_back(gameState); }
+	virtual void clearStates() { states.clear(); }
+
 	template<typename T, typename... Args>
 	static std::shared_ptr<GameState> CreateState(Args&&... args) {
 		T* t = new T(std::forward<Args>(args)...);
@@ -34,6 +37,7 @@ public:
 protected:
 	friend struct State;
 	std::shared_ptr<Window> window;
+	std::vector<std::shared_ptr<GameState>> states;
 	ComponentManager componentManager;
 };
 

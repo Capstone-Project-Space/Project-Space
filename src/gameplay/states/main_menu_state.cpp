@@ -9,6 +9,9 @@ const std::string TITLE_SCREEN_TEXTURE_NAME = std::string{ "./resources/textures
 
 MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 	: GameState(window, "main_menu") {
+
+	//Setup Interactive Buttons
+	////New Game
 	componentManager.addComponent(new ButtonComponent(
 		"play_game",
 		new RelativeLayout("window:right:0%", "window:bottom:50%"),
@@ -17,6 +20,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		}, "New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
+	////Load Game
 	componentManager.addComponent(new ButtonComponent(
 		"load_game",
 		new RelativeLayout("window:right:0%", "play_game:bottom:-10"),
@@ -25,19 +29,21 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		}, "Load Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
+	////Settings
 	componentManager.addComponent(new ButtonComponent(
 		"settings",
 		new RelativeLayout("window:right:0%", "load_game:bottom:-10"),
-		[](ButtonComponent& button) {
-
+		[&](ButtonComponent& button) {
+			State::ChangeState(states[0]);
 		}, "Settings", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
+	////Exit
 	componentManager.addComponent(new ButtonComponent(
 		"exit",
 		new RelativeLayout("window:right:0%", "settings:bottom:-10"),
-		[](ButtonComponent& button) {
-
+		[&](ButtonComponent& button) {
+			this->window->close();
 		}, "Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));

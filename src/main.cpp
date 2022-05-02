@@ -28,6 +28,7 @@
 
 #include <src/gameplay/events/event.h>
 #include <src/gameplay/states/main_menu_state.h>
+#include <src/gameplay/states/settings_state.h>
 
 #define DEBUG
 #define RUN_TESTS
@@ -41,7 +42,7 @@ using Clock = std::chrono::high_resolution_clock;
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
 int height = 1020, width = 720;
-std::shared_ptr<GameState> menuState = nullptr, playState = nullptr;
+std::shared_ptr<GameState> menuState = nullptr, playState = nullptr, settingsState = nullptr;
 std::shared_ptr<Console> console = nullptr;
 
 constexpr int count = 64;
@@ -549,10 +550,14 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = /*GameState::CreateState<MainMenuState>(window); */ GameState::CreateState<TempState>(window, std::string{"Temporary State"});
-	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
+	menuState = GameState::CreateState<MainMenuState>(window);  //GameState::CreateState<TempState>(window, std::string{"Temporary State"});
+	settingsState = GameState::CreateState<SettingsState>(window);
+	playState = GameState::CreateState<PlayState>(window, std::string{ "Temporary State" });
 	LOG_GL_ERROR;
-	
+
+	menuState->addState(settingsState);
+	settingsState->addState(menuState);
+
 	State::ChangeState(menuState);
 
 	LOG_GL_ERROR;
