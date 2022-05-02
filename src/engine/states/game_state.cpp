@@ -14,6 +14,14 @@ void GameState::changeWindow(std::shared_ptr<Window> window) {
 	this->componentManager.applyLayouts(window);
 }
 
+bool GameState::onMouseButtonPressed(const MouseButton& button) {
+	return componentManager.onMouseButtonPressed(button);
+}
+
+bool GameState::onMouseButtonReleased(const MouseButton& button) {
+	return componentManager.onMouseButtonReleased(button);
+}
+
 std::shared_ptr<GameState> State::CurrentState = nullptr;
 std::stack<std::shared_ptr<GameState>> State::StateStack;
 

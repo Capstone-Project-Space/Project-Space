@@ -25,6 +25,9 @@ public:
 
 	void changeWindow(std::shared_ptr<Window> window);
 
+	virtual bool onMouseButtonPressed(const MouseButton& button) override;
+	virtual bool onMouseButtonReleased(const MouseButton& button) override;
+
 	template<typename T, typename... Args>
 	static std::shared_ptr<GameState> CreateState(Args&&... args) {
 		T* t = new T(std::forward<Args>(args)...);
