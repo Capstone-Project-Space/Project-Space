@@ -23,7 +23,7 @@ public:
 	static bool SetTextGravity(std::shared_ptr<TextComponent> component, Gravity gravity);
 	static bool SetLayoutGravity(std::shared_ptr<TextComponent> component, Gravity gravity);
 
-private:
+protected:
 	std::string text;
 	std::shared_ptr<Font> font;
 	float scale = 1.0f;

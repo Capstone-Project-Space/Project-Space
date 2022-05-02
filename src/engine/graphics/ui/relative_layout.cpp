@@ -45,21 +45,17 @@ glm::vec2 RelativeLayout::size(const std::shared_ptr<Window> window, const UICom
 	glm::vec2 size{0.0f};
 
 	if (leftX.has_value() && rightX.has_value()) {
-		auto leftPeer = peers.at(this->leftID);
-		leftPeer->applyLayout(window, peers);
-		auto rightPeer = peers.at(this->rightID);
-		rightPeer->applyLayout(window, peers);
-		size.x = std::fabsf(RelativeLayout::GetValue(leftPeer->getX(), leftX.value()) - RelativeLayout::GetValue(rightPeer->getX(), rightX.value()));
+		float lx = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->leftID, this->leftSide), leftX.value());
+		float rx = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->rightID, this->rightSide), rightX.value());
+		size.x = std::fabsf(lx - rx);
 	} else {
 		size.x = self.getContentWidth();
 	}
 
 	if (topY.has_value() && bottomY.has_value()) {
-		auto topPeer = peers.at(this->topID);
-		topPeer->applyLayout(window, peers);
-		auto bottomPeer = peers.at(this->bottomID);
-		bottomPeer->applyLayout(window, peers);
-		size.y = std::fabsf(RelativeLayout::GetValue(topPeer->getY(), topY.value()) - RelativeLayout::GetValue(bottomPeer->getY(), bottomY.value()));
+		float ty = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->topID, this->topSide), topY.value());
+		float by = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->bottomID, this->bottomSide), bottomY.value());
+		size.y = std::fabsf(ty - by);
 	}
 	else {
 		size.y = self.getContentHeight();
@@ -126,7 +122,7 @@ std::optional<std::variant<Literal, Percentage>> RelativeLayout::GetValue(const 
 	std::optional<std::variant<Literal, Percentage>> value = std::nullopt;
 	if (view.empty()) return value;
 	if (*view.rbegin() == '%') {
-		value.emplace(std::variant<Literal, Percentage>{std::in_place_index<1>, std::stof(std::string{ view.substr(0, view.size() - 1)})});
+		value.emplace(std::variant<Literal, Percentage>{std::in_place_index<1>, std::stof(std::string{ view.substr(0, view.size() - 1)}) / 100.0f});
 	} else {
 		value.emplace(std::variant<Literal, Percentage>{std::in_place_index<0>, std::stof(std::string{ view.substr(0, view.size())})});
 	}
