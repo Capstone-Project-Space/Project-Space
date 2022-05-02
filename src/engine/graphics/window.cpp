@@ -59,6 +59,9 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 
 	glfwSetCursorPosCallback(window->window,
 		[](GLFWwindow* window, double xpos, double ypos) {
+			WindowData* data = (WindowData*)glfwGetWindowUserPointer(window);
+			xpos -= data->size.x / 2.f;
+			ypos = data->size.y / 2.f - ypos;
 			float vals[4] = { xpos, ypos, xpos - Mouse::x, ypos - Mouse::y };
 			Mouse::x = xpos;
 			Mouse::y = ypos;
@@ -100,7 +103,7 @@ Window::Window(const std::string& title, int width, int height, std::shared_ptr<
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
+	this->window = glfwCreateWindow(width, height, title.c_str(), NULL, share ? share->window : NULL);
 	if (this->window == NULL) {
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
