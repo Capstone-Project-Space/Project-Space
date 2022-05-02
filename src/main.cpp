@@ -26,7 +26,8 @@
 
 #include <src/engine/console/console.h>
 
-#include <src/gameplay/event.h>
+#include <src/gameplay/events/event.h>
+#include <src/gameplay/states/main_menu_state.h>
 
 #define DEBUG
 #define RUN_TESTS
@@ -494,7 +495,7 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
+	menuState = GameState::CreateState<MainMenuState>(window); // GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
 	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
 	LOG_GL_ERROR;
 	
