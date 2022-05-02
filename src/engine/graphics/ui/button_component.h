@@ -14,9 +14,9 @@ class ButtonComponent : public UIComponent {
 public:
 	ButtonComponent(
 		const std::string_view& id, Layout* layout, std::function<void(ButtonComponent&)> clickCallback,
-		const std::string& text, std::shared_ptr<Font> font, Gravity gravity = Gravity::CENTER,
+		const std::string& text, std::shared_ptr<Font> font,
 		const Color& textColor = Color{ glm::vec4{1.0f} }, const Color& textHighlightColor = Color{ glm::vec4{ 0.6f } },
-		const glm::vec2& minimumDimensions = { 0.0f, 0.0f }
+		Gravity gravity = Gravity::CENTER, const glm::vec2& minimumDimensions = { 0.0f, 0.0f }
 	);
 
 	ButtonComponent(

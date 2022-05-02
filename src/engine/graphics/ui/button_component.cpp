@@ -4,8 +4,9 @@
 
 ButtonComponent::ButtonComponent(
 	const std::string_view& id, Layout* layout, std::function<void(ButtonComponent&)> clickCallback,
-	const std::string& text, std::shared_ptr<Font> font, Gravity gravity,
-	const Color& textColor, const Color& textHighlightColor, const glm::vec2& minimumDimensions
+	const std::string& text, std::shared_ptr<Font> font, 
+	const Color& textColor, const Color& textHighlightColor,
+	Gravity gravity, const glm::vec2& minimumDimensions
 ) : UIComponent(id, layout), text(text), textFont(font), textGravity(gravity), texture(nullptr),
 	textureHighlightTint({1.0f}), minimumDimensions(minimumDimensions), clickCallback(clickCallback) {
 	if (textColor.index() == 0) this->textColor = glm::vec4{ std::get<0>(textColor), 1.0f };
