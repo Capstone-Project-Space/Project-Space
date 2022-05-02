@@ -1,6 +1,6 @@
 #include "window.h"
 
-#include "src/engine/io/event.h"
+#include <src/engine/io/event.h>
 
 std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int width, int height, std::shared_ptr<Window> share) {
 	std::shared_ptr<Window> window = std::shared_ptr<Window>(new Window(name, width, height, share));
@@ -75,6 +75,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 			float vals[4] = { data->size.x, data->size.y, width, height };
 			data->size.x = width;
 			data->size.y = height;
+			data->orthographicCamera = {width / -2.f, width / 2.f, height / -2.f, height / 2.f};
 			glViewport(0, 0, width, height);
 			Events::DispatchEvent(Event<float[4]>{ EventType::WINDOW_RESIZE, vals });
 		}
@@ -93,7 +94,7 @@ void Window::flush() {
 }
 
 Window::Window(const std::string& title, int width, int height, std::shared_ptr<Window> share) 
-	: data({ false, title, { width, height }, { 0.0f } }) {
+	: data({ title, { width, height }}) {
 	
 	glfwSetErrorCallback([](int code, const char* msg) {
 		throw msg;
