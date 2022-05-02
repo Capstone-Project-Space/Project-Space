@@ -99,7 +99,8 @@ public:
 			"exit_button",
 			new RelativeLayout("window:right:0%", "window:bottom:50%"),
 			[&](ButtonComponent& button) {	std::cout << "MainMenu: exit_button clicked\n\tExiting Application\n" << std::endl;
-										window->close(); },
+				this->window->close();
+			},
 			"Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
 			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
 		));
@@ -548,7 +549,7 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = GameState::CreateState<MainMenuState>(window); // GameState::CreateState<TempState>(window, std::string{ "Temporary State" });
+	menuState = /*GameState::CreateState<MainMenuState>(window); */ GameState::CreateState<TempState>(window, std::string{"Temporary State"});
 	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
 	LOG_GL_ERROR;
 	

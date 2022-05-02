@@ -17,12 +17,19 @@ namespace std {
 		}
 	};
 
+	template<>
+	struct hash<std::pair<std::string, std::shared_ptr<Texture>>> {
+		size_t operator()(const std::pair<std::string, std::shared_ptr<Texture>>& p) const {
+			return hash<string>()(p.first) ^ hash<shared_ptr<Texture>>()(p.second);
+		}
+	};
+
 };
 
 struct AssetManager {
 	
 	static std::unordered_map<std::string, std::shared_ptr<Font>> Fonts;
-	static std::unordered_map<std::string, std::shared_ptr<Model>> Models;
+	static std::unordered_map<std::pair<std::string, std::shared_ptr<Texture>>, std::shared_ptr<Model>> Models;
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> Textures;
 
 	static std::unordered_map<std::pair<std::string, std::string>, std::shared_ptr<ShaderProgram>> ShaderPrograms;
@@ -43,7 +50,7 @@ struct AssetManager {
 
 	template<>
 	static std::shared_ptr<Model> GetOrCreate(const std::string& filepath) {
-		const std::string key = std::filesystem::absolute(filepath).generic_string();
+		const auto key = std::pair{ std::filesystem::absolute(filepath).generic_string(), nullptr };
 		if (Models.find(key) != Models.end())
 			return Models.at(key);
 		return (Models[key] = Model::CreateModel(filepath));
@@ -51,7 +58,7 @@ struct AssetManager {
 
 	template<>
 	static std::shared_ptr<Model> GetOrCreate(const std::string& filepath, std::shared_ptr<Texture> texture) {
-		const std::string key = std::filesystem::absolute(filepath).generic_string();
+		const auto key = std::pair{ std::filesystem::absolute(filepath).generic_string(), texture };
 		if (Models.find(key) != Models.end())
 			return Models.at(key);
 		return (Models[key] = Model::CreateModel(filepath, texture));
@@ -83,7 +90,7 @@ struct AssetManager {
 
 	template<>
 	static void Unload<Model>(const std::string& filepath) {
-		const std::string key = std::filesystem::absolute(filepath).generic_string();
+		const auto key = std::pair{ std::filesystem::absolute(filepath).generic_string(), nullptr };
 		Models.erase(key);
 	}
 
