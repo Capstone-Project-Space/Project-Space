@@ -2,9 +2,9 @@
 
 #include <src/engine/states/game_state.h>
 
-class SettingsState : public GameState {
+class LoadGameState : public GameState {
 public:
-     SettingsState(std::shared_ptr<Window> window);
+     LoadGameState(std::shared_ptr<Window> window);
 
      virtual void update(float delta) override;
      virtual void render(float delta) override;

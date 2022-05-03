@@ -28,6 +28,8 @@
 
 #include <src/gameplay/events/event.h>
 #include <src/gameplay/states/main_menu_state.h>
+#include <src/gameplay/states/new_game_state.h>
+#include <src/gameplay/states/load_game_state.h>
 #include <src/gameplay/states/settings_state.h>
 
 #define DEBUG
@@ -42,7 +44,9 @@ using Clock = std::chrono::high_resolution_clock;
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
 int height = 1020, width = 720;
-std::shared_ptr<GameState> menuState = nullptr, playState = nullptr, settingsState = nullptr;
+std::shared_ptr<GameState> mainMenuState = nullptr, newGameState = nullptr,
+						loadGameState = nullptr, playState = nullptr,
+						settingsState = nullptr;
 std::shared_ptr<Console> console = nullptr;
 
 constexpr int count = 64;
@@ -448,7 +452,7 @@ public:
 		else {
 			if (key == GLFW_KEY_ESCAPE) {
 				printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
-				State::ResetStateTo(menuState);
+				State::ResetStateTo(mainMenuState);
 			}
 			if (key == GLFW_KEY_F) {
 				gameCamera.focusOn(this->system->getStar().star->getPosition());
@@ -539,7 +543,7 @@ int main(int argc, char** args) {
 #ifdef RUN_TESTS
 	Test();
 #endif
-	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
+	std::shared_ptr<Window> window = Window::CreateGLWindow("Project Space Engine v0.1a", 1280, 720);
 
 	console = std::shared_ptr<Console>(new Console());
 
@@ -550,15 +554,25 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = GameState::CreateState<MainMenuState>(window);  //GameState::CreateState<TempState>(window, std::string{"Temporary State"});
+	mainMenuState = GameState::CreateState<MainMenuState>(window);  //GameState::CreateState<TempState>(window, std::string{"Temporary State"});
+	newGameState = GameState::CreateState<NewGameState>(window);
+	loadGameState = GameState::CreateState<LoadGameState>(window);
 	settingsState = GameState::CreateState<SettingsState>(window);
 	playState = GameState::CreateState<PlayState>(window, std::string{ "Temporary State" });
 	LOG_GL_ERROR;
 
-	menuState->addState(settingsState);
-	settingsState->addState(menuState);
+	mainMenuState->addState(newGameState);
+	mainMenuState->addState(loadGameState);
+	mainMenuState->addState(settingsState);
 
-	State::ChangeState(menuState);
+	newGameState->addState(mainMenuState);
+
+	loadGameState->addState(mainMenuState);
+
+	settingsState->addState(mainMenuState);
+	LOG_GL_ERROR;
+
+	State::ChangeState(mainMenuState);
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
