@@ -24,6 +24,7 @@ public:
 
 	virtual bool onMouseButtonPressed(const MouseButton& button) override;
 	virtual bool onMouseButtonReleased(const MouseButton& button) override;
+	virtual void onWindowResize(const float oldWidth, const float oldHeight, const float newWidth, const float newHeight) override;
 
 	template<typename T, typename... Args>
 	static std::shared_ptr<GameState> CreateState(Args&&... args) {

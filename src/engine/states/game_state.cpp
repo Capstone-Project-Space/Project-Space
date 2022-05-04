@@ -29,6 +29,10 @@ bool GameState::onMouseButtonReleased(const MouseButton& button) {
 	return componentManager.onMouseButtonReleased(button);
 }
 
+void GameState::onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) {
+	componentManager.applyLayouts(window);
+}
+
 std::shared_ptr<GameState> State::CurrentState = nullptr;
 std::stack<std::shared_ptr<GameState>> State::StateStack;
 
