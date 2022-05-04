@@ -53,7 +53,7 @@ void ButtonComponent::draw(float delta) {
 	bool within = this->isWithin({ Mouse::x, Mouse::y });
 	if (texture) {
 		if (within) Renderer::SubmitQuad(pos, size, Texture::GetWhiteTexture(), textureHighlightTint);
-		else Renderer::SubmitQuad(pos, size, { 0.f, 236.f / 256.f, 200.f/256.f, 1.f }, texture);
+		else Renderer::SubmitQuad(pos, size, {0.f, 236.f / 256.f, 200.f / 256.f, 1.f}, texture);
 	}
 	if (textFont) {
 		if (within) {
