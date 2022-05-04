@@ -5,21 +5,23 @@
 #include <src/engine/graphics/ui/button_component.h>
 #include <src/engine/graphics/ui/relative_layout.h>
 
+#include <src/gameplay/states/ingame_state.h>
+
 const std::string TITLE_SCREEN_TEXTURE_NAME = std::string{ "./resources/textures/title_screen.png" };
 
 MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 	: GameState(window, "main_menu") {
 	componentManager.addComponent(new ButtonComponent(
 		"play_game",
-		new RelativeLayout("window:right:0%", "window:bottom:50%"),
-		[](ButtonComponent& button) {
-
+		new RelativeLayout("window:left:50%", "window:bottom:26%"),
+		[=](ButtonComponent& button) {
+			State::ChangeState(GameState::CreateState<InGameState>(window));
 		}, "New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
 	componentManager.addComponent(new ButtonComponent(
 		"load_game",
-		new RelativeLayout("window:right:0%", "play_game:bottom:-10"),
+		new RelativeLayout("play_game:left:0", "play_game:bottom:-10"),
 		[](ButtonComponent& button) {
 
 		}, "Load Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
@@ -27,7 +29,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 	));
 	componentManager.addComponent(new ButtonComponent(
 		"settings",
-		new RelativeLayout("window:right:0%", "load_game:bottom:-10"),
+		new RelativeLayout("play_game:left:0", "load_game:bottom:-10"),
 		[](ButtonComponent& button) {
 
 		}, "Settings", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
@@ -35,9 +37,9 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 	));
 	componentManager.addComponent(new ButtonComponent(
 		"exit",
-		new RelativeLayout("window:right:0%", "settings:bottom:-10"),
-		[](ButtonComponent& button) {
-
+		new RelativeLayout("play_game:left:0", "settings:bottom:-10"),
+		[=](ButtonComponent& button) {
+			window->close();
 		}, "Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));

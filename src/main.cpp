@@ -88,7 +88,7 @@ public:
 
 		componentManager.addComponent(new ButtonComponent(
 			"newgame_button",
-			new RelativeLayout("window:right:0%", "window:bottom:30%"),
+			new RelativeLayout("window:left:50%", "window:top:-70%"),
 			[](ButtonComponent& button) { std::cout << "MainMenu: newgame_button clicked\n\tSwitching States\n" << std::endl;
 									State::ChangeState(playState); },
 			"New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
@@ -97,7 +97,7 @@ public:
 
 		componentManager.addComponent(new ButtonComponent(
 			"exit_button",
-			new RelativeLayout("window:right:0%", "window:bottom:50%"),
+			new RelativeLayout("newgame_button:left:0", "newgame_button:bottom:-40%"),
 			[&](ButtonComponent& button) {	std::cout << "MainMenu: exit_button clicked\n\tExiting Application\n" << std::endl;
 				this->window->close();
 			},
@@ -319,9 +319,9 @@ public:
 
 			//Render Sun
 			Star star = system->getStar();
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/16x16.obj"),
+			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/sun.obj"),
 				glm::scale(glm::translate(glm::identity<glm::mat4>(),star.star->getPosition()),
-					glm::vec3{ star.star->getScale() }), glm::vec4{star.star->getColor(), 1.0f});
+					glm::vec3{ star.star->getScale() }));
 
 			//Render all system bodies
 			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
@@ -365,14 +365,19 @@ public:
 				}
 			}
 			else {
-				Renderer::SubmitQuad({ 0.0f, 0.4f, 0.0f }, { window->getData().size.x, (int)(window->getData().size.y * (3.0f / 5.0f)) }, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
+				glm::vec2 size = window->getData().size;
+				size.y *= (3.f / 5.f);
+				const float bottom{ (window->getData().size.y / 2.f) - (size.y) };
+				Renderer::SubmitQuad({ 0.0f, window->getData().size.y / 2.f - (size.y / 2.f), 0.0f}, size, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
 
 				Renderer::SubmitText("> " + console->getCmdLine(),
-					{ -(window->getData().size.x / 2.f) + 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+					{ -(window->getData().size.x / 2.f) + 1.0f, bottom + (.02f * size.y), 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::CENTER_VERTICAL, 0.3);
 
+				glm::vec2 pos{ window->getData().size.x / -2.f, bottom + size.y * .075 };
 				for (int i = 1; i <= console->getArchiveSize(); i++) {
 					Renderer::SubmitText(console->getArchiveAt(i - 1),
-						{ -(window->getData().size.x / 2.f) + 14.0f, i * 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+						pos, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, 0.3);
+					pos.y += Renderer::GetFont()->getTextHeight(console->getArchiveAt(i - 1)) * .42;
 				}
 			}
 		}
@@ -383,7 +388,7 @@ public:
 
 	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
 		this->orthoCamera = { newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f };
-		this->gameCamera.updateProjection({ newWidth, newHeight }, 70.0f, .1f, 1000.0f);
+		if (newWidth != 0 && newHeight != 0) this->gameCamera.updateProjection({ newWidth, newHeight }, 70.0f, .1f, 1000.0f);
 	}
 
 	virtual bool onKeyPressed(const Key& key) {
@@ -521,7 +526,7 @@ public:
 
 			}
 			if (mouse2Down == true) {
-				gameCamera.setPitch(gameCamera.getPitch() + -dy * .4f);
+				gameCamera.setPitch(gameCamera.getPitch() + dy * .4f);
 				gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
 			}
 		}
@@ -549,7 +554,7 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = /*GameState::CreateState<MainMenuState>(window); */ GameState::CreateState<TempState>(window, std::string{"Temporary State"});
+	menuState = GameState::CreateState<MainMenuState>(window);// GameState::CreateState<TempState>(window, std::string{"Temporary State"});
 	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
 	LOG_GL_ERROR;
 	
