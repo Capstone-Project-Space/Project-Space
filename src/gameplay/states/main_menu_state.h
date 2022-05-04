@@ -8,7 +8,5 @@ public:
 
 	virtual void update(float delta) override;
 	virtual void render(float delta) override;
-
 private:
-
 };

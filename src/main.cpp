@@ -20,14 +20,11 @@
 #include <src/engine/graphics/ui/explicit_layout.h>
 #include <src/engine/graphics/ui/relative_layout.h>
 
-#include <src/engine/randgen/randomgen.h>
-
-#include <src/engine/body_systems/body_system.h>
-
-#include <src/engine/console/console.h>
-
 #include <src/gameplay/events/event.h>
 #include <src/gameplay/states/main_menu_state.h>
+#include <src/gameplay/states/new_game_state.h>
+#include <src/gameplay/states/load_game_state.h>
+#include <src/gameplay/states/settings_state.h>
 
 #define DEBUG
 #define RUN_TESTS
@@ -40,512 +37,365 @@ using Clock = std::chrono::high_resolution_clock;
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-int height = 1020, width = 720;
-std::shared_ptr<GameState> menuState = nullptr, playState = nullptr;
-std::shared_ptr<Console> console = nullptr;
-
-constexpr int count = 64;
-class TempState : public GameState {
-
-	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
-	Camera perspectiveCamera{ 1280.0f, 720.0f, 70.0f, .01f, 1000.0f };
-
-	glm::mat4 transforms[count];
-
-public:
-	TempState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
-		for (int i = 0; i < count; i++) {
-			transforms[i] = glm::translate(glm::scale(glm::identity<glm::mat4>(), { .1f, .1f, .1f }), { RandomGen::RangedRandomFloat(-12, 12), -.9f, RandomGen::RangedRandomFloat(-7, 7)});
-		}
-
-		/*componentManager.addComponent(new TextComponent(
-			std::string_view{ "simple_text" },
-			new ConstraintLayout("", "window:top", "window:right", "", "window"),
-			std::string{ "This is some text." },
-			AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf")
-		));
-
-		componentManager.addComponent(new TextComponent(
-			"colored_text",
-			new ConstraintLayout("", "", "simple_text:left", "window:bottom", "window"),
-			"This text changes color.",
-			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
-		));
-
-		componentManager.addComponent(new TextComponent(
-			"explicit_text",
-			new ExplicitLayout("300", "50%", "100%", ""),
-			"This text is explicit.",
-			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
-		));
-
-		componentManager.addComponent(new TextComponent(
-			"relative_text",
-			new RelativeLayout("window:left:200", "explicit_text:top:-100"),
-			"Relative",
-			AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf")
-		));*/
-
-		componentManager.addComponent(new ButtonComponent(
-			"newgame_button",
-			new RelativeLayout("window:left:50%", "window:top:-70%"),
-			[](ButtonComponent& button) { std::cout << "MainMenu: newgame_button clicked\n\tSwitching States\n" << std::endl;
-									State::ChangeState(playState); },
-			"New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
-			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
-		));
-
-		componentManager.addComponent(new ButtonComponent(
-			"exit_button",
-			new RelativeLayout("newgame_button:left:0", "newgame_button:bottom:-40%"),
-			[&](ButtonComponent& button) {	std::cout << "MainMenu: exit_button clicked\n\tExiting Application\n" << std::endl;
-				this->window->close();
-			},
-			"Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"), AssetManager::GetOrCreate<Texture>("./resources/textures/ui/button.png"),
-			Color{ glm::vec3{1.0f, 1.0f, 1.0f} }, Color{ glm::vec3{.6f, .6f, .6f} }, Color{ glm::vec3{ 1.0f, 0.4f, 0.0f } }
-		));
-	}
-
-	virtual void update(float delta) override {
-		static float totalTime = 0.0f;
-		totalTime += delta;
-		if (totalTime >= 5.0f && totalTime <= 5.2f) {
-			componentManager.modifyComponent<TextComponent, const std::string&>("simple_text", std::function{ TextComponent::SetText }, "Smol text.");
-			componentManager.modifyComponent<TextComponent, Gravity>("explicit_text", std::function{ TextComponent::SetTextGravity }, Gravity::CENTER);
-		}
-		componentManager.modifyComponent<TextComponent, glm::vec4>("colored_text", std::function((bool(*)(std::shared_ptr<TextComponent>, glm::vec4))TextComponent::SetColor), glm::vec4{delta * 500.0f, delta * 200.0f, delta * 700.0f, 1.0f});
-		componentManager.modifyComponent<TextComponent, float>("simple_text", std::function(TextComponent::SetScale), std::clamp(totalTime, .1f, 1.4f));
-	}
-
-	virtual void render(float delta) override {
-		Renderer::Begin2DScene(orthoCamera);
-		{
-			Renderer::SubmitQuad({ 0.0f, 0.0f }, window->getData().size, AssetManager::GetOrCreate<Texture>("./resources/textures/projectspacefull.png"));
-		}
-		Renderer::End2DScene();
-
-		Renderer::Begin3DScene(perspectiveCamera);
-		{
-			Renderer::SubmitLightSource({{0.0f, 10.0f, 0.0f, 1.0f}});
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/spacepod.obj"), transforms[0]);
-		}
-		Renderer::End3DScene();
-		
-		componentManager.drawComponents(delta, orthoCamera);
-	}
-
-	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
-		this->orthoCamera = {newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f};
-		this->perspectiveCamera = { newWidth, newHeight, 70.0f, .01f, 1000.0f };
-	}
-
-	//Handle Single Button Press
-	virtual bool onKeyPressed(const Key& key) {
-		if (key == GLFW_KEY_ESCAPE) {
-			printf("Escape Key Was Pressed\n");
-			window->close();
-
-		}
-		if (key == GLFW_KEY_SPACE) {
-			printf("Space Key Was Pressed\n");
-			State::ChangeState(playState);
-		}
-		return true;
-	}
-};
-
-class PlayState : public GameState {
-	
-	Camera orthoCamera{ -640.0f, 640.0f, -360.0f, 360.0f };
-
-	CameraObject gameCamera{ {1280.0f, 720.0f}, 70.0f, .01f, 1000.0f, glm::vec3(10.0f), glm::vec3{0.0f}, glm::vec3(50.0f) };
-
-	std::shared_ptr<BodySystem> system;
-	bool mouse1Down = false, mouse2Down = false, lShiftMod = false, rShiftMod = false, lAltMod = false;
-	float delta;
-
-	float mouseX, mouseY, mouseDX, mouseDY;
-
-	float mouse1DownTime, doubleClick1Time;
-	bool doubleClick1Check;
-
-	std::shared_ptr<void> targetObject;
-
-public:
-	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
-		system = std::shared_ptr<BodySystem>(new BodySystem(0));
-		gameCamera.focusOn({ 0.0f, 0.0f, 0.0f });
-
-		mouse1DownTime = 0.0f;
-		doubleClick1Time = 0.0f;
-		doubleClick1Check = false;
-#if defined(DEBUG)
-	printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
-	system->printDebugInfo();
-#endif
-	}
-
-	virtual void update(float delta) override {
-		if (doubleClick1Check) {
-			if (doubleClick1Time > 0.15f) {
-				doubleClick1Check = false;
-				doubleClick1Time = 0.0f;
-			}
-			else {
-				doubleClick1Time += delta;
-			}
-		}
-
-		if (mouse1Down) {
-			if (mouse1DownTime < 1.0f) mouse1DownTime += delta;
-			if (mouse1DownTime > 1.0f) mouse1DownTime = 1.0f;
-		}
-
-
-		if (!console->getVisible()) {
-			if (Keyboard::isKeyDown(GLFW_KEY_UP)) {
-				if (gameCamera.getTarget() == std::nullopt) {
-					gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
-				}
-				else {
-
-				}
-			}
-			if (Keyboard::isKeyDown(GLFW_KEY_LEFT)) {
-				if (gameCamera.getTarget() == std::nullopt) {
-					gameCamera.move(1.5 * delta, MoveDirection::LEFT);
-				}
-			}
-			if (Keyboard::isKeyDown(GLFW_KEY_DOWN)) {
-				if (gameCamera.getTarget() == std::nullopt) {
-					gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
-				}
-			}
-			if (Keyboard::isKeyDown(GLFW_KEY_RIGHT)) {
-				if (gameCamera.getTarget() == std::nullopt) {
-					gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
-				}
-			}
-		}
-		this->delta = delta;
-	}
-
-	virtual void render(float delta) override {
-		Renderer::Begin2DScene(orthoCamera); {
-			//Render Skybox
-			//front
-			//Renderer::SubmitQuad({0.0f, 0.0f, -25.0f}, {window->getData().size.x, window->getData().size.y}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp"), 0.0f);
-			//left
-			//Renderer::SubmitQuad({-25.0f, 0.0f, 0.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp"), 270.0f);
-			//right
-			//Renderer::SubmitQuad({25.0f, 0.0f, 0.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp"), 90.0f);
-			//back
-			//Renderer::SubmitQuad({0.0f, 0.0f, 25.0f}, {50.0f, 50.0f}, AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp"), 180.0f);
-		}
-		Renderer::End2DScene();
-
-		Renderer::Begin3DScene(gameCamera.getCamera());{
-			//Submit Skybox
-
-			//front
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")),
-				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-					{ 0.0f, 0.0f, -50.0f }),										//position
-					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-			//back
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")),
-				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-					{ 0.0f, 0.0f, 50.0f }),										//position
-					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-			//left
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")),
-				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-					{ -50.0f, 0.0f, 0.0f }),										//position
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
-					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-			//right
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")),
-				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-					{ 50.0f, 0.0f, 0.0f }),										//position
-					(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
-					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-
-/*			//Test Solar Plane
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
-				glm::scale(glm::translate(glm::identity<glm::mat4>(),
-					{ 0.0f, 0.0f, 0.0f }),				//position
-					glm::vec3{ 25.0f, 1.0f, 25.0f }),			//scale
-				glm::vec4{ 1.0f, 1.0f, 1.0f, 0.5f });			//color
-				*/
-				//Render Camera Target Location
-			if (gameCamera.getTarget() != std::nullopt) {
-				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
-					glm::scale(glm::translate(glm::identity<glm::mat4>(),
-						gameCamera.hasTarget() ? gameCamera.getTarget().value()
-						: glm::vec3{ 0.0f, 0.0f, 0.0f }),				//position
-						glm::vec3{ 1.0f, 1.0f, 1.0f }),			//scale
-					glm::vec4{ 1.0f, 0.45f, 0.45f, 1.0f });			//color
-			}
-
-
-
-
-
-
-
-
-
-
-			//Render Light source at star
-			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
-
-			//Render Sun
-			Star star = system->getStar();
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/sun.obj"),
-				glm::scale(glm::translate(glm::identity<glm::mat4>(),star.star->getPosition()),
-					glm::vec3{ star.star->getScale() }));
-
-			//Render all system bodies
-			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
-			for (auto i : bodies) {
-				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/32x32.obj"),
-					glm::scale(glm::translate(glm::identity<glm::mat4>(),i->getPosition()),
-						glm::vec3(i->getScale())),glm::vec4{ i->getColor(), 1.0f });
-			}
-		}
-		Renderer::End3DScene();
-
-		
-		Renderer::Begin2DScene(orthoCamera); {
-			Renderer::ChangeFont(AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"));
-				
-			if (!console->getVisible()) {
-				//Render GameState Information
-				Renderer::SubmitText("Camera Position:  x = " + std::to_string(gameCamera.getPosition().x)
-					+ ";  y = " + std::to_string(gameCamera.getPosition().y)
-					+ ";  z = " + std::to_string(gameCamera.getPosition().z),
-					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
-
-				//Render Mouse Information
-				Renderer::SubmitText("Mouse:  x - " + std::to_string(mouseX) + ";  y - " + std::to_string(mouseY)
-					+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
-					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
-
-				Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
-					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 28.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::LEFT, 0.3);
-
-				Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
-					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
-				if (doubleClick1Check) {
-					Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
-						{ -(window->getData().size.x / 2.f) + 1.0f,
-							(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
-				}
-			}
-			else {
-				glm::vec2 size = window->getData().size;
-				size.y *= (3.f / 5.f);
-				const float bottom{ (window->getData().size.y / 2.f) - (size.y) };
-				Renderer::SubmitQuad({ 0.0f, window->getData().size.y / 2.f - (size.y / 2.f), 0.0f}, size, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
-
-				Renderer::SubmitText("> " + console->getCmdLine(),
-					{ -(window->getData().size.x / 2.f) + 1.0f, bottom + (.02f * size.y), 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::CENTER_VERTICAL, 0.3);
-
-				glm::vec2 pos{ window->getData().size.x / -2.f, bottom + size.y * .075 };
-				for (int i = 1; i <= console->getArchiveSize(); i++) {
-					Renderer::SubmitText(console->getArchiveAt(i - 1),
-						pos, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, 0.3);
-					pos.y += Renderer::GetFont()->getTextHeight(console->getArchiveAt(i - 1)) * .42;
-				}
-			}
-		}
-		Renderer::End2DScene();
-
-		componentManager.drawComponents(delta, orthoCamera);
-	}
-
-	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
-		this->orthoCamera = { newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f };
-		if (newWidth != 0 && newHeight != 0) this->gameCamera.updateProjection({ newWidth, newHeight }, 70.0f, .1f, 1000.0f);
-	}
-
-	virtual bool onKeyPressed(const Key& key) {
-		if (key == GLFW_KEY_LEFT_SHIFT) {
-			lShiftMod = true;
-		}
-		if (key == GLFW_KEY_RIGHT_SHIFT) {
-			rShiftMod = true;
-		}
-		if (key == GLFW_KEY_LEFT_ALT) {
-			lAltMod = true;
-		}
-
-		if ((lShiftMod || rShiftMod) && key == GLFW_KEY_GRAVE_ACCENT) {
-			printf("PlayState: Grave Accent Pressed -- Swapping Console Visibility\n");
-#if defined(DEBUG)
-			printf("\tConsole Visibility: ");
-			printf(console->getVisible() ? "True -> " : "False -> ");
-#endif
-			console->setVisible(!console->getVisible());
-#if defined(DEBUG)
-			printf(console->getVisible() ? "True\n" : "False\n");
-#endif
-		}
-
-		if (console->getVisible()) {
-			if (key >= 'A' && key <= 'Z') {
-				(lShiftMod || rShiftMod) ? console->pushChar(key) : console->pushChar(key + 32);
-#if defined(DEBUG)
-				printf("PlayState: Console -- Character Added: ");
-				(lShiftMod || rShiftMod) ? printf("%c", key) : printf("%c", (key + 32));
-				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
-#endif
-			}
-
-			if ((key >= '0' && key <= '9') || (key == ' ') || (key == '.')) {
-				console->pushChar(key);
-#if defined(DEBUG)
-				printf("PlayState: Console -- Character Added: ");
-				printf("%c", key);
-				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
-#endif
-			}
-
-
-			if (key == GLFW_KEY_BACKSPACE) {
-				console->popChar();
-#if defined(DEBUG)
-				printf("PlayState: Console -- Character Removed\n");
-#endif
-			}
-			if (key == GLFW_KEY_ENTER) {
-				if (console->getCmdLine() != "") {
-#if defined(DEBUG)
-					printf("PlayState: Console -- Command Pushed:\n%s\n", console->getCmdLine().c_str());
-#endif
-					console->pushString(console->getCmdLine().c_str());
-				}
-			}
-		}
-		else {
-			if (key == GLFW_KEY_ESCAPE) {
-				printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
-				State::ResetStateTo(menuState);
-			}
-			if (key == GLFW_KEY_F) {
-				gameCamera.focusOn(this->system->getStar().star->getPosition());
-			}
-		}
-		return true;
-	}
-
-	virtual bool onKeyReleased(const Key& key) {
-		if (key == GLFW_KEY_LEFT_SHIFT) {
-			lShiftMod = false;
-		}
-		if (key == GLFW_KEY_RIGHT_SHIFT) {
-			rShiftMod = false;
-		}
-		if (key == GLFW_KEY_LEFT_ALT) {
-			lAltMod = false;
-		}
-		return true;
-	}
-
-	virtual bool onMouseButtonPressed(const MouseButton& button) {
-		if (button == GLFW_MOUSE_BUTTON_1) {
-			mouse1Down = true;
-		}
-		if (button == GLFW_MOUSE_BUTTON_2) {
-			mouse2Down = true;
-		}
-		return true;
-	}
-
-	virtual bool onMouseButtonReleased(const MouseButton& button) {
-		if (button == GLFW_MOUSE_BUTTON_1) {
-			mouse1Down = false;
-			if (mouse1DownTime < 0.15f) {
-				if (!doubleClick1Check) {
-					doubleClick1Check = true;
-				}
-				else {
-					//On Double Click
-
-				}
-			}
-
-			mouse1DownTime = 0.0f;
-		}
-		if (button == GLFW_MOUSE_BUTTON_2) {
-			mouse2Down = false;
-		}
-		return true;
-	}
-
-	virtual bool onMouseWheelScroll(float xOffset, float yOffset) {
-		gameCamera.scale += yOffset / 12.0f;
-		gameCamera.setYaw(gameCamera.getYaw());
-		if (lAltMod == true) {
-			// gameCamera.setCameraFOV(gameCamera.getCameraFOV() - yOffset);
-		}
-		if (lShiftMod == true) {
-			// gameCamera.setCameraSpeed(gameCamera.getCameraSpeed() + yOffset);
-		}
-		return true;
-	}
-
-	virtual bool onMouseMoved(float x, float y, float dx, float dy) {
-		if (mouse1Down == true && mouse2Down == true) {
-			gameCamera.move(dx, MoveDirection::LEFT);
-			gameCamera.move(dy, MoveDirection::FORWARDS);
-		} else {
-			if (mouse1Down == true) {
-
-			}
-			if (mouse2Down == true) {
-				gameCamera.setPitch(gameCamera.getPitch() + dy * .4f);
-				gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
-			}
-		}
-
-		mouseX = x;
-		mouseY = y;
-		mouseDX = dx;
-		mouseDY = dy;
-		return true;
-	}
-};
+//class PlayState : public GameState {
+//
+//	CameraObject gameCamera{ {1280.0f, 720.0f}, 70.0f, .01f, 1000.0f, glm::vec3(10.0f), glm::vec3{0.0f}, glm::vec3(50.0f) };
+//
+//	std::shared_ptr<BodySystem> system;
+//	bool mouse1Down = false, mouse2Down = false, lShiftMod = false, rShiftMod = false, lAltMod = false;
+//	float delta;
+//
+//	float mouseX, mouseY, mouseDX, mouseDY;
+//
+//	float mouse1DownTime, doubleClick1Time;
+//	bool doubleClick1Check;
+//
+//	std::shared_ptr<void> targetObject;
+//
+//public:
+//	PlayState(const std::shared_ptr<Window> window, const std::string& name) : GameState(window, name) {
+//		system = std::shared_ptr<BodySystem>(new BodySystem(0));
+//		gameCamera.focusOn({ 0.0f, 0.0f, 0.0f });
+//
+//		mouse1DownTime = 0.0f;
+//		doubleClick1Time = 0.0f;
+//		doubleClick1Check = false;
+//		#if defined(DEBUG)
+//			printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
+//			system->printDebugInfo();
+//		#endif
+//	}
+//
+//	virtual void update(float delta) override {
+//		if (doubleClick1Check) {
+//			if (doubleClick1Time > 0.15f) {
+//				doubleClick1Check = false;
+//				doubleClick1Time = 0.0f;
+//			}
+//			else {
+//				doubleClick1Time += delta;
+//			}
+//		}
+//
+//		if (mouse1Down) {
+//			if (mouse1DownTime < 1.0f) mouse1DownTime += delta;
+//			if (mouse1DownTime > 1.0f) mouse1DownTime = 1.0f;
+//		}
+//
+//
+//		if (!console->getVisible()) {
+//			if (Keyboard::IsKeyDown(GLFW_KEY_UP)) {
+//				if (gameCamera.getTarget() == std::nullopt) {
+//					gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
+//				}
+//				else {
+//
+//				}
+//			}
+//			if (Keyboard::IsKeyDown(GLFW_KEY_LEFT)) {
+//				if (gameCamera.getTarget() == std::nullopt) {
+//					gameCamera.move(1.5 * delta, MoveDirection::LEFT);
+//				}
+//			}
+//			if (Keyboard::IsKeyDown(GLFW_KEY_DOWN)) {
+//				if (gameCamera.getTarget() == std::nullopt) {
+//					gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
+//				}
+//			}
+//			if (Keyboard::IsKeyDown(GLFW_KEY_RIGHT)) {
+//				if (gameCamera.getTarget() == std::nullopt) {
+//					gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
+//				}
+//			}
+//		}
+//		this->delta = delta;
+//	}
+//
+//	virtual void render(float delta) override {
+//		Renderer::Begin3DScene(gameCamera.getCamera());{
+//			//Submit Skybox
+//
+//			//front
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")),
+//				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+//					{ 0.0f, 0.0f, -50.0f }),										//position
+//					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+//					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+//				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+//
+//			//back
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")),
+//				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+//					{ 0.0f, 0.0f, 50.0f }),										//position
+//					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+//					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+//				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+//
+//			//left
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")),
+//				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+//					{ -50.0f, 0.0f, 0.0f }),										//position
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
+//					(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+//					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+//				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+//
+//			//right
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")),
+//				glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+//					{ 50.0f, 0.0f, 0.0f }),										//position
+//					(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+//					(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+//					(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
+//					glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+//				glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+//
+//			//Render Camera Target Location
+//			if (gameCamera.getTarget() != std::nullopt) {
+//				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj"),
+//					glm::scale(glm::translate(glm::identity<glm::mat4>(),
+//						gameCamera.hasTarget() ? gameCamera.getTarget().value()
+//						: glm::vec3{ 0.0f, 0.0f, 0.0f }),				//position
+//						glm::vec3{ 1.0f, 1.0f, 1.0f }),			//scale
+//					glm::vec4{ 1.0f, 0.45f, 0.45f, 1.0f });			//color
+//			}
+//
+//
+//			//Render Light source at star
+//			Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
+//
+//			//Render Sun
+//			Star star = system->getStar();
+//			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/sun.obj"),
+//				glm::scale(glm::translate(glm::identity<glm::mat4>(),star.star->getPosition()),
+//					glm::vec3{ star.star->getScale() }));
+//
+//			//Render all system bodies
+//			std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
+//			for (auto i : bodies) {
+//				Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/32x32.obj"),
+//					glm::scale(glm::translate(glm::identity<glm::mat4>(),i->getPosition()),
+//						glm::vec3(i->getScale())),glm::vec4{ i->getColor(), 1.0f });
+//			}
+//		}
+//		Renderer::End3DScene();
+//
+//		
+//		Renderer::Begin2DScene(orthoCamera); {
+//			Renderer::ChangeFont(AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"));
+//				
+//			if (!console->getVisible()) {
+//				//Render GameState Information
+//				Renderer::SubmitText("Camera Position:  x = " + std::to_string(gameCamera.getPosition().x)
+//					+ ";  y = " + std::to_string(gameCamera.getPosition().y)
+//					+ ";  z = " + std::to_string(gameCamera.getPosition().z),
+//					{ -(window->getData().size.x / 2.f) + 1.0f,
+//						(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+//
+//				//Render Mouse Information
+//				Renderer::SubmitText("Mouse:  x - " + std::to_string(mouseX) + ";  y - " + std::to_string(mouseY)
+//					+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
+//					{ -(window->getData().size.x / 2.f) + 1.0f,
+//						(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+//
+//				Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
+//					{ -(window->getData().size.x / 2.f) + 1.0f,
+//						(window->getData().size.y / 2.f) - 28.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::LEFT, 0.3);
+//
+//				Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
+//					{ -(window->getData().size.x / 2.f) + 1.0f,
+//						(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+//				if (doubleClick1Check) {
+//					Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
+//						{ -(window->getData().size.x / 2.f) + 1.0f,
+//							(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+//				}
+//			}
+//			else {
+//				glm::vec2 size = window->getData().size;
+//				size.y *= (3.f / 5.f);
+//				const float bottom{ (window->getData().size.y / 2.f) - (size.y) };
+//				Renderer::SubmitQuad({ 0.0f, window->getData().size.y / 2.f - (size.y / 2.f), 0.0f}, size, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
+//
+//				Renderer::SubmitText("> " + console->getCmdLine(),
+//					{ -(window->getData().size.x / 2.f) + 1.0f, bottom + (.02f * size.y), 0.0f}, {1.0f, 1.0f, 1.0f}, Gravity::CENTER_VERTICAL, 0.3);
+//
+//				glm::vec2 pos{ window->getData().size.x / -2.f, bottom + size.y * .075 };
+//				for (int i = 1; i <= console->getArchiveSize(); i++) {
+//					Renderer::SubmitText(console->getArchiveAt(i - 1),
+//						pos, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, 0.3);
+//					pos.y += Renderer::GetFont()->getTextHeight(console->getArchiveAt(i - 1)) * .42;
+//				}
+//			}
+//		}
+//		Renderer::End2DScene();
+//
+//		componentManager.drawComponents(delta, orthoCamera);
+//	}
+//
+//	virtual void onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) override {
+//		this->orthoCamera = { newWidth / -2.0f, newWidth / 2.0f, newHeight / -2.0f, newHeight / 2.0f };
+//		if (newWidth != 0 && newHeight != 0) this->gameCamera.updateProjection({ newWidth, newHeight }, 70.0f, .1f, 1000.0f);
+//	}
+//
+//	virtual bool onKeyPressed(const Key& key) {
+//		if (key == GLFW_KEY_LEFT_SHIFT) {
+//			lShiftMod = true;
+//		}
+//		if (key == GLFW_KEY_RIGHT_SHIFT) {
+//			rShiftMod = true;
+//		}
+//		if (key == GLFW_KEY_LEFT_ALT) {
+//			lAltMod = true;
+//		}
+//
+//		if ((lShiftMod || rShiftMod) && key == GLFW_KEY_GRAVE_ACCENT) {
+//			printf("PlayState: Grave Accent Pressed -- Swapping Console Visibility\n");
+//			#if defined(DEBUG)
+//				printf("\tConsole Visibility: ");
+//				printf(console->getVisible() ? "True -> " : "False -> ");
+//			#endif
+//			console->setVisible(!console->getVisible());
+//			#if defined(DEBUG)
+//				printf(console->getVisible() ? "True\n" : "False\n");
+//			#endif
+//		}
+//
+//		if (console->getVisible()) {
+//			if (key >= 'A' && key <= 'Z') {
+//				(lShiftMod || rShiftMod) ? console->pushChar(key) : console->pushChar(key + 32);
+//				#if defined(DEBUG)
+//					printf("PlayState: Console -- Character Added: ");
+//					(lShiftMod || rShiftMod) ? printf("%c", key) : printf("%c", (key + 32));
+//					printf("\tNew Command: %s\n", console->getCmdLine().c_str());
+//				#endif
+//			}
+//
+//			if ((key >= '0' && key <= '9') || (key == ' ') || (key == '.')) {
+//				console->pushChar(key);
+//				#if defined(DEBUG)
+//					printf("PlayState: Console -- Character Added: ");
+//					printf("%c", key);
+//					printf("\tNew Command: %s\n", console->getCmdLine().c_str());
+//				#endif
+//			}
+//
+//
+//			if (key == GLFW_KEY_BACKSPACE) {
+//				console->popChar();
+//				#if defined(DEBUG)
+//					printf("PlayState: Console -- Character Removed\n");
+//				#endif
+//			}
+//			if (key == GLFW_KEY_ENTER) {
+//				if (console->getCmdLine() != "") {
+//					#if defined(DEBUG)
+//						printf("PlayState: Console -- Command Pushed:\n%s\n", console->getCmdLine().c_str());
+//					#endif
+//					console->pushString(console->getCmdLine().c_str());
+//				}
+//			}
+//		}
+//		else {
+//			if (key == GLFW_KEY_ESCAPE) {
+//				printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
+//				State::RestoreState();
+//			}
+//			if (key == GLFW_KEY_F) {
+//				gameCamera.focusOn(this->system->getStar().star->getPosition());
+//			}
+//		}
+//		return true;
+//	}
+//
+//	virtual bool onKeyReleased(const Key& key) {
+//		if (key == GLFW_KEY_LEFT_SHIFT) {
+//			lShiftMod = false;
+//		}
+//		if (key == GLFW_KEY_RIGHT_SHIFT) {
+//			rShiftMod = false;
+//		}
+//		if (key == GLFW_KEY_LEFT_ALT) {
+//			lAltMod = false;
+//		}
+//		return true;
+//	}
+//
+//	virtual bool onMouseButtonPressed(const MouseButton& button) {
+//		if (button == GLFW_MOUSE_BUTTON_1) {
+//			mouse1Down = true;
+//		}
+//		if (button == GLFW_MOUSE_BUTTON_2) {
+//			mouse2Down = true;
+//		}
+//		return true;
+//	}
+//
+//	virtual bool onMouseButtonReleased(const MouseButton& button) {
+//		if (button == GLFW_MOUSE_BUTTON_1) {
+//			mouse1Down = false;
+//			if (mouse1DownTime < 0.15f) {
+//				if (!doubleClick1Check) {
+//					doubleClick1Check = true;
+//				}
+//				else {
+//					//On Double Click
+//
+//				}
+//			}
+//
+//			mouse1DownTime = 0.0f;
+//		}
+//		if (button == GLFW_MOUSE_BUTTON_2) {
+//			mouse2Down = false;
+//		}
+//		return true;
+//	}
+//
+//	virtual bool onMouseWheelScroll(float xOffset, float yOffset) {
+//		gameCamera.scale += yOffset / 12.0f;
+//		gameCamera.setYaw(gameCamera.getYaw());
+//		if (lAltMod == true) {
+//			// gameCamera.setCameraFOV(gameCamera.getCameraFOV() - yOffset);
+//		}
+//		if (lShiftMod == true) {
+//			// gameCamera.setCameraSpeed(gameCamera.getCameraSpeed() + yOffset);
+//		}
+//		return true;
+//	}
+//
+//	virtual bool onMouseMoved(float x, float y, float dx, float dy) {
+//		if (mouse1Down == true && mouse2Down == true) {
+//			gameCamera.move(dx, MoveDirection::LEFT);
+//			gameCamera.move(dy, MoveDirection::FORWARDS);
+//		} else {
+//			if (mouse1Down == true) {
+//
+//			}
+//			if (mouse2Down == true) {
+//				gameCamera.setPitch(gameCamera.getPitch() + dy * .4f);
+//				gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
+//			}
+//		}
+//
+//		mouseX = x;
+//		mouseY = y;
+//		mouseDX = dx;
+//		mouseDY = dy;
+//		return true;
+//	}
+//};
 
 int main(int argc, char** args) {
-#ifdef RUN_TESTS
-	Test();
-#endif
-	std::shared_ptr<Window> window = Window::CreateGLWindow("Model Test", 1280, 720);
-
-	console = std::shared_ptr<Console>(new Console());
+	#ifdef RUN_TESTS
+		Test();
+	#endif
+	std::shared_ptr<Window> window = Window::CreateGLWindow("Project Space Engine v0.1a", 1280, 720);
 
 	GameEvent gameEvents[TOTAL_EVENTS];
 	for (int i = 0; i < TOTAL_EVENTS; i++) {
@@ -554,11 +404,11 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	menuState = GameState::CreateState<MainMenuState>(window);// GameState::CreateState<TempState>(window, std::string{"Temporary State"});
-	playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
+	std::shared_ptr<GameState> mainMenuState = GameState::CreateState<MainMenuState>(window);// GameState::CreateState<TempState>(window, std::string{"Temporary State"});
+	//playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
 	LOG_GL_ERROR;
-	
-	State::ChangeState(menuState);
+
+	State::ChangeState(mainMenuState);
 
 	LOG_GL_ERROR;
 	glEnable(GL_BLEND);
@@ -594,8 +444,6 @@ int main(int argc, char** args) {
 			frames -= fps;
 		}
 	}
-
-	console.~shared_ptr();
 
 	State::Close();
 	AssetManager::Clear();

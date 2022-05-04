@@ -1,9 +1,13 @@
 #include "console.h"
 
+Console& Console::Get() {
+    static Console Console;
+    return Console;
+}
+
 Console::Console() {
      visible = false;
      cmdLine = new std::string("");
-     archive.empty();
 }
 
 Console::~Console() {

@@ -5,6 +5,8 @@
 
 class Console {
 public:
+    static Console& Get();
+
      Console();
      ~Console();
 
