@@ -5,6 +5,8 @@
 #include <src/engine/graphics/ui/button_component.h>
 #include <src/engine/graphics/ui/relative_layout.h>
 
+#include <src/gameplay/states/play_state.h>
+
 const std::string NEW_GAME_SCREEN_TEXTURE = std::string{ "./resources/textures/skybox/front.bmp" };
 
 NewGameState::NewGameState(std::shared_ptr<Window> window)
@@ -15,6 +17,15 @@ NewGameState::NewGameState(std::shared_ptr<Window> window)
 		[&](ButtonComponent& button) {
 			State::RestoreState();
 		}, "Return", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
+		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
+	));
+	componentManager.addComponent(new ButtonComponent(
+		"play_state",
+		new RelativeLayout("window:left:50%", "", "", "window:bottom:25"),
+		[=](ButtonComponent& button) {
+			State::RestoreState();
+			State::ChangeState(GameState::CreateState<PlayState>(window));
+		}, "Play", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
 }

@@ -1,5 +1,6 @@
 #include "button_component.h"
 
+#include <src/engine/graphics/asset_manager.h>
 #include <src/engine/graphics/renderer.h>
 
 ButtonComponent::ButtonComponent(
@@ -52,7 +53,7 @@ void ButtonComponent::draw(float delta) {
 	const glm::vec2 size = this->size.value();
 	bool within = this->isWithin({ Mouse::x, Mouse::y });
 	if (texture) {
-		if (within) Renderer::SubmitQuad(pos, size, Texture::GetWhiteTexture(), textureHighlightTint);
+		if (within) Renderer::SubmitQuad(pos, size, AssetManager::GetOrCreate<Texture>(glm::vec4{1.f}), textureHighlightTint);
 		else Renderer::SubmitQuad(pos, size, {0.f, 236.f / 256.f, 200.f / 256.f, 1.f}, texture);
 	}
 	if (textFont) {

@@ -68,7 +68,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			assert(mat);
 			mat->texture = Texture::CreateTexture("./resources/textures/" + line.substr(7));
 		}
-		if (mat && !mat->texture) mat->texture = Texture::GetWhiteTexture();
+		if (mat && !mat->texture) mat->texture = AssetManager::GetOrCreate<Texture>(glm::vec4{1.f});
 	}
 	return map;
 }

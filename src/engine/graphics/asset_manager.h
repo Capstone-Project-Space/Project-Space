@@ -1,12 +1,14 @@
 #pragma once
 
+#include <unordered_map>
+#include <filesystem>
+
 #include <src/engine/graphics/texture.h>
 #include <src/engine/graphics/model.h>
 #include <src/engine/graphics/shader.h>
 #include <src/engine/graphics/font.h>
 
-#include <unordered_map>
-#include <filesystem>
+#include <glm/glm.hpp>
 
 namespace std {
 
@@ -24,6 +26,13 @@ namespace std {
 		}
 	};
 
+	template<>
+	struct hash<glm::vec4> {
+		size_t operator()(const glm::vec4& p) const {
+			return hash<float>()(p.x) ^ hash<float>()(p.y) ^ hash<float>()(p.z) ^ hash<float>()(p.w);
+		}
+	};
+
 };
 
 struct AssetManager {
@@ -31,6 +40,7 @@ struct AssetManager {
 	static std::unordered_map<std::string, std::shared_ptr<Font>> Fonts;
 	static std::unordered_map<std::pair<std::string, std::shared_ptr<Texture>>, std::shared_ptr<Model>> Models;
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> Textures;
+	static std::unordered_map<glm::vec4, std::shared_ptr<Texture>> ColoredTextures;
 
 	static std::unordered_map<std::pair<std::string, std::string>, std::shared_ptr<ShaderProgram>> ShaderPrograms;
 
@@ -42,6 +52,8 @@ struct AssetManager {
 	static std::shared_ptr<T> GetOrCreate(const std::string& vertFilePath, const std::string& fragFilePath);
 	template<typename T>
 	static std::shared_ptr<T> GetOrCreate(const std::string& filepath, std::shared_ptr<Texture> texture);
+	template<typename T>
+	static std::shared_ptr<T> GetOrCreate(const glm::vec4& color);
 
 	template<typename T>
 	static void Unload(const std::string& filepath);
@@ -70,6 +82,13 @@ struct AssetManager {
 		if (Textures.find(key) != Textures.end())
 			return Textures.at(key);
 		return (Textures[key] = Texture::CreateTexture(filepath));
+	}
+
+	template<>
+	static std::shared_ptr<Texture> GetOrCreate(const glm::vec4& color) {
+		if (ColoredTextures.find(color) != ColoredTextures.end())
+			return ColoredTextures.at(color);
+		return (ColoredTextures[color] = Texture::CreateColoredTexture(color));
 	}
 
 	template<>

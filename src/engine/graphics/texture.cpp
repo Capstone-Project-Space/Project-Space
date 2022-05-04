@@ -12,11 +12,8 @@ std::shared_ptr<Texture> Texture::CreateTexture(const std::string& filepath) {
 	return texture;
 }
 
-std::shared_ptr<Texture> Texture::GetWhiteTexture() {
-	static std::shared_ptr<Texture> texture = nullptr;
-	if (!texture)
-		texture = std::shared_ptr<Texture>(new Texture(glm::vec4{1.0f}));
-	return texture;
+std::shared_ptr<Texture> Texture::CreateColoredTexture(const glm::vec4& color) {
+	return std::shared_ptr<Texture>(new Texture(color));
 }
 
 Texture::~Texture() {

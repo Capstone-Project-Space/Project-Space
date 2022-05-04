@@ -9,7 +9,7 @@
 class Texture {
 public:
 	static std::shared_ptr<Texture> CreateTexture(const std::string& filepath);
-	static std::shared_ptr<Texture> GetWhiteTexture();
+	static std::shared_ptr<Texture> CreateColoredTexture(const glm::vec4& color);
 
 
 	~Texture();

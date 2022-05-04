@@ -20,7 +20,7 @@ RelativeLayout::RelativeLayout(const std::string_view& left, const std::string_v
 }
 
 glm::vec3 RelativeLayout::position(const std::shared_ptr<Window> window, const UIComponent& self, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers) {
-	glm::vec3 pos{INFINITY, -INFINITY, 0.0f};
+	glm::vec3 pos{INFINITY, INFINITY, 0.0f};
 
 	if (leftX.has_value()) {
 		pos.x = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->leftID, this->leftSide), leftX.value());
