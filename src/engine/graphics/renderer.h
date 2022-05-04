@@ -47,6 +47,10 @@ public:
 		Renderer::CurrentFont = font;
 	}
 
+	inline static std::shared_ptr<Font> GetFont() {
+		return Renderer::CurrentFont;
+	}
+
 	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec3& color, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
 		SubmitText(text, glm::vec3{ pos, 0.0f }, glm::vec4{ color, 1.0f }, gravity, scale, rotation);
 	}
