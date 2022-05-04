@@ -79,7 +79,44 @@ RelativeLayout::Side RelativeLayout::FromSide(const std::string_view& side) {
 	}
 }
 
-float RelativeLayout::GetRelativeValue(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side) {
+std::pair<float, float> RelativeLayout::GetRelativeValue(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side) {
+	if (id == std::string_view{ "window" }) {
+		switch (side) {
+		case Side::LEFT:
+			return { -window->getData().size.x / 2.0f, window->getData().size.x };
+		case Side::RIGHT:
+			return { window->getData().size.x / 2.0f, window->getData().size.x };
+		case Side::TOP:
+			return { window->getData().size.y / 2.0f, window->getData().size.y };
+		case Side::BOTTOM:
+			return { -window->getData().size.y / 2.0f, window->getData().size.y };
+		case Side::INFRONT:
+			return { 0.0f, 0.0f };
+		case Side::NONE:
+			throw "Got Side::NONE when evaluating relative value.";
+		}
+	}
+	else {
+		auto peer = peers.at(id);
+		peer->applyLayout(window, peers);
+		switch (side) {
+		case Side::LEFT:
+			return { peer->getX(), peer->getWidth() };
+		case Side::RIGHT:
+			return { peer->getX() + peer->getWidth(), peer->getWidth()};
+		case Side::TOP:
+			return { peer->getY() + peer->getHeight(), peer->getHeight() };
+			case Side::BOTTOM:
+			return { peer->getY(), peer->getHeight() };
+		case Side::INFRONT:
+			return { peer->getZ(), 0.0f };
+		case Side::NONE:
+			throw "Got Side::NONE when evaluating relative value.";
+		}
+	}
+}
+
+float RelativeLayout::GetRelativeSize(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side) {
 	if (id == std::string_view{ "window" }) {
 		switch (side) {
 		case Side::LEFT:
@@ -100,14 +137,10 @@ float RelativeLayout::GetRelativeValue(const std::shared_ptr<Window> window, con
 		auto peer = peers.at(id);
 		peer->applyLayout(window, peers);
 		switch (side) {
-		case Side::LEFT:
-			return peer->getX();
-		case Side::RIGHT:
-			return peer->getX() + peer->getWidth();
-		case Side::TOP:
-			return peer->getY() + peer->getHeight();
-		case Side::BOTTOM:
-			return peer->getY();
+		case Side::LEFT: case Side::RIGHT:
+			return peer->getWidth();
+		case Side::TOP: case Side::BOTTOM:
+			return peer->getHeight();
 		case Side::INFRONT:
 			return peer->getZ();
 		case Side::NONE:
@@ -115,6 +148,7 @@ float RelativeLayout::GetRelativeValue(const std::shared_ptr<Window> window, con
 		}
 	}
 }
+
 
 using Literal = RelativeLayout::Literal;
 using Percentage = RelativeLayout::Percentage;
@@ -130,6 +164,9 @@ std::optional<std::variant<Literal, Percentage>> RelativeLayout::GetValue(const 
 }
 
 
-float RelativeLayout::GetValue(float target, const std::variant<Literal, Percentage>& position) {
-	return position.index() == 0 ? target + std::get<0>(position) : target * std::get<1>(position);
+float RelativeLayout::GetValue(const std::pair<float, float> target, const std::variant<Literal, Percentage>& position) {
+	if (position.index() == 0) {
+		return target.first + std::get<0>(position);
+	}
+	return target.first + target.second * std::get<1>(position);
 }

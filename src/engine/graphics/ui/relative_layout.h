@@ -28,7 +28,8 @@ private:
 	Side leftSide, topSide, rightSide, bottomSide;
 
 	static Side FromSide(const std::string_view& side);
-	static float GetRelativeValue(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side);
+	static std::pair<float, float> GetRelativeValue(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side);
+	static float GetRelativeSize(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, const std::string_view& id, const Side side);
 	static std::optional<std::variant<Literal, Percentage>> GetValue(const std::string_view& view);
-	static float GetValue(float targetX, const std::variant<Literal, Percentage>& position);
+	static float GetValue(const std::pair<float, float> targetX, const std::variant<Literal, Percentage>& position);
 };
