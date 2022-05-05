@@ -21,7 +21,7 @@ Texture::~Texture() {
 	LOG_GL_ERROR;
 }
 
-void Texture::bind(uint32_t id) {
+void Texture::bind(uint32_t id) const {
 	glActiveTexture(GL_TEXTURE0 + id);
 	LOG_GL_ERROR;
 	glBindTexture(GL_TEXTURE_2D, this->id);

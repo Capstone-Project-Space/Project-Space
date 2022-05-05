@@ -10,6 +10,10 @@ Camera::Camera(float width, float height, float fov, float near, float far)
 	: projection(glm::perspectiveFov(fov, width, height, near, far)), view(glm::identity<glm::mat4>()) {
 }
 
+void Camera::updateProjection(const float left, const float right, const float bottom, const float top) {
+	this->projection = glm::ortho(left, right, bottom, top);
+}
+
 void Camera::updateProjection(const float width, const float height, const float fov, const float near, const float far) {
 	this->projection = glm::perspectiveFov(fov, width, height, near, far);
 }

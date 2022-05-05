@@ -19,15 +19,47 @@ class ModelRenderer {
 public:
 	ModelRenderer();
 
+	/**
+	 * @brief Initialize all of the graphics objects.
+	 */
 	void init();
+
+	/**
+	 * @brief Destroy all of the graphics objects.
+	 */
 	void destroy();
 
+	/**
+	 * @brief Submit a light to be rendered in this render pass.
+	 * 
+	 * @param lightData The data for this Light.s
+	 */
 	void submitLight(const LightSource& lightData);
+
+	/**
+	 * @brief Submit a Model for rendering.
+	 * 
+	 * @param model The Model to be rendered.
+	 * @param modelTransform The transformation matrix to render the model with.
+	 * @param color A tint color which will be multiplied by the models texture color.
+	 */
 	inline void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f }) {
 		submitModel(model, modelTransform, this->program, color);
 	}
+
+	/**
+	 * @brief Submit a Model for rendering.
+	 * 
+	 * @param model The model to be rendered.
+	 * @param modelTransform The transformation matrix to render the model with.
+	 * @param shader The ShaderProgram this model will use to render onto the screen.
+	 * @param color A tint color which will be multipled by the models texture color.
+	 */
 	void submitModel(std::shared_ptr<Model> model, const glm::mat4& modelTransform, std::shared_ptr<ShaderProgram> shader, const glm::vec4& color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
+	/**
+	 * @brief Perform instance rendering for each Model with each ShaderProgram.
+	 */
 	void draw();
 
 	inline void setCamera(const Camera& camera) { this->camera = &camera; }

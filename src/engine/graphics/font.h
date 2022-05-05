@@ -16,15 +16,34 @@ struct Character {
 
 class Font {
 public:
+	/**
+	 * @brief Create a Font.
+	 * 
+	 * @param filepath The file path to the font file.
+	 * @param startChar The starting character to generate the font at.
+	 * @param length The number of characters to generate the font at.
+	 * @return A std::shared_ptr to a Font.
+	 */
 	static std::shared_ptr<Font> CreateFont(const std::string& filepath, unsigned char startChar, uint32_t length);
 
 	~Font();
 
-	inline void bind(uint32_t textureSlot) {
+	/**
+	 * @brief Bind the font texture to a texture slot.
+	 * 
+	 * @param textureSlot The texture slot to bind to.
+	 */
+	inline void bind(uint32_t textureSlot) const {
 		glActiveTexture(GL_TEXTURE0 + textureSlot);
 		glBindTexture(GL_TEXTURE_2D, this->id);
 	}
 
+	/**
+	 * @brief Get the Character Data for a single character.
+	 * 
+	 * @param c The character we want the Character data for.
+	 * @return The Character data for c.
+	 */
 	inline const Character& getCharacterData(unsigned char c) {
 		assert(c >= startChar && c < endChar);
 		return characters[c];

@@ -43,7 +43,7 @@ struct State {
 	static std::stack<std::shared_ptr<GameState>> StateStack;
 
 	static void ChangeState(std::shared_ptr<GameState> state);
-	static void RestoreState();
+	static std::shared_ptr<GameState> RestoreState();
 	static void ResetStateTo(std::shared_ptr<GameState> state);
 	static void Close();
 

@@ -13,6 +13,9 @@
 
 #include <glm/glm.hpp>
 
+/**
+ * @brief Basically the alignment of something.
+ */
 enum class Gravity : uint32_t {
 	LEFT = 0, BOTTOM = 0,
 	RIGHT = 1, CENTER_HORIZONTAL = 2,
@@ -39,17 +42,39 @@ inline bool operator ==(const Gravity& g, const uint32_t& u) {
 
 class Layout;
 
+/**
+ * @brief The base class for all UIComponents.
+ */
 class UIComponent : public EventReceiver {
 public:
 	UIComponent(const std::string_view& id, Layout* layout);
 	UIComponent(const std::string_view& id, std::shared_ptr<Layout> layout);
 	virtual ~UIComponent() = default;
 
+	/**
+	 * @brief Get/calculate the width of the content for this UIComponent.
+	 */
 	virtual float getContentWidth() const = 0;
+
+	/**
+	 * @brief Get/calculate the height of the content for this UIComponent.
+	 */
 	virtual float getContentHeight() const = 0;
 
+	/**
+	 * @brief Apply the layout to this UIComponent if update is true or the layout has not yet been applied.
+	 * 
+	 * @param window The window the UIComponent exists in.
+	 * @param peers The peers of the UIComponent.
+	 * @param update Whether or not we want to update the position and size.
+	 */
 	virtual void applyLayout(const std::shared_ptr<Window> window, const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers, bool update = false);
 	
+	/**
+	 * @brief Display the UIComponent using Renderer.
+	 * 
+	 * @param delta The time since the last frame.
+	 */
 	virtual void draw(float delta) = 0;
 
 	inline const std::string_view& getID() const { return id; }
@@ -58,15 +83,14 @@ public:
 	virtual inline const glm::vec3& getPosition() const { return position.value(); }
 	virtual inline const glm::vec2& getSize() const { return size.value(); }
 
-	virtual inline float getX() const { return position.value().x; }
-	virtual inline float getY() const { return position.value().y; }
-	virtual inline float getZ() const { return position.value().z; }
+	virtual inline float getX() const { return getPosition().x; }
+	virtual inline float getY() const { return getPosition().y; }
+	virtual inline float getZ() const { return getPosition().z; }
 
-	virtual inline float getWidth() const { return size.value().x; }
-	virtual inline float getHeight() const { return size.value().y; }
+	virtual inline float getWidth() const { return getSize().x; }
+	virtual inline float getHeight() const { return getSize().y; }
 
 	virtual inline bool isVisible() const { return visible; }
-	// virtual inline void setVisible(bool visible) { this->visible = visible; }
 
 	virtual inline bool isWithin(const glm::vec2& pos) const {
 		const glm::vec3 position = this->position.value();
@@ -74,7 +98,22 @@ public:
 		return pos.x >= position.x && pos.y >= position.y && pos.x < position.x + size.x && pos.y < position.y + size.y;
 	}
 	
+	/**
+	 * @brief Change the Layout for a UIComponent and then apply them.
+	 * 
+	 * @param component The component to change the Layout for.
+	 * @param layout The layout to change to.
+	 * @return true
+	 */
 	static bool ChangeLayout(std::shared_ptr<UIComponent> component, Layout* layout);
+
+	/**
+	 * @brief Change the Layout for a UIComponent and then apply them.
+	 * 
+	 * @param component The component to change the Layout for.
+	 * @param layout The layout to change to.
+	 * @return true
+	 */
 	template<typename T>
 	static bool ChangeLayout(std::shared_ptr<T> component, std::function<Layout*(std::shared_ptr<T>)> func) {
 		static_assert(std::is_base_of<UIComponent, T>);
@@ -86,7 +125,22 @@ public:
 		return false;
 	}
 
+	/**
+	 * @brief Change the visibility for a UIComponent.
+	 * 
+	 * @param component The component to change the visibility for.
+	 * @param visibility The visibiility to assign to the UIComponent.
+	 * @return false
+	 */
 	static bool ChangeVisibility(std::shared_ptr<UIComponent> component, bool visibility);
+
+	/**
+	 * @brief Change the visibility for a UIComponent.
+	 * 
+	 * @param component The component to change the visibility for.
+	 * @param visibility The visibiility to assign to the UIComponent.
+	 * @return false
+	 */
 	template<typename T>
 	static bool ChangeVisibility(std::shared_ptr<UIComponent> component, std::function<bool(std::shared_ptr<T>)> func) {
 		static_assert(std::is_base_of<UIComponent, T>);
@@ -105,16 +159,34 @@ protected:
 	bool visible = true;
 };
 
-
+/**
+ * @brief The base class for all Layouts.
+ */
 class Layout {
 public:
 	virtual ~Layout() = default;
 
+	/**
+	 * @brief Interface function for calculating the position of a UIComponent.
+	 * 
+	 * @param window The window the UIComponent exists in.
+	 * @param self The UIComponent we are applying this layout to.
+	 * @param peers The peers of the UIComponent.
+	 * @return The bottom left position of the UIComponent.
+	 */
 	virtual glm::vec3 position(
 		const std::shared_ptr<Window> window, const UIComponent& self,
 		const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers
 	) = 0;
 
+	/**
+	 * @brief Interface function for calculating the size of a UIComponent.
+	 * 
+	 * @param window The window the UIComponent exists in.
+	 * @param self The UIComponent we are applying this layout to.
+	 * @param peers The peers of the UIComponent.
+	 * @return The width and height of the UIComponent.
+	 */
 	virtual glm::vec2 size(
 		const std::shared_ptr<Window> window, const UIComponent& self,
 		const std::unordered_map<std::string_view, std::shared_ptr<UIComponent>>& peers

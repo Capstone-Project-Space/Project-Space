@@ -16,6 +16,7 @@ NewGameState::NewGameState(std::shared_ptr<Window> window)
 		new RelativeLayout("window:left:100", "window:top:0"),
 		[&](ButtonComponent& button) {
 			State::RestoreState();
+			return true;
 		}, "Return", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
@@ -23,8 +24,9 @@ NewGameState::NewGameState(std::shared_ptr<Window> window)
 		"play_state",
 		new RelativeLayout("window:left:50%", "", "", "window:bottom:25"),
 		[=](ButtonComponent& button) {
-			State::RestoreState();
+			auto lastState = State::RestoreState(); // Gotta save this because this is us and if we don't we vanish.
 			State::ChangeState(GameState::CreateState<PlayState>(window));
+			return true;
 		}, "Play", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));

@@ -272,8 +272,6 @@ bool PlayState::onMouseButtonReleased(const MouseButton& button) {
 }
 
 bool PlayState::onMouseWheelScroll(float xOffset, float yOffset) {
-	gameCamera.scale += yOffset / 12.0f;
-	gameCamera.setYaw(gameCamera.getYaw());
 	if (Keyboard::IsAltDown()  == true) {
 		// gameCamera.setCameraFOV(gameCamera.getCameraFOV() - yOffset);
 	}

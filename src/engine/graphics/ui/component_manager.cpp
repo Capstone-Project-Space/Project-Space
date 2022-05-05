@@ -54,7 +54,7 @@ bool ComponentManager::onMouseButtonPressed(const MouseButton& button) {
 	return false;
 }
 bool ComponentManager::onMouseButtonReleased(const MouseButton& button) {
-	for (auto component : components) {
+	for (auto& component : components) {
 		if (component->onMouseButtonReleased(button)) return true;
 	}
 	return false;

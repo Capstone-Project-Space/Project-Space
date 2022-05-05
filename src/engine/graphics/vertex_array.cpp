@@ -76,7 +76,7 @@ VertexArray::~VertexArray() {
 	LOG_GL_ERROR;
 }
 
-void VertexArray::bind() {
+void VertexArray::bind() const {
 	glBindVertexArray(this->id);
 	LOG_GL_ERROR;
 }

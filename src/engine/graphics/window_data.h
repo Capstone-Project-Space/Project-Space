@@ -4,10 +4,16 @@
 
 #include <glm/glm.hpp>
 
+/**
+ * @brief This struct should contain performance metrics data for a Window.
+ */
 struct PerformanceData {
 	float frames;
 };
 
+/**
+ * @brief This struct should contain all data related to a Window.
+ */
 struct WindowData {
 	bool isOpen;
 	const std::string title;

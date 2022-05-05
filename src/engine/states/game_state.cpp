@@ -43,11 +43,12 @@ void State::ChangeState(std::shared_ptr<GameState> state) {
 	if (State::CurrentState) State::CurrentState->onResume(lastState ? lastState->window : nullptr);
 }
 
-void State::RestoreState() {
+std::shared_ptr<GameState> State::RestoreState() {
 	auto lastState = State::CurrentState;
 	State::CurrentState = State::StateStack.top();
 	State::StateStack.pop();
 	if (State::CurrentState) State::CurrentState->onResume(lastState ? lastState->window : nullptr);
+	return lastState;
 }
 
 void State::ResetStateTo(std::shared_ptr<GameState> state) {

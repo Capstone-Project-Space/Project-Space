@@ -24,7 +24,7 @@ ShaderProgram::~ShaderProgram() {
 	LOG_GL_ERROR;
 }
 
-void ShaderProgram::bind() { glUseProgram(this->id); }
+void ShaderProgram::bind() const { glUseProgram(this->id); }
 
 void ShaderProgram::bindUniformBuffer(const std::string& name, const std::shared_ptr<UniformBuffer> ub) {
 	uint32_t id = glGetUniformBlockIndex(this->id, name.c_str());

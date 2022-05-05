@@ -21,6 +21,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		new RelativeLayout("window:left:50%", "window:bottom:26%"),
 		[=](ButtonComponent& button) {
 			State::ChangeState(GameState::CreateState<NewGameState>(window));
+			return true;
 		}, "New Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 		Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
@@ -30,6 +31,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		new RelativeLayout("play_game:left:0", "play_game:bottom:-10"),
 		[=](ButtonComponent& button) {
 			State::ChangeState(GameState::CreateState<LoadGameState>(window));
+			return true;
 		}, "Load Game", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
@@ -39,6 +41,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		new RelativeLayout("play_game:left:0", "load_game:bottom:-10"),
 		[=](ButtonComponent& button) {
 			State::ChangeState(GameState::CreateState<SettingsState>(window));
+			return true;
 		}, "Settings", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));
@@ -48,6 +51,7 @@ MainMenuState::MainMenuState(std::shared_ptr<Window> window)
 		new RelativeLayout("play_game:left:0", "settings:bottom:-10"),
 		[=](ButtonComponent& button) {
 			window->close();
+			return true;
 		}, "Exit", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));

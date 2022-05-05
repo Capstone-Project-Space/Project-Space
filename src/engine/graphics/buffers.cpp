@@ -39,7 +39,7 @@ VertexBuffer::~VertexBuffer() {
 	LOG_GL_ERROR;
 }
 
-void VertexBuffer::bind() { glBindBuffer(GL_ARRAY_BUFFER, this->id); LOG_GL_ERROR;}
+void VertexBuffer::bind() const { glBindBuffer(GL_ARRAY_BUFFER, this->id); LOG_GL_ERROR;}
 
 void VertexBuffer::updateBuffer(uint64_t size, const void* data, uint64_t offset) {
 	assert(size + offset >= size && size + offset >= offset);
@@ -82,7 +82,7 @@ IndexBuffer::~IndexBuffer() {
 	LOG_GL_ERROR;
 }
 
-void IndexBuffer::bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id); LOG_GL_ERROR; }
+void IndexBuffer::bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id); LOG_GL_ERROR; }
 
 void IndexBuffer::updateBuffer(uint64_t size, const uint32_t* data, uint64_t offset) {
 	assert(size + offset >= size && size + offset >= offset);
@@ -144,6 +144,6 @@ void UniformBuffer::updateBuffer(const void* data) {
 	LOG_GL_ERROR;
 }
 
-void UniformBuffer::bind() {
+void UniformBuffer::bind() const {
 	glBindBuffer(GL_UNIFORM_BUFFER, this->id);
 }

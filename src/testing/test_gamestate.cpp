@@ -90,6 +90,7 @@ TestResult* GS_TestStateChanges() {
 	}
 
 	result->succeeded = true;
+	State::ResetStateTo(nullptr);
 	return result;
 }
 
@@ -175,5 +176,6 @@ TestResult* GS_TestEventReceiving() {
 	}
 
 	result->succeeded = true;
+	State::ResetStateTo(nullptr);
 	return result;
 }

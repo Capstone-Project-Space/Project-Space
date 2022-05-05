@@ -19,10 +19,26 @@ namespace ShaderDataType {
 		MAT3, MAT4
 	};
 
+	/**
+	 * @brief Get the Size of a ShaderDataType::Type.
+	 * 
+	 * @param type The type of variable to get the size of.
+	 * @return The size of the type in bytes.
+	 */
 	uint64_t GetSize(Type type);
+
+	/**
+	 * @brief Get the Count of single types.
+	 * 
+	 * @param type The type of variable to get the count of.
+	 * @return The count of individual types in this type.
+	 */
 	uint64_t GetCount(Type type);
 }
 
+/**
+ * @brief A single Layout variable.
+ */
 struct LayoutElement {
 	bool normalized;
 	const std::string name;
@@ -31,6 +47,9 @@ struct LayoutElement {
 	LayoutElement(const char* name, ShaderDataType::Type type, bool normalized = false);
 };
 
+/**
+ * @brief A sequence of layout elements which comprises the data for each vertex.
+ */
 class VertexLayout {
 public:
 	VertexLayout();
@@ -55,15 +74,32 @@ private:
 
 class VertexArray {
 public:
-	static std::shared_ptr<VertexArray> CreateVertexArray(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> buffer);
+	/**
+	 * @brief Create a Vertex Array.
+	 * 
+	 * @param layout The layout for each vertex in a VertexBuffer.
+	 * @param buffer A buffer to apply to this VertexArray.
+	 * @return A std::shared_ptr to a VertexArray.
+	 */
+	static std::shared_ptr<VertexArray> CreateVertexArray(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> buffer=nullptr);
 
 	~VertexArray();
 
-	void bind();
+	/**
+	 * @brief 
+	 * 
+	 */
+	void bind() const;
+	
+	/**
+	 * @brief Apply a VertexBuffer to this VertexArray.
+	 * 
+	 * @param layout The layout for each vertex in a VertexBuffer.
+	 * @param vertices The buffer to apply to this VertexArray.
+	 */
 	void addVertexBuffer(const VertexLayout& layout, const std::shared_ptr<VertexBuffer> vertices);
 
 private:
 	uint32_t id;
-	std::unordered_set<std::shared_ptr<VertexBuffer>> buffers;
 	VertexArray();
 };

@@ -35,56 +35,180 @@ class BatchRenderer {
 public:
 	BatchRenderer();
 
+	/**
+	 * @brief Initialize all of the graphics objects.
+	 */
 	void init();
+
+	/**
+	 * @brief Destroy all of the graphics objects.
+	 */
 	void destroy();
 
 	void submitQuad(QuadData data, const std::shared_ptr<Texture> texture);
-	void submitQuad(const glm::vec3&, const glm::vec2&, const glm::vec4&, const std::shared_ptr<Texture>, const glm::vec4&, float = 0.0f);
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
+	void submitQuad(
+		const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq,
+		const std::shared_ptr<Texture> texture, const glm::vec4& color, float rotation = 0.0f
+	);
+
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, WHITE_COLOR, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
 		submitQuad(pos, size, stpq, texture, WHITE_COLOR, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, WHITE_COLOR, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, float rotation = 0.0f) {
 		submitQuad(pos, size, FULL_UV, texture, WHITE_COLOR, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, tintColor, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, tintColor, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec4& tintColor, float rotation = 0.0f) {
 		submitQuad(pos, size, FULL_UV, texture, tintColor, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, stpq, texture, glm::vec4{ tintColor, 1.0f }, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param stpq The texture coordinates to take from the texture with 0, 0 being the bottom left.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const glm::vec4& stpq, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
 		submitQuad(pos, size, stpq, texture, glm::vec4{ tintColor, 1.0f }, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec2& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
 		submitQuad(glm::vec3{ pos, 0.0f }, size, FULL_UV, texture, glm::vec4{ tintColor, 1.0f }, rotation);
 	}
 
+	/**
+	 * @brief Submit a single Quad for rendering.
+	 * 
+	 * @param pos The position of the center of the quad.
+	 * @param size The width and height of the quad.
+	 * @param texture The texture to apply to the quad.
+	 * @param color The color which is multiplied to the quad.
+	 * @param rotation The rotation about the z axis.
+	 */
 	inline void submitQuad(const glm::vec3& pos, const glm::vec2& size, const std::shared_ptr<Texture> texture, const glm::vec3& tintColor, float rotation = 0.0f) {
 		submitQuad(pos, size, FULL_UV, texture, glm::vec4{ tintColor, 1.0f }, rotation);
 	}
 
+	/**
+	 * @brief Flush the contents of the quad buffer to the GPU and tell it to render.
+	 */
 	void draw();
 
 	inline void setCamera(const Camera& camera) { this->camera = &camera; }

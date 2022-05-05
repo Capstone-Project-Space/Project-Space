@@ -14,6 +14,7 @@ LoadGameState::LoadGameState(std::shared_ptr<Window> window)
 		new RelativeLayout("window:left:100", "window:top:0"),
 		[&](ButtonComponent& button) {
 			State::RestoreState();
+			return true;
 		}, "Return", AssetManager::GetOrCreate<Font>("./resources/fonts/Movement.ttf"),
 			Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
 	));

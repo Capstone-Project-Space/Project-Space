@@ -8,6 +8,17 @@ class RelativeLayout : public Layout {
 public:
 	using Literal = float;
 	using Percentage = float;
+	/**
+	 * @brief Construct a new Relative Layout object. Parameters are in the format id:side:offset. Using ##.##% will add that percentage of `id`s width or height.
+	 * id: is the id of another UIComponent or "window".
+	 * side: is left, right, bottom, top, ?center.
+	 * offset: is the offset in pixels or a percentage of a the `side`'s dimension.
+	 * @param left Where should the left of the UIComponent be located.
+	 * @param topY Where should the top of the UIComponent be located.
+	 * @param right Where should the right of the UIComponent be located.
+	 * @param bottom Where should the bottom of the UIComponent be located.
+	 * @param infront What layer should the UIComponent be located.
+	 */
 	RelativeLayout(const std::string_view& left, const std::string_view& topY, const std::string_view& right = "", const std::string_view& bottom = "", const std::string_view& infront="window:0.0");
 	
 	virtual glm::vec3 position(

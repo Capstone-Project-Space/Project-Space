@@ -4,11 +4,11 @@
 #include <src/engine/graphics/renderer.h>
 
 ButtonComponent::ButtonComponent(
-	const std::string_view& id, Layout* layout, std::function<void(ButtonComponent&)> clickCallback,
+	const std::string_view& id, Layout* layout, std::function<bool(ButtonComponent&)> clickCallback,
 	const std::string& text, std::shared_ptr<Font> font, 
 	const Color& textColor, const Color& textHighlightColor,
 	Gravity gravity, const glm::vec2& minimumDimensions
-) : UIComponent(id, layout), text(text), textFont(font), textGravity(gravity), texture(nullptr),
+) : UIComponent(id, layout), text(text), textFont(font), gravity(gravity), texture(nullptr),
 	textureHighlightTint({1.0f}), minimumDimensions(minimumDimensions), clickCallback(clickCallback) {
 	if (textColor.index() == 0) this->textColor = glm::vec4{ std::get<0>(textColor), 1.0f };
 	else this->textColor = std::get<1>(textColor);
@@ -17,20 +17,20 @@ ButtonComponent::ButtonComponent(
 }
 
 ButtonComponent::ButtonComponent(
-	const std::string_view& id, Layout* layout, std::function<void(ButtonComponent&)> clickCallback,
-	std::shared_ptr<Texture> texture, const Color& tintColor, const glm::vec2& minimumDimensions
-) : UIComponent(id, layout), text(""), textFont(nullptr), textGravity(Gravity::CENTER), textColor({ 1.0f }),
+	const std::string_view& id, Layout* layout, std::function<bool(ButtonComponent&)> clickCallback,
+	std::shared_ptr<Texture> texture, const Color& tintColor, Gravity gravity, const glm::vec2& minimumDimensions
+) : UIComponent(id, layout), text(""), textFont(nullptr), gravity(gravity), textColor({ 1.0f }),
 	textHighlightColor({ 0.6f }), texture(texture), minimumDimensions(minimumDimensions), clickCallback(clickCallback) {
 	if (tintColor.index() == 0) this->textureHighlightTint = { std::get<0>(tintColor), 1.0f };
 	else this->textureHighlightTint = std::get<1>(tintColor);
 }
 
 ButtonComponent::ButtonComponent(
-	const std::string_view& id, Layout* layout, std::function<void(ButtonComponent&)> clickCallback,
+	const std::string_view& id, Layout* layout, std::function<bool(ButtonComponent&)> clickCallback,
 	const std::string& text, std::shared_ptr<Font> font, std::shared_ptr<Texture> texture,
 	const Color& textColor, const Color& textHighlightColor, const Color& tintColor, Gravity gravity,
 	const glm::vec2& minimumDimensions
-) : UIComponent(id, layout), text(text), textFont(font), textGravity(gravity), texture(texture),
+) : UIComponent(id, layout), text(text), textFont(font), gravity(gravity), texture(texture),
 	minimumDimensions(minimumDimensions), clickCallback(clickCallback) {
 	if (textColor.index() == 0) this->textColor = glm::vec4{ std::get<0>(textColor), 1.0f };
 	else this->textColor = std::get<1>(textColor);
@@ -58,9 +58,9 @@ void ButtonComponent::draw(float delta) {
 	}
 	if (textFont) {
 		if (within) {
-			Renderer::SubmitText(text, pos, textHighlightColor, textFont, textGravity);
+			Renderer::SubmitText(text, pos, textHighlightColor, textFont, gravity);
 		} else 
-			Renderer::SubmitText(text, pos, textColor, textFont, textGravity);
+			Renderer::SubmitText(text, pos, textColor, textFont, gravity);
 	}
 
 }
@@ -72,6 +72,6 @@ bool ButtonComponent::isWithin(const glm::vec2& pos) const {
 }
 
 bool ButtonComponent::onMouseButtonReleased(const MouseButton& button) {
-	if (this->isWithin({Mouse::x, Mouse::y})) clickCallback(*this);
+	if (this->isWithin({Mouse::x, Mouse::y})) return clickCallback(*this);
 	return false;
 }

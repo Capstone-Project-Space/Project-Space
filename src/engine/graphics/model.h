@@ -41,6 +41,13 @@ constexpr uint64_t getVertexFloatSize() { return sizeof(ModelVertex) / sizeof(fl
 
 class Model {
 public:
+	/**
+	 * @brief Create a Model.
+	 * 
+	 * @param filepath The filepath to the obj file.
+	 * @param texture An optional default/forced texture.
+	 * @return A std::shared_ptr to a Model.
+	 */
 	static std::shared_ptr<Model> CreateModel(const std::string& filepath, std::shared_ptr<Texture> texture=nullptr);
 
 	~Model() = default;
@@ -48,6 +55,9 @@ public:
 	const inline std::shared_ptr<IndexBuffer> getIndices() const { return indexBuffer; }
 	const inline std::shared_ptr<VertexBuffer> getVertices() const { return vertexBuffer; }
 
+	/**
+	 * @brief Bind the IndexBuffer, VertexBuffer, and Textures related to this Model. 
+	 */
 	void bind() const;
 
 private:
