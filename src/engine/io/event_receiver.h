@@ -3,6 +3,9 @@
 #include "mouse.h"
 #include "keyboard.h"
 
+/**
+ * @brief A class that inherits from EventReceiver can be registered to recieve events.
+ */
 class EventReceiver {
 public:
 	virtual bool onKeyPressed(const Key& key) { return false; }

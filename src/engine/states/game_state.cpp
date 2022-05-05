@@ -2,7 +2,7 @@
 
 #include <src/engine/io/event.h>
 
-GameState::GameState(const std::string& saveFileName) : FileStorage(saveFileName), window(nullptr) { }
+// GameState::GameState(const std::string& saveFileName) : FileStorage(saveFileName), window(nullptr) { }
 GameState::GameState(const std::shared_ptr<Window> window, const std::string& saveFileName) : FileStorage(saveFileName), window(window) { }
 
 GameState::~GameState() {
@@ -56,7 +56,7 @@ void State::ResetStateTo(std::shared_ptr<GameState> state) {
 	auto lastState = State::CurrentState;
 	State::StateStack.push(std::shared_ptr<GameState>(nullptr));
 	State::CurrentState = state;
-	if (State::CurrentState) State::CurrentState->onResume(lastState->window);
+	if (State::CurrentState) State::CurrentState->onResume(lastState ? lastState->window : nullptr);
 }
 
 void State::Close() {

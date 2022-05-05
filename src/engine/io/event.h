@@ -34,6 +34,12 @@ struct Event {
 struct Events {
 	static std::vector<EventReceiver*> Receivers;
 
+	/**
+	 * @brief Dispatches an Event to the State::CurrentState and then to any registered listeners until something returns true saying the event has been handled.
+	 * 
+	 * @tparam T The data stored within the type of event.
+	 * @param e The event which has occured.
+	 */
 	template<typename T>
 	static void DispatchEvent(const Event<T>& e) {
 		float* vals;
@@ -103,6 +109,17 @@ struct Events {
 		}
 	}
 
+	/**
+	 * @brief Register an EventReceiver to receive events.
+	 * 
+	 * @param recv The EventReceiver to register.
+	 */
 	static void RegisterReceiver(EventReceiver* recv);
+
+	/**
+	 * @brief Un-register an EventReceiver to no longer receive events.
+	 * 
+	 * @param recv The EventReceiver to un-register.
+	 */
 	static void RemoveReceiver(EventReceiver* recv);
 };

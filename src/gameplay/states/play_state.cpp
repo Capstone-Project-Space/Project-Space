@@ -27,7 +27,7 @@ void PlayState::update(float delta) {
 		}
 	}
 
-	if (Mouse::isButtonDown(GLFW_MOUSE_BUTTON_1)) {
+	if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1)) {
 		if (mouse1DownTime < 1.0f) mouse1DownTime += delta;
 		if (mouse1DownTime > 1.0f) mouse1DownTime = 1.0f;
 	}
@@ -282,15 +282,15 @@ bool PlayState::onMouseWheelScroll(float xOffset, float yOffset) {
 }
 
 bool PlayState::onMouseMoved(float x, float y, float dx, float dy) {
-	if (Mouse::isButtonDown(GLFW_MOUSE_BUTTON_1) == true && Mouse::isButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
+	if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1) == true && Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
 		gameCamera.move(dx, MoveDirection::LEFT);
 		gameCamera.move(dy, MoveDirection::FORWARDS);
 	}
 	else {
-		if (Mouse::isButtonDown(GLFW_MOUSE_BUTTON_1) == true) {
+		if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1) == true) {
 
 		}
-		if (Mouse::isButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
+		if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
 			gameCamera.setPitch(gameCamera.getPitch() + dy * .4f);
 			gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
 		}
