@@ -10,7 +10,7 @@
 
 class ComponentManager : public EventReceiver {
 public:
-	ComponentManager() = default;
+	ComponentManager(std::shared_ptr<Window> window);
 
 	/**
 	 * @brief Add a UIComponent to this manager.

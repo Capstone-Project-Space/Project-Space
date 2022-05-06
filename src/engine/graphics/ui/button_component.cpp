@@ -19,7 +19,7 @@ ButtonComponent::ButtonComponent(
 ButtonComponent::ButtonComponent(
 	const std::string_view& id, Layout* layout, std::function<bool(ButtonComponent&)> clickCallback,
 	std::shared_ptr<Texture> texture, const Color& tintColor, Gravity gravity, const glm::vec2& minimumDimensions
-) : UIComponent(id, layout), text(""), textFont(nullptr), gravity(gravity), textColor({ 1.0f }),
+) : UIComponent(id, layout), text(""), textFont(nullptr), gravity(gravity), textColor({1.0f}),
 	textHighlightColor({ 0.6f }), texture(texture), minimumDimensions(minimumDimensions), clickCallback(clickCallback) {
 	if (tintColor.index() == 0) this->textureHighlightTint = { std::get<0>(tintColor), 1.0f };
 	else this->textureHighlightTint = std::get<1>(tintColor);
@@ -48,9 +48,39 @@ float ButtonComponent::getContentHeight() const {
 	return std::max((float) textFont->getTextHeight(text), minimumDimensions.y);
 }
 
-void ButtonComponent::draw(float delta) {
+const glm::vec3& ButtonComponent::getPosition() const {
 	glm::vec3 pos = this->position.value();
+	if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
+		pos.x -= this->getWidth() / 2.f;
+	}
+	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
+		pos.y -= this->getHeight() / 2.f;
+	}
+
+	if ((gravity & Gravity::RIGHT) == Gravity::RIGHT) {
+		pos.x -= this->getWidth();
+	}
+
+	if ((gravity & Gravity::TOP) == Gravity::TOP) {
+		pos.y -= this->getHeight();
+	}
+	
+	return pos;
+}
+
+void ButtonComponent::draw(std::shared_ptr<Window> window, float delta) {
 	const glm::vec2 size = this->size.value();
+	glm::vec3 pos = position.value();
+	if (gravity & Gravity::RIGHT) {
+		pos.x -= size.x / 2.f;
+	} else if (!(gravity & Gravity::CENTER_HORIZONTAL)) {
+		pos.x += size.x / 2.f;
+	}
+	if (gravity & Gravity::TOP) {
+		pos.y -= size.y / 2.f;
+	} else if (!(gravity & Gravity::CENTER_VERTICAL)) {
+		pos.y += size.y / 2.f;
+	}
 	bool within = this->isWithin({ Mouse::x, Mouse::y });
 	if (texture) {
 		if (within) Renderer::SubmitQuad(pos, size, AssetManager::GetOrCreate<Texture>(glm::vec4{1.f}), textureHighlightTint);
@@ -58,17 +88,11 @@ void ButtonComponent::draw(float delta) {
 	}
 	if (textFont) {
 		if (within) {
-			Renderer::SubmitText(text, pos, textHighlightColor, textFont, gravity);
+			Renderer::SubmitText(text, this->position.value(), textHighlightColor, textFont, gravity, window->getData().scale);
 		} else 
-			Renderer::SubmitText(text, pos, textColor, textFont, gravity);
+			Renderer::SubmitText(text, this->position.value(), textColor, textFont, gravity, window->getData().scale);
 	}
 
-}
-
-bool ButtonComponent::isWithin(const glm::vec2& pos) const {
-	const glm::vec2 size = this->size.value();
-	const glm::vec3 position = this->position.value() - (glm::vec3{ size / 2.f, 0.0f });
-	return pos.x >= position.x && pos.y >= position.y && pos.x < position.x + size.x && pos.y < position.y + size.y;
 }
 
 bool ButtonComponent::onMouseButtonReleased(const MouseButton& button) {

@@ -11,7 +11,7 @@
  */
 class ConstraintLayout : public Layout {
 public:
-	ConstraintLayout(const std::string_view& left, const std::string_view& top, const std::string_view& right, const std::string_view& bottom, const std::string_view& infront = "window");
+	ConstraintLayout(const std::string_view& left, const std::string_view& top, const std::string_view& right="", const std::string_view& bottom="", const std::string_view& infront = "window");
 
 	operator Layout*() {
 		return reinterpret_cast<Layout*>(this);

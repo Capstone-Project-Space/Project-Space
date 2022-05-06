@@ -404,8 +404,7 @@ int main(int argc, char** args) {
 		printEvent(gameEvents[i]);
 	}
 
-	std::shared_ptr<GameState> mainMenuState = GameState::CreateState<MainMenuState>(window);// GameState::CreateState<TempState>(window, std::string{"Temporary State"});
-	//playState = GameState::CreateState<PlayState>(window, std::string{ "Play Test State" });
+	std::shared_ptr<GameState> mainMenuState = GameState::CreateState<MainMenuState>(window);
 	LOG_GL_ERROR;
 
 	State::ChangeState(mainMenuState);

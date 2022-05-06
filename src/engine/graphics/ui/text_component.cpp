@@ -2,8 +2,10 @@
 
 #include <src/engine/graphics/renderer.h>
 
-TextComponent::TextComponent(const std::string_view& id, Layout* layout, const std::string& text, std::shared_ptr<Font> font)
-	: UIComponent(id, layout), text(text), font(font) {}
+TextComponent::TextComponent(
+	const std::string_view& id, Layout* layout, const std::string& text, std::shared_ptr<Font> font, 
+	Gravity gravity, const glm::vec4& color, float scale)
+	: UIComponent(id, layout), text(text), font(font), gravity(gravity), color(color), scale(scale) {}
 
 float TextComponent::getContentWidth() const {
 	return font->getTextWidth(text) * scale;
@@ -13,20 +15,27 @@ float TextComponent::getContentHeight() const {
 	return font->getTextHeight(text) * scale;
 }
 
-void TextComponent::draw(float delta) {
+const glm::vec3& TextComponent::getPosition() const {
 	glm::vec3 pos = this->position.value();
-	if ((this->layoutGravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
-		pos.x -= this->getWidth() / 2.0f;
-	} else if (this->layoutGravity & Gravity::RIGHT) {
-		pos.x -= this->getWidth();
+	const glm::vec3& size = this->position.value();
+	if (gravity & Gravity::CENTER_HORIZONTAL) {
+		pos.x -= size.x / 2.f;
 	}
-	if ((layoutGravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
-		pos.y += this->getHeight() / 2.0f;
-	} else if (layoutGravity & Gravity::TOP) {
-		pos.y -= this->getHeight();
+	if (gravity & Gravity::CENTER_VERTICAL) {
+		pos.y -= size.y / 2.f;
+	}
+	if (gravity & Gravity::RIGHT) {
+		pos.x -= size.x;
+	}
+	if (gravity & Gravity::TOP) {
+		pos.y -= size.y / 2.f;
 	}
 
-	Renderer::SubmitText(text, pos, color, this->font, textGravity, scale);
+	return pos;
+}
+
+void TextComponent::draw(std::shared_ptr<Window> window, float delta) {
+	Renderer::SubmitText(text, this->position.value(), color, this->font, gravity, window->getData().scale * this->scale);
 }
 
 bool TextComponent::SetText(std::shared_ptr<TextComponent> component, const std::string& text) {
@@ -54,12 +63,12 @@ bool TextComponent::SetColor(std::shared_ptr<TextComponent> component, glm::vec4
 }
 
 bool TextComponent::SetTextGravity(std::shared_ptr<TextComponent> component, Gravity gravity) {
-	component->textGravity = gravity;
+	component->gravity = gravity;
 	return false;
 }
 
 
-bool TextComponent::SetLayoutGravity(std::shared_ptr<TextComponent> component, Gravity gravity) {
-	component->layoutGravity = gravity;
-	return false;
-}
+//bool TextComponent::SetLayoutGravity(std::shared_ptr<TextComponent> component, Gravity gravity) {
+//	component->layoutGravity = gravity;
+//	return false;
+//}

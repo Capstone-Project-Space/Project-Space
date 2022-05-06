@@ -39,6 +39,8 @@ inline bool operator ==(const Gravity& g, const uint32_t& u) {
 	return static_cast<uint32_t>(g) == u;
 }
 
+glm::vec3 GravitateBottomLeft(const glm::vec3& pos, const glm::vec2& size, Gravity g);
+
 
 class Layout;
 
@@ -75,7 +77,7 @@ public:
 	 * 
 	 * @param delta The time since the last frame.
 	 */
-	virtual void draw(float delta) = 0;
+	virtual void draw(std::shared_ptr<Window> window, float delta) = 0;
 
 	inline const std::string_view& getID() const { return id; }
 	inline const std::shared_ptr<Layout> getLayout() const { return layout; }
@@ -92,11 +94,7 @@ public:
 
 	virtual inline bool isVisible() const { return visible; }
 
-	virtual inline bool isWithin(const glm::vec2& pos) const {
-		const glm::vec3 position = this->position.value();
-		const glm::vec2 size = this->size.value();
-		return pos.x >= position.x && pos.y >= position.y && pos.x < position.x + size.x && pos.y < position.y + size.y;
-	}
+	virtual bool isWithin(const glm::vec2& pos) const;
 	
 	/**
 	 * @brief Change the Layout for a UIComponent and then apply them.

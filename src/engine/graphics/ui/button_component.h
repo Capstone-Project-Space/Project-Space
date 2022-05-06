@@ -74,9 +74,9 @@ public:
 	virtual float getContentWidth() const override;
 	virtual float getContentHeight() const override;
 
-	virtual void draw(float delta) override;
+	virtual const glm::vec3& getPosition() const override;
 
-	virtual bool isWithin(const glm::vec2& position) const override;
+	virtual void draw(std::shared_ptr<Window> window, float delta) override;
 
 	virtual bool onMouseButtonReleased(const MouseButton& button) override;
 

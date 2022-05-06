@@ -227,7 +227,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec3& color, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec3& color, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, glm::vec3{ pos, 0.0f }, glm::vec4{ color, 1.0f }, gravity, scale, rotation);
 	}
 
@@ -241,7 +241,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec4& color, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec4& color, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, glm::vec3{ pos, 0.0f }, color, gravity, scale, rotation);
 	}
 	
@@ -255,7 +255,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec3& color, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec3& color, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, pos, glm::vec4{ color, 1.0f }, gravity, scale, rotation);
 	}
 
@@ -270,7 +270,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec3& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec3& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, glm::vec3{ pos, 0.0f }, glm::vec4{ color, 1.0f }, font, gravity, scale, rotation);
 	}
 
@@ -285,7 +285,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec2& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, glm::vec3{ pos, 0.0f }, color, font, gravity, scale, rotation);
 	}
 
@@ -300,7 +300,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	inline static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec3& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f) {
+	inline static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec3& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f) {
 		SubmitText(text, pos, glm::vec4{ color, 1.0f }, font, gravity, scale, rotation);
 	}
 
@@ -314,7 +314,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f);
+	static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f);
 	
 	/**
 	 * @brief Submit a line of text for rendering.
@@ -327,7 +327,7 @@ public:
 	 * @param scale The scale(multiplier of size) of the text.
 	 * @param rotation The rotation about the z axis.
 	 */
-	static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, float scale = 1.0f, float rotation = 0.0f);
+	static void SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity = Gravity::LEFT, const glm::vec2& scale = glm::vec2{1.f}, float rotation = 0.0f);
 
 	/**
 	 * @brief Ends this 2D scene and flush the 2D renderer.

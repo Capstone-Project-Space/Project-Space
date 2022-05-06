@@ -2,6 +2,10 @@
 
 #include <src/engine/graphics/renderer.h>
 
+ComponentManager::ComponentManager(std::shared_ptr<Window> window) {
+	this->window = window;
+}
+
 void ComponentManager::addComponent(std::shared_ptr<UIComponent> component) {
 	assert(componentMapping.find(component->getID()) == componentMapping.end() && "No duplicate IDs allowed. First remove the id then add.");
 	this->components.push_back(component);
@@ -42,7 +46,7 @@ void ComponentManager::applyLayouts(std::shared_ptr<Window> window) {
 void ComponentManager::drawComponents(float delta, const Camera& camera) {
 	Renderer::Begin2DScene(camera);
 	for (auto& component : components) {
-		if (component->isVisible()) component->draw(delta);
+		if (component->isVisible()) component->draw(this->window, delta);
 	}
 	Renderer::End2DScene();
 }

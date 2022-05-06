@@ -145,25 +145,25 @@ void PlayState::render(float delta) {
 				+ ";  y = " + std::to_string(gameCamera.getPosition().y)
 				+ ";  z = " + std::to_string(gameCamera.getPosition().z),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+					(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 
 			//Render Mouse Information
 			/*Renderer::SubmitText("Mouse:  x - " + std::to_string(Mouse::x) + ";  y - " + std::to_string(Mouse::y)
 				+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);*/
+					(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });*/
 
 			Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 28.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+					(window->getData().size.y / 2.f) - 28.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 
 			Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+					(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 			if (doubleClick1Check) {
 				Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
 					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.3);
+						(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 			}
 		}
 		else {
@@ -173,12 +173,12 @@ void PlayState::render(float delta) {
 			Renderer::SubmitQuad({ 0.0f, window->getData().size.y / 2.f - (size.y / 2.f), 0.0f }, size, AssetManager::GetOrCreate<Texture>("./resources/textures/console/consoleBackground.png"), 0.0f);
 
 			Renderer::SubmitText("> " + Console::Get().getCmdLine(),
-				{ -(window->getData().size.x / 2.f) + 1.0f, bottom + (.02f * size.y), 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, 0.3);
+				{ -(window->getData().size.x / 2.f) + 1.0f, bottom + (.02f * size.y), 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, glm::vec2{ 0.3f });
 
 			glm::vec2 pos{ window->getData().size.x / -2.f, bottom + size.y * .075 };
 			for (int i = 1; i <= Console::Get().getArchiveSize(); i++) {
 				Renderer::SubmitText(Console::Get().getArchiveAt(i - 1),
-					pos, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, 0.3);
+					pos, { 1.0f, 1.0f, 1.0f }, Gravity::CENTER_VERTICAL, glm::vec2{ 0.3f });
 				pos.y += Renderer::GetFont()->getTextHeight(Console::Get().getArchiveAt(i - 1)) * .42;
 			}
 		}

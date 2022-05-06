@@ -75,6 +75,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 			float vals[4] = { data->size.x, data->size.y, width, height };
 			data->size.x = width;
 			data->size.y = height;
+			data->scale = data->size / data->initialSize;
 			data->orthographicCamera = {width / -2.f, width / 2.f, height / -2.f, height / 2.f};
 			glViewport(0, 0, width, height);
 			Events::DispatchEvent(Event<float[4]>{ EventType::WINDOW_RESIZE, vals });

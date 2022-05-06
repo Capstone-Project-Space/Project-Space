@@ -118,13 +118,13 @@ void Renderer::SubmitQuad(const glm::vec3& pos, const glm::vec2& size, const glm
 	Renderer::BatchRenderer.submitQuad(pos, size, stpq, texture, tintColor, rotation);
 }
 
-void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
+void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, const glm::vec2& scale, float rotation) {
 	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
 	assert(font);
 	Renderer::TextRenderer.submitText(text, pos, color, font, gravity, scale, rotation);
 }
 
-void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, Gravity gravity, float scale, float rotation) {
+void Renderer::SubmitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, Gravity gravity, const glm::vec2& scale, float rotation) {
 	assert(Renderer::mode == Mode::BATCH && "Renderer did not begin 2D scene.");
 	assert(Renderer::CurrentFont);
 	Renderer::TextRenderer.submitText(text, pos, color, Renderer::CurrentFont, gravity, scale, rotation);

@@ -52,19 +52,19 @@ void TextRenderer::destroy() {
 	this->fonts.fill(nullptr);
 }
 
-void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, float scale, float rotation) {
-	float height = font->getTextHeight(text) * scale;
-	float x = pos.x, y = pos.y - height;
+void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, const glm::vec2& scale, float rotation) {
+	float height = font->getTextHeight(text) * scale.y;
+	float x = pos.x, y = pos.y;
 
 
 	if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
-		x -= (font->getTextWidth(text) * scale) / 2.0f;
+		x -= (font->getTextWidth(text) * scale.x) / 2.0f;
 	}
 	else if (gravity & Gravity::RIGHT) {
-		x -= (font->getTextWidth(text) * scale);
+		x -= (font->getTextWidth(text) * scale.x);
 	}
 	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
-		y += (height) / 2.0f;
+		y -= (height) / 2.0f;
 	}
 	else if (gravity & Gravity::TOP) {
 		y -= (height);
@@ -95,11 +95,11 @@ void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, con
 			this->draw();
 		}
 		// Put the character quad into the quads buffer.
-		float xpos = x + ch.offset.x * scale;
-		float ypos = y - (ch.size.y - ch.offset.y) * scale;
+		float xpos = x + ch.offset.x * scale.x;
+		float ypos = y - (ch.size.y - ch.offset.y) * scale.y;
 
-		float wpos = xpos + ch.size.x * scale;
-		float hpos = ypos + ch.size.y * scale;
+		float wpos = xpos + ch.size.x * scale.x;
+		float hpos = ypos + ch.size.y * scale.y;
 
 		this->quads[count++] = TextQuad{
 			TextVertex{ { xpos, hpos, pos.z }, { ch.stpq.s, ch.stpq.t }, (uint32_t)idx, color, transform },
@@ -107,7 +107,7 @@ void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, con
 			TextVertex{ { wpos, ypos, pos.z }, { ch.stpq.p, ch.stpq.q }, (uint32_t)idx, color, transform },
 			TextVertex{ { wpos, hpos, pos.z }, { ch.stpq.p, ch.stpq.t }, (uint32_t)idx, color, transform }
 		};
-		x += ch.advance * scale;
+		x += ch.advance * scale.x;
 	}
 }
 

@@ -3,7 +3,8 @@
 #include <src/engine/io/event.h>
 
 // GameState::GameState(const std::string& saveFileName) : FileStorage(saveFileName), window(nullptr) { }
-GameState::GameState(const std::shared_ptr<Window> window, const std::string& saveFileName) : FileStorage(saveFileName), window(window) { }
+GameState::GameState(const std::shared_ptr<Window> window, const std::string& saveFileName)
+	: FileStorage(saveFileName), window(window), componentManager(window) { }
 
 GameState::~GameState() {
 	Events::RemoveReceiver(this);

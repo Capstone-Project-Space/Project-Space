@@ -1,5 +1,6 @@
 #include "constraint_layout.h"
 
+// TODO: Modify this to work all the time. Currently crashes if size is the difference between two locations.
 ConstraintLayout::ConstraintLayout(const std::string_view& left, const std::string_view& top, const std::string_view& right, const std::string_view& bottom, const std::string_view& infront)
 	: top(top), bottom(bottom), left(left), right(right), infront(infront.empty() ? "window" : infront) {
 	assert(!top.empty() || !bottom.empty() && "Missing vertical constraint.");
@@ -52,8 +53,8 @@ glm::vec3 ConstraintLayout::position(const std::shared_ptr<Window> window, const
 		peerVert->applyLayout(window, peers);
 		pos.y = ConstraintLayout::GetYFromSide(peerVert, relationVert);
 	}
-	if (!empties[1])
-		pos.y += self.getHeight();
+	if (empties[1])
+		pos.y -= self.getHeight();
 
 	if (this->infront == std::string_view{ "window" }) {
 		// pos.z = 0.0f;
@@ -117,9 +118,9 @@ float ConstraintLayout::GetXFromSide(const std::shared_ptr<UIComponent> componen
 
 float ConstraintLayout::GetYFromSide(const std::shared_ptr<UIComponent> component, const std::string_view& side) {
 	if (side == std::string_view{ "top" }) {
-		return component->getY();
+		return component->getY() + component->getHeight();
 	} else if (side == std::string_view{ "bottom" }) {
-		return component->getY() - component->getHeight();
+		return component->getY();
 	} else if (side == std::string_view{ "center" }) {
 		return component->getY() - (component->getHeight() / 2.0f);
 	} else assert(false && "The only applicable alignments are top, bottom, and center.");
