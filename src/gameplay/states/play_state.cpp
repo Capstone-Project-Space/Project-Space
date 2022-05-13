@@ -213,7 +213,7 @@ void PlayState::render(float delta) {
 
 		//Render Sun
 		Star star = system->getStar();
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/planet.obj", { Material{glm::vec3{2.7f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f, AssetManager::GetOrCreate<Texture>("./resources/textures/planets/star.png")} }),
+		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/planet.obj", { Material{glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f, AssetManager::GetOrCreate<Texture>("./resources/textures/planets/star2.png")} }),
 			glm::scale(glm::translate(glm::identity<glm::mat4>(), star.star->getPosition()),
 				glm::vec3{ star.star->getScale() }));
 
@@ -226,7 +226,7 @@ void PlayState::render(float delta) {
 				case BodyType::ROCKY_PLANET:
 					model = AssetManager::GetOrCreate<Model>(
 						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
 							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/rocky.png")
 						} }
 					);
@@ -234,7 +234,7 @@ void PlayState::render(float delta) {
 				case BodyType::EARTH_PLANET:
 					model = AssetManager::GetOrCreate<Model>(
 						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
 							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/alive_earth.png")
 						} }
 					);
@@ -242,7 +242,7 @@ void PlayState::render(float delta) {
 				case BodyType::DEAD_PLANET:
 					model = AssetManager::GetOrCreate<Model>(
 						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							glm::vec3{1.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
 							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/earth.png")
 						} }
 					);
@@ -250,7 +250,7 @@ void PlayState::render(float delta) {
 				case BodyType::GREEN_GAS_GIANT:
 					model = AssetManager::GetOrCreate<Model>(
 						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
 							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/green_gas.png")
 						} }
 					);
@@ -258,7 +258,7 @@ void PlayState::render(float delta) {
 				case BodyType::BROWN_GAS_GIANT:
 					model = AssetManager::GetOrCreate<Model>(
 						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
 							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/brown_gas.png")
 						} }
 					);
