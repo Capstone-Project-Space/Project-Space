@@ -3,16 +3,18 @@
 #include <src/engine/graphics/asset_manager.h>
 #include <src/engine/graphics/renderer.h>
 #include <src/engine/graphics/ui/button_component.h>
+#include <src/engine/graphics/ui/checkbox_component.h>
 #include <src/engine/graphics/ui/text_component.h>
+#include <src/engine/graphics/ui/linear_component_container.h>
 #include <src/engine/graphics/ui/relative_layout.h>
 #include <src/engine/graphics/ui/constraint_layout.h>
 
-const std::string SETTINGS_GAME_SCREEN_TEXTURE = std::string{ "./resources/textures/skybox/front.bmp" };
+constexpr std::string_view SETTINGS_GAME_SCREEN_TEXTURE = "./resources/textures/skybox/front.bmp";
 
 
 SettingsState::SettingsState(std::shared_ptr<Window> window)
      : GameState(window, "Project Space") {
-    componentManager.addComponent(new ButtonComponent(
+    /*componentManager.addComponent(new ButtonComponent(
         "return_to_mainmenu",
         new RelativeLayout("window:left:100", "window:top:0"),
         [&](ButtonComponent& button) {
@@ -25,13 +27,40 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         "desc",
         new ConstraintLayout("window:center", "window:center"),
         "This is the screen to change settings of the game.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        Gravity::CENTER, glm::vec4{ 1.f }, .6f
+        .6f, Gravity::CENTER, glm::vec4{ 1.f }
     ));
+    componentManager.addComponent(new CheckboxComponent(
+        "onoff",
+        new RelativeLayout("window:center:0", "window:center:10%"), glm::vec2{ 32.f, 32.f }
+    ));
+    componentManager.addComponent(new TextComponent(
+        "onoff_desc",
+        new RelativeLayout("onoff:right:10", "onoff:center:0"),
+        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::CENTER_VERTICAL
+    ));*/
+
+    LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
+    container->add(std::shared_ptr<UIComponent>(new TextComponent(
+        "onoff_desc1", nullptr,
+        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::BOTTOM
+    )));
+    container->add(std::shared_ptr<UIComponent>(new TextComponent(
+        "onoff_desc2", nullptr,
+        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::BOTTOM
+    )));
+    container->add(std::shared_ptr<UIComponent>(new TextComponent(
+        "onoff_desc3", nullptr,
+        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::BOTTOM
+    )));
+    componentManager.addComponent(container);
+
 }
 
-void SettingsState::update(float delta) {
-
-}
+void SettingsState::update(float delta) {}
 
 void SettingsState::render(float delta) {
      Renderer::Begin2DScene(window->getData().orthographicCamera);

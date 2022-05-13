@@ -64,46 +64,138 @@ void PlayState::update(float delta) {
 void PlayState::render(float delta) {
 	Renderer::Begin3DScene(gameCamera.getCamera()); {
 		//Submit Skybox
+		auto get_plane = [](const std::string_view& texture) {
+			return AssetManager::GetOrCreate<Model>(
+				"./resources/models/plane.obj",
+				{ {
+					glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
+					AssetManager::GetOrCreate<Texture>(texture)
+				} }
+			);
+		};
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/front.bmp"),
+			glm::scale(
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 50.f, 0.f }),
+				glm::vec3{ 50.f }
+			)
+		);
+
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/back.bmp"),
+			glm::scale(
+				glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, -50.f, 0.f }),
+				glm::vec3{ 50.f }
+			)
+		);
+
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/front.bmp"),
+			glm::scale(
+				glm::rotate(
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 0.f, -50.f }),
+					glm::radians(90.f), glm::vec3{1.f, 0.f, 0.f}
+				),
+				glm::vec3{ 50.f }
+			)
+		);
+
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/back.bmp"),
+			glm::scale(
+				glm::rotate(
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 0.f, 50.f }),
+					glm::radians(-90.f), glm::vec3{ 1.f, 0.f, 0.f }
+				),
+				glm::vec3{ 50.f }
+			)
+		);
+
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/left.bmp"),
+			glm::scale(
+				glm::rotate(
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 50.f, 0.f, 0.f }),
+					glm::radians(90.f), glm::vec3{ 0.f, 0.f, 1.f }
+				),
+				glm::vec3{ 50.f }
+			)
+		);
+
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/right.bmp"),
+			glm::scale(
+				glm::rotate(
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ -50.f, 0.f, 0.f }),
+					glm::radians(-90.f), glm::vec3{ 0.f, 0.f, 1.f }
+				),
+				glm::vec3{ 50.f }
+			)
+		);
 
 		//front
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")),
-			glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-				{ 0.0f, 0.0f, -50.0f }),										//position
-				(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-				glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+		//Renderer::SubmitModel(
+		//	AssetManager::GetOrCreate<Model>(
+		//		"./resources/models/plane.obj", {Material{
+		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
+		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")
+		//		}}
+		//	),
+		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+		//		{ 0.0f, 0.0f, -50.0f }),										//position
+		//		(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
 
 		//back
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")),
-			glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-				{ 0.0f, 0.0f, 50.0f }),										//position
-				(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-				glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+		//Renderer::SubmitModel(
+		//	AssetManager::GetOrCreate<Model>(
+		//		"./resources/models/plane.obj", { {
+		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
+		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")
+		//		} }
+		//	),
+		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+		//		{ 0.0f, 0.0f, 50.0f }),										//position
+		//		(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
 
 		//left
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")),
-			glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-				{ -50.0f, 0.0f, 0.0f }),										//position
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
-				(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-				glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+		//Renderer::SubmitModel(
+		//	AssetManager::GetOrCreate<Model>(
+		//		"./resources/models/plane.obj", { {
+		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
+		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")
+		//		} }
+		//	),
+		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+		//		{ -50.0f, 0.0f, 0.0f }),										//position
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
+		//		(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
+		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
 
 		//right
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/plane.obj", AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")),
-			glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-				{ 50.0f, 0.0f, 0.0f }),										//position
-				(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-				(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-				(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
-				glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-			glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+		//Renderer::SubmitModel(
+		//	AssetManager::GetOrCreate<Model>(
+		//		"./resources/models/plane.obj", { {
+		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
+		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")
+		//		} }
+		//	),
+		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
+		//		{ 50.0f, 0.0f, 0.0f }),										//position
+		//		(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
+		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
+		//		(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
+		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
+		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
 
 		//Render Camera Target Location
 		if (gameCamera.getTarget() != std::nullopt) {
@@ -121,16 +213,61 @@ void PlayState::render(float delta) {
 
 		//Render Sun
 		Star star = system->getStar();
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/sun.obj"),
+		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/planet.obj", { Material{glm::vec3{2.7f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f, AssetManager::GetOrCreate<Texture>("./resources/textures/planets/star.png")} }),
 			glm::scale(glm::translate(glm::identity<glm::mat4>(), star.star->getPosition()),
 				glm::vec3{ star.star->getScale() }));
 
 		//Render all system bodies
 		std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
-		for (auto i : bodies) {
-			Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/32x32.obj"),
-				glm::scale(glm::translate(glm::identity<glm::mat4>(), i->getPosition()),
-					glm::vec3(i->getScale())), glm::vec4{ i->getColor(), 1.0f });
+		for (auto body : bodies) {
+			std::shared_ptr<Model> model = nullptr;
+			const glm::mat4 transform = glm::scale(glm::translate(glm::identity<glm::mat4>(), body->getPosition()), glm::vec3(body->getScale()));
+			switch (body->getBodyType()) {
+				case BodyType::ROCKY_PLANET:
+					model = AssetManager::GetOrCreate<Model>(
+						"./resources/models/planet.obj", { {
+							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/rocky.png")
+						} }
+					);
+					break;
+				case BodyType::EARTH_PLANET:
+					model = AssetManager::GetOrCreate<Model>(
+						"./resources/models/planet.obj", { {
+							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/alive_earth.png")
+						} }
+					);
+					break;
+				case BodyType::DEAD_PLANET:
+					model = AssetManager::GetOrCreate<Model>(
+						"./resources/models/planet.obj", { {
+							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/earth.png")
+						} }
+					);
+					break;
+				case BodyType::GREEN_GAS_GIANT:
+					model = AssetManager::GetOrCreate<Model>(
+						"./resources/models/planet.obj", { {
+							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/green_gas.png")
+						} }
+					);
+					break;
+				case BodyType::BROWN_GAS_GIANT:
+					model = AssetManager::GetOrCreate<Model>(
+						"./resources/models/planet.obj", { {
+							glm::vec3{.6f}, glm::vec3{1.f}, glm::vec3{.3f}, 90.f, 1.f,
+							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/brown_gas.png")
+						} }
+					);
+					break;
+				default:
+					fprintf(stderr, "%d\n", body->getBodyType());
+			}
+			if (model)
+				Renderer::SubmitModel(model, transform, glm::vec4{ /*i->getColor(), */1.0f });
 		}
 	}
 	Renderer::End3DScene();

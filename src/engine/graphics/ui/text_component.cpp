@@ -4,7 +4,7 @@
 
 TextComponent::TextComponent(
 	const std::string_view& id, Layout* layout, const std::string& text, std::shared_ptr<Font> font, 
-	Gravity gravity, const glm::vec4& color, float scale)
+	float scale, Gravity gravity, const glm::vec4& color)
 	: UIComponent(id, layout), text(text), font(font), gravity(gravity), color(color), scale(scale) {}
 
 float TextComponent::getContentWidth() const {
@@ -17,7 +17,7 @@ float TextComponent::getContentHeight() const {
 
 const glm::vec3& TextComponent::getPosition() const {
 	glm::vec3 pos = this->position.value();
-	const glm::vec3& size = this->position.value();
+	const glm::vec2& size = this->size.value();
 	if (gravity & Gravity::CENTER_HORIZONTAL) {
 		pos.x -= size.x / 2.f;
 	}
@@ -35,7 +35,8 @@ const glm::vec3& TextComponent::getPosition() const {
 }
 
 void TextComponent::draw(std::shared_ptr<Window> window, float delta) {
-	Renderer::SubmitText(text, this->position.value(), color, this->font, gravity, window->getData().scale * this->scale);
+	glm::vec2 scale = window->getData().scale * this->scale;
+	Renderer::SubmitText(text, this->position.value() + glm::vec3{ 0.f, this->font->getTextHeight(this->text) * scale.y, 0.f}, color, this->font, gravity, scale);
 }
 
 bool TextComponent::SetText(std::shared_ptr<TextComponent> component, const std::string& text) {

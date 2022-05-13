@@ -24,7 +24,7 @@ public:
 	 * @param length The number of characters to generate the font at.
 	 * @return A std::shared_ptr to a Font.
 	 */
-	static std::shared_ptr<Font> CreateFont(const std::string& filepath, unsigned char startChar, uint32_t length);
+	static std::shared_ptr<Font> CreateFont(const std::string_view& filepath, unsigned char startChar, uint32_t length);
 
 	~Font();
 

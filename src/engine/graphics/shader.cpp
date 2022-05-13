@@ -7,12 +7,12 @@
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-std::shared_ptr<ShaderProgram> ShaderProgram::CreateFromSource(const std::string& vertSrc, const std::string& fragSrc) {
+std::shared_ptr<ShaderProgram> ShaderProgram::CreateFromSource(const std::string_view & vertSrc, const std::string_view & fragSrc) {
 	std::shared_ptr<ShaderProgram> program = std::shared_ptr<ShaderProgram>(new ShaderProgram(vertSrc, fragSrc));
 	return program;
 }
 
-std::shared_ptr<ShaderProgram> ShaderProgram::Create(const std::string& vertPath, const std::string& fragPath) {
+std::shared_ptr<ShaderProgram> ShaderProgram::Create(const std::string_view& vertPath, const std::string_view& fragPath) {
 	std::string vertSrc = readFile(vertPath);
 	std::string fragSrc = readFile(fragPath);
 	std::shared_ptr<ShaderProgram> program = std::shared_ptr<ShaderProgram>(new ShaderProgram(vertSrc, fragSrc));
@@ -105,17 +105,17 @@ void ShaderProgram::uploadMat4(const std::string& name, const glm::mat4& matrix)
 }
 
 
-ShaderProgram::ShaderProgram(const std::string& vertSrc, const std::string& fragSrc) {
+ShaderProgram::ShaderProgram(const std::string_view& vertSrc, const std::string_view& fragSrc) {
 	this->id = glCreateProgram();
 	LOG_GL_ERROR;
 	uint32_t vertId = glCreateShader(GL_VERTEX_SHADER);
 	LOG_GL_ERROR;
-	compileShader(vertId, vertSrc.c_str(), vertSrc.size());
+	compileShader(vertId, vertSrc.data(), vertSrc.size());
 	glAttachShader(this->id, vertId);
 	LOG_GL_ERROR;
 	uint32_t fragId = glCreateShader(GL_FRAGMENT_SHADER);
 	LOG_GL_ERROR;
-	compileShader(fragId, fragSrc.c_str(), fragSrc.size());
+	compileShader(fragId, fragSrc.data(), fragSrc.size());
 	glAttachShader(this->id, fragId);
 	LOG_GL_ERROR;
 
@@ -170,9 +170,9 @@ void ShaderProgram::compileShader(uint32_t id, const char* const src, int length
 	}
 }
 
-std::string ShaderProgram::readFile(const std::string& filepath) {
+std::string ShaderProgram::readFile(const std::string_view& filepath) {
 	std::string result;
-	std::ifstream in(filepath, std::ios::in | std::ios::binary);
+	std::ifstream in(filepath.data(), std::ios::in | std::ios::binary);
 	if (in) {
 		in.seekg(0, std::ios::end);
 		result.resize((uint64_t) in.tellg());
@@ -180,7 +180,7 @@ std::string ShaderProgram::readFile(const std::string& filepath) {
 		in.read(&result[0], result.size());
 		in.close();
 	} else {
-		throw "Could not open file" + filepath;
+		throw "Could not open file" + std::string{ filepath };
 	}
 	return result;
 }

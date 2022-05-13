@@ -14,12 +14,12 @@ public:
 	 * side: is left, right, bottom, top, ?center.
 	 * offset: is the offset in pixels or a percentage of a the `side`'s dimension.
 	 * @param left Where should the left of the UIComponent be located.
-	 * @param topY Where should the top of the UIComponent be located.
+	 * @param top Where should the top of the UIComponent be located.
 	 * @param right Where should the right of the UIComponent be located.
 	 * @param bottom Where should the bottom of the UIComponent be located.
 	 * @param infront What layer should the UIComponent be located.
 	 */
-	RelativeLayout(const std::string_view& left, const std::string_view& topY, const std::string_view& right = "", const std::string_view& bottom = "", const std::string_view& infront="window:0.0");
+	RelativeLayout(const std::string_view& left, const std::string_view& top, const std::string_view& right = "", const std::string_view& bottom = "", const std::string_view& infront="window:0.0");
 	
 	virtual glm::vec3 position(
 		const std::shared_ptr<Window> window, const UIComponent& self, 

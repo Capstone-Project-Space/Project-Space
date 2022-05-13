@@ -17,8 +17,8 @@ public:
 	 * @param scale The size multiplier of the text.
 	 */
 	TextComponent(
-		const std::string_view& id, Layout* layout, const std::string& text, std::shared_ptr<Font> font, 
-		Gravity gravity = Gravity::LEFT, const glm::vec4& color = glm::vec4{ 1.0f }, float scale = 1.0f
+		const std::string_view& id, Layout* layout, const std::string& text, std::shared_ptr<Font> font,
+		float scale = 1.0f, Gravity gravity = Gravity::LEFT, const glm::vec4& color = glm::vec4{ 1.0f }
 	);
 
 	operator UIComponent*() { return this; }

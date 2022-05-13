@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <optional>
 #include <unordered_map>
 #include <set>
 #include <sstream>
@@ -73,7 +74,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 	return map;
 }
 
-std::shared_ptr<Model> Model::CreateModel(const std::string& filepath, std::shared_ptr<Texture> texture) {
+std::shared_ptr<Model> Model::CreateModel(const std::string_view& filepath, std::optional<Material> forcedMaterial) {
 	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
 
 	std::vector<uint32_t> indices;
@@ -88,14 +89,14 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath, std::shar
 
 	Material* currentMaterial = NULL;
 	auto mtls = std::map<std::string, Material>();
-	if (texture) {
+	if (forcedMaterial) {
 		// TODO: Maybe allow for full Material control instead of just Texture.
-		mtls["ForcedTexture"] = Material{ glm::vec3{1.0f}, glm::vec3{1.0f}, glm::vec3{1.0f}, 1.0f, 1.0f, texture };
-		model->textures[0] = texture;
+		mtls["ForcedTexture"] = *forcedMaterial;
+		model->textures[0] = (*forcedMaterial).texture;
 	}
 
 	std::string line;
-	std::ifstream file{ filepath };
+	std::ifstream file{ filepath.data()};
 	assert(file, "File does not exist.");
 	std::stringstream obj;
 	obj << file.rdbuf();
@@ -104,29 +105,29 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath, std::shar
 	while (!obj.eof()) {
 		std::getline(obj, line);
 		if (line.rfind("mtllib ") == 0) {
-			mtls = Model::CreateMaterial(filepath.substr(0, filepath.find_last_of('/') + 1) + line.substr(7));
-			uint32_t count = texture ? 1 : 0;
+			mtls = Model::CreateMaterial(std::string(filepath.substr(0, filepath.find_last_of('/') + 1)) + line.substr(7));
+			uint32_t count = forcedMaterial ? 1 : 0;
 			for (auto&[_, material] : mtls) {
 				auto found = std::find(model->textures.begin(), model->textures.end(), material.texture);
 				if (found == model->textures.end()) model->textures[count++] = material.texture;
 			}
-			if (texture) {
+			if (forcedMaterial) {
 				// TODO: Maybe allow for full Material control instead of just Texture.
-				mtls["ForcedTexture"] = Material{ glm::vec3{1.0f}, glm::vec3{1.0f}, glm::vec3{1.0f}, 1.0f, 1.0f, texture };
+				mtls["ForcedTexture"] = *forcedMaterial;
 			}
 		} else if (line.rfind("usemtl ") == 0) {
 			currentMaterial = &mtls[line.substr(7)];
 		} else if (line.rfind("v ") == 0) {
 			int count = sscanf(line.c_str(), "v %f %f %f\n", &f1, &f2, &f3);
-			if (count != 3) throw "parsing vertex in wavefront obj model: " + filepath;
+			if (count != 3) throw "parsing vertex in wavefront obj model: " + std::string{ filepath };
 			points.emplace_back(f1, f2, f3);
 		} else if (line.rfind("vn ") == 0) {
 			int count = sscanf(line.c_str(), "vn %f %f %f\n", &f1, &f2, &f3);
-			if (count != 3) throw "parsing normal in wavefront obj model: " + filepath;
+			if (count != 3) throw "parsing normal in wavefront obj model: " + std::string{ filepath };
 			normals.emplace_back(f1, f2, f3);
 		} else if (line.rfind("vt ") == 0) {
 			int count = sscanf(line.c_str(), "vt %f %f\n", &f1, &f2);
-			if (count != 2) throw "parsing uv in wavefront obj model: " + filepath;
+			if (count != 2) throw "parsing uv in wavefront obj model: " + std::string{ filepath };
 			uvs.emplace_back(f1, f2);
 		} else if (line.rfind("f ") == 0) {
 			uint64_t fpoints[3], fuvs[3], fnormals[3];
@@ -135,8 +136,8 @@ std::shared_ptr<Model> Model::CreateModel(const std::string& filepath, std::shar
 				fpoints, fuvs, fnormals, &fpoints[1], &fuvs[1], &fnormals[1],
 				&fpoints[2], &fuvs[2], &fnormals[2]
 			);
-			if (count != 9) throw "parsing face in wavefront obj model: " + filepath;
-			if (!currentMaterial) throw "currentMaterial is NULL when parsing face in wavefront obj model: " + filepath;
+			if (count != 9) throw "parsing face in wavefront obj model: " + std::string{ filepath };
+			if (!currentMaterial) throw "currentMaterial is NULL when parsing face in wavefront obj model: " + std::string{ filepath };
 			for (uint64_t i = 0; i < 3; i++) {
 				std::tuple vertex{ fpoints[i], fuvs[i], fnormals[i] };
 				if (vertexMap.find(vertex) == vertexMap.end()) {

@@ -26,17 +26,17 @@ void BodySystem::generateSystem() {
           std::shared_ptr<Body> body = std::shared_ptr<Body>(new Body());
 
           body->setName(this->getName() + " " + intToNumeral(i + 1));
-          body->setBodyType((BodyType)RandomGen::RangedRandomUnSignedInt(0, 2));
+          body->setBodyType((BodyType)RandomGen::RangedRandomUnSignedInt(0, BODY_TYPE_COUNT));
           body->setHabitType((HabitType)RandomGen::RangedRandomUnSignedInt(0, 1));
 
           switch (body->getBodyType()) {
-          case BodyType::Planet:
+          case BodyType::EARTH_PLANET: case BodyType::DEAD_PLANET: case BodyType::ROCKY_PLANET: case BodyType::WATER:
                body->setScale(RandomGen::RangedRandomFloat(0.06f, 0.2f));
                break;
-          case BodyType::Moon:
+          case BodyType::MOON:
                body->setScale(RandomGen::RangedRandomFloat(0.01f, 0.06f));
                break;
-          case BodyType::GasGiant:
+          case BodyType::GREEN_GAS_GIANT: case BodyType::BROWN_GAS_GIANT:
                body->setScale(RandomGen::RangedRandomFloat(0.2f, 0.5f));
                break;
           default:
@@ -64,7 +64,7 @@ void BodySystem::generateSystem() {
                (float)(distance * sin(angle))));
 
           //No Moonception
-          if (body->getBodyType() != BodyType::Moon) {
+          if (body->getBodyType() != BodyType::MOON) {
                //body->setMoonCount(RandomGen::RangedRandomUnSignedInt(0,0));
                //No moons for now
                body->setMoonCount(0);

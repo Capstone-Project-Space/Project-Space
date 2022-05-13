@@ -175,17 +175,17 @@ void main() {
 		vec3 light  = normalize(u_Lights[i].position.xyz - v_ECPosition);
 		vec3 eye    = normalize(v_EyePos);
 
-		vec3 ambient = .5 * color.rgb;
+		vec3 ambient = color.rgb * v_Ambient;
 	
 		float d = max(dot(normal, light), 0);
-		vec3 diffuse = .4 * d * v_Diffuse;
+		vec3 diffuse = d * v_Diffuse * color.rgb;
 
 		float s = 0;
 		if (dot(normal, light) > 0.) {
 			vec3 ref = normalize(2 * normal * dot(normal, light) - light);
 			s = pow(max(dot(eye, ref), 0), v_SpecExponent);
 		}
-		vec3 specular = .1 * s * v_Specular;
+		vec3 specular = s * v_Specular * color.rgb;
 
 		color = vec4(ambient + diffuse + specular, 1.0) * u_ModelMatrices[v_InstanceID].color;
 	}

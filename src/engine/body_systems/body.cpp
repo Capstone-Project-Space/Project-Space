@@ -3,7 +3,7 @@
 //Used for generating a system
 Body::Body() {
      setName("");
-     setBodyType(BodyType::Planet);
+     setBodyType(BodyType::ROCKY_PLANET);
      setHabitType(HabitType::Habitable);
      setPosition(glm::vec3(0.0f));
      setScale(0.3f);

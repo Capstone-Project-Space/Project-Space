@@ -18,7 +18,7 @@ public:
 	 * @param fragPath The path to the fragment shader source.
 	 * @return A std::shared_ptr to a ShaderProgram.
 	 */
-	static std::shared_ptr<ShaderProgram> Create(const std::string& vertPath, const std::string& fragPath);
+	static std::shared_ptr<ShaderProgram> Create(const std::string_view& vertPath, const std::string_view& fragPath);
 	
 	/**
 	 * @brief Create a ShaderProgram from source.
@@ -27,7 +27,7 @@ public:
 	 * @param fragSrc The fragment shader source.
 	 * @return A std::shared_ptr to a ShaderProgram.
 	 */
-	static std::shared_ptr<ShaderProgram> CreateFromSource(const std::string& vertSrc, const std::string& fragSrc);
+	static std::shared_ptr<ShaderProgram> CreateFromSource(const std::string_view& vertSrc, const std::string_view& fragSrc);
 
 	~ShaderProgram();
 
@@ -158,9 +158,9 @@ public:
 
 private:
 	uint32_t id;
-	ShaderProgram(const std::string& vertSrc, const std::string& fragSrc);
+	ShaderProgram(const std::string_view& vertSrc, const std::string_view& fragSrc);
 
-	static std::string readFile(const std::string& filepath);
+	static std::string readFile(const std::string_view& filepath);
 	void compileShader(uint32_t id, const char* const src, int length);
 
 };

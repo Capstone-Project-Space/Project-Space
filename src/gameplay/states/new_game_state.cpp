@@ -37,7 +37,7 @@ NewGameState::NewGameState(std::shared_ptr<Window> window)
 		"desc",
 		new ConstraintLayout("window:center", "window:center"),
 		"This is the screen to create a new game.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-		Gravity::CENTER, glm::vec4{1.f}, .6f
+		.6f, Gravity::CENTER, glm::vec4{1.f}
 	));
 }
 

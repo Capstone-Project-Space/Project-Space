@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -35,6 +36,9 @@ struct Material {
 	float specExponent = 1.0f;
 	float idxRefraction = 1.0f;
 	std::shared_ptr<Texture> texture = nullptr;
+	inline bool operator ==(const Material& material) const {
+		return this->ambient == material.ambient && this->diffuse == material.diffuse && this->specular == material.specular && this->specExponent == material.specExponent && this->idxRefraction == material.idxRefraction && this->texture == material.texture;
+	}
 };
 
 constexpr uint64_t getVertexFloatSize() { return sizeof(ModelVertex) / sizeof(float); }
@@ -48,7 +52,7 @@ public:
 	 * @param texture An optional default/forced texture.
 	 * @return A std::shared_ptr to a Model.
 	 */
-	static std::shared_ptr<Model> CreateModel(const std::string& filepath, std::shared_ptr<Texture> texture=nullptr);
+	static std::shared_ptr<Model> CreateModel(const std::string_view& filepath, std::optional<Material> forcedMaterial = std::nullopt);
 
 	~Model() = default;
 

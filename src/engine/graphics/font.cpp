@@ -3,7 +3,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-std::shared_ptr<Font> Font::CreateFont(const std::string& filepath, unsigned char startChar, uint32_t length) {
+std::shared_ptr<Font> Font::CreateFont(const std::string_view& filepath, unsigned char startChar, uint32_t length) {
 	assert(255 - startChar <= length);
 	std::shared_ptr<Font> font = std::shared_ptr<Font>(new Font(startChar, length));
 	
@@ -14,7 +14,7 @@ std::shared_ptr<Font> Font::CreateFont(const std::string& filepath, unsigned cha
 		exit(1);
 	}
 
-	if (FT_New_Face(ft, filepath.c_str(), 0, &face)) {
+	if (FT_New_Face(ft, filepath.data(), 0, &face)) {
 		fprintf(stderr, "Error::FREETYPE: Failed to load font.\n");
 		exit(1);
 	}

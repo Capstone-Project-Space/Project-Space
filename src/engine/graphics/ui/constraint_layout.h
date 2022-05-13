@@ -28,7 +28,7 @@ public:
 	) override;
 
 private:
-	const std::string_view top, bottom, left, right, infront;
+	const std::string top, bottom, left, right, infront;
 
 	static float GetXFromSide(const std::shared_ptr<UIComponent> component, const std::string_view& relation);
 	static float GetYFromSide(const std::shared_ptr<UIComponent> component, const std::string_view& relation);

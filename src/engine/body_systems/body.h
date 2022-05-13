@@ -10,7 +10,8 @@
 #include "glm/glm.hpp"
 
 //Solar system body types
-enum class BodyType {Planet, Moon, GasGiant, Sun};
+constexpr uint32_t BODY_TYPE_COUNT = 8;
+enum class BodyType {ROCKY_PLANET, DEAD_PLANET, EARTH_PLANET, GREEN_GAS_GIANT, BROWN_GAS_GIANT, WATER, MOON, SUN};
 //Body habitability
 enum class HabitType {Habitable, UnInhabitable};
 

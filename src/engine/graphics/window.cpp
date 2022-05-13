@@ -2,8 +2,15 @@
 
 #include <src/engine/io/event.h>
 
+#include <stb_image.h>
+
 std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int width, int height, std::shared_ptr<Window> share) {
 	std::shared_ptr<Window> window = std::shared_ptr<Window>(new Window(name, width, height, share));
+
+	GLFWimage image;
+	image.pixels = stbi_load("./resources/icon_bg.png", &image.width, &image.height, NULL, 4);
+	glfwSetWindowIcon(window->window, 1, &image);
+	stbi_image_free(image.pixels);
 
 	glfwSetWindowUserPointer(window->window, &window->data);
 

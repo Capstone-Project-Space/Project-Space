@@ -7,7 +7,7 @@
 
 #define LOG_GL_ERROR for (int glErrorGL = glGetError(); glErrorGL != 0;) { fprintf(stderr, "GLError: %d\n", glErrorGL); assert(false);}
 
-std::shared_ptr<Texture> Texture::CreateTexture(const std::string& filepath) {
+std::shared_ptr<Texture> Texture::CreateTexture(const std::string_view & filepath) {
 	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture(filepath));
 	return texture;
 }
@@ -30,7 +30,7 @@ void Texture::bind(uint32_t id) const {
 
 Texture::Texture(const glm::vec4& color)
 	: width(16), height(16), internalFormat(GL_RGBA8), dataFormat(GL_RGBA) {
-	int iColor = (static_cast<int>(255 * color.r) << 24) | (static_cast<int>(255 * color.g) << 16) | (static_cast<int>(255 * color.b) << 8) | static_cast<int>(255 * color.a);
+	int iColor = (static_cast<int>(255 * color.a) << 24) | (static_cast<int>(255 * color.b) << 16) | (static_cast<int>(255 * color.g) << 8) | static_cast<int>(255 * color.r);
 	int data[256];
 	for (int i = 0; i < 256; i++) data[i] = iColor;
 
@@ -52,11 +52,11 @@ Texture::Texture(const glm::vec4& color)
 	LOG_GL_ERROR;
 }
 
-Texture::Texture(const std::string& filepath) {
+Texture::Texture(const std::string_view& filepath) {
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(true);
 	stbi_uc* data = nullptr;
-	data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+	data = stbi_load(filepath.data(), &width, &height, &channels, 0);
 	assert(data);
 	this->width = width;
 	this->height = height;

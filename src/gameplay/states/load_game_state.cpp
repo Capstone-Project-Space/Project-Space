@@ -24,7 +24,7 @@ LoadGameState::LoadGameState(std::shared_ptr<Window> window)
 		"desc",
 		new ConstraintLayout("window:center", "window:center"),
 		"This is the screen to load saved games.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-		Gravity::CENTER, glm::vec4{ 1.f }, .6f
+		.6f, Gravity::CENTER, glm::vec4{ 1.f }
 	));
 }
 
