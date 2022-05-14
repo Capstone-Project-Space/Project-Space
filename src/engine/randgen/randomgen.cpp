@@ -10,7 +10,7 @@ signed int RandomGen::RangedRandomSignedInt(int lo, int hi) {
 unsigned int RandomGen::RangedRandomUnSignedInt(unsigned int lo, unsigned int hi) {
      std::random_device r;
      std::mt19937 rng(r());
-     std::uniform_int_distribution<signed int> dis(lo, hi);
+     std::uniform_int_distribution<unsigned int> dis(lo, hi);
      return dis(rng);
 }
 

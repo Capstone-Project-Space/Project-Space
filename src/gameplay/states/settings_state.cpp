@@ -14,7 +14,7 @@ constexpr std::string_view SETTINGS_GAME_SCREEN_TEXTURE = "./resources/textures/
 
 SettingsState::SettingsState(std::shared_ptr<Window> window)
      : GameState(window, "Project Space") {
-    /*componentManager.addComponent(new ButtonComponent(
+    componentManager.addComponent(new ButtonComponent(
         "return_to_mainmenu",
         new RelativeLayout("window:left:100", "window:top:0"),
         [&](ButtonComponent& button) {
@@ -38,7 +38,7 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         new RelativeLayout("onoff:right:10", "onoff:center:0"),
         "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
         .4f, Gravity::CENTER_VERTICAL
-    ));*/
+    ));
 
     LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
     container->add(std::shared_ptr<UIComponent>(new TextComponent(

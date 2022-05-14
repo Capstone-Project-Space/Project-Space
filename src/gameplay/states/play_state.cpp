@@ -7,8 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-PlayState::PlayState(std::shared_ptr<Window> window) : GameState(window, "play_state") {
-	system = std::make_shared<BodySystem>(0);
+PlayState::PlayState(std::shared_ptr<Window> window) : GameState(window, "play_state"), starBody(Body::CreateSingleStarSystem("Solis")) {
 	gameCamera.focusOn(glm::vec3{0.f});
 	#if defined(DEBUG)
 		printf("DEBUG MODE -- PRINTING SYSTEM DATA\n");
@@ -17,6 +16,7 @@ PlayState::PlayState(std::shared_ptr<Window> window) : GameState(window, "play_s
 }
 
 void PlayState::update(float delta) {
+	starBody.update(delta);
 	if (doubleClick1Check) {
 		if (doubleClick1Time > 0.15f) {
 			doubleClick1Check = false;
@@ -208,67 +208,8 @@ void PlayState::render(float delta) {
 		}
 
 
-		//Render Light source at star
-		Renderer::SubmitLightSource({ {0.0f, 0.0f, 0.0f, 1.0f} });
-
-		//Render Sun
-		Star star = system->getStar();
-		Renderer::SubmitModel(AssetManager::GetOrCreate<Model>("./resources/models/planet.obj", { Material{glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f, AssetManager::GetOrCreate<Texture>("./resources/textures/planets/star2.png")} }),
-			glm::scale(glm::translate(glm::identity<glm::mat4>(), star.star->getPosition()),
-				glm::vec3{ star.star->getScale() }));
-
-		//Render all system bodies
-		std::vector<std::shared_ptr<Body>> bodies = system->getBodyList();
-		for (auto body : bodies) {
-			std::shared_ptr<Model> model = nullptr;
-			const glm::mat4 transform = glm::scale(glm::translate(glm::identity<glm::mat4>(), body->getPosition()), glm::vec3(body->getScale()));
-			switch (body->getBodyType()) {
-				case BodyType::ROCKY_PLANET:
-					model = AssetManager::GetOrCreate<Model>(
-						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
-							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/rocky.png")
-						} }
-					);
-					break;
-				case BodyType::EARTH_PLANET:
-					model = AssetManager::GetOrCreate<Model>(
-						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
-							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/alive_earth.png")
-						} }
-					);
-					break;
-				case BodyType::DEAD_PLANET:
-					model = AssetManager::GetOrCreate<Model>(
-						"./resources/models/planet.obj", { {
-							glm::vec3{1.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
-							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/earth.png")
-						} }
-					);
-					break;
-				case BodyType::GREEN_GAS_GIANT:
-					model = AssetManager::GetOrCreate<Model>(
-						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
-							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/green_gas.png")
-						} }
-					);
-					break;
-				case BodyType::BROWN_GAS_GIANT:
-					model = AssetManager::GetOrCreate<Model>(
-						"./resources/models/planet.obj", { {
-							glm::vec3{.6f}, glm::vec3{.8f}, glm::vec3{.3f}, 90.f, 1.f,
-							AssetManager::GetOrCreate<Texture>("./resources/textures/planets/brown_gas.png")
-						} }
-					);
-					break;
-				default:
-					fprintf(stderr, "%d\n", body->getBodyType());
-			}
-			if (model)
-				Renderer::SubmitModel(model, transform, glm::vec4{ /*i->getColor(), */1.0f });
-		}
+		// Moved rendering of Body into Body class.
+		starBody.draw(delta, true);
 	}
 	Renderer::End3DScene();
 
@@ -385,7 +326,7 @@ bool PlayState::onKeyPressed(const Key& key) {
 			State::RestoreState();
 		}
 		if (key == GLFW_KEY_F) {
-			gameCamera.focusOn(this->system->getStar().star->getPosition());
+			gameCamera.focusOn(starBody.getPosition());
 		}
 	}
 	return true;
