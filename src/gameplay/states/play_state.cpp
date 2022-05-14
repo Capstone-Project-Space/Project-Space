@@ -73,22 +73,29 @@ void PlayState::render(float delta) {
 				} }
 			);
 		};
+
+
+		//Skybox
+		//Top
 		Renderer::SubmitModel(
-			get_plane("./resources/textures/skybox/front.bmp"),
+			get_plane("./resources/textures/skybox/top.bmp"),
 			glm::scale(
-				glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 50.f, 0.f }),
+				glm::rotate(
+					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 50.f, 0.f }),
+					glm::radians(180.f), glm::vec3{ 1.f, 0.f, 0.f }
+					),
 				glm::vec3{ 50.f }
 			)
 		);
-
+		//Bottom
 		Renderer::SubmitModel(
-			get_plane("./resources/textures/skybox/back.bmp"),
+			get_plane("./resources/textures/skybox/bot.bmp"),
 			glm::scale(
 				glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, -50.f, 0.f }),
 				glm::vec3{ 50.f }
 			)
 		);
-
+		//Front
 		Renderer::SubmitModel(
 			get_plane("./resources/textures/skybox/front.bmp"),
 			glm::scale(
@@ -99,103 +106,48 @@ void PlayState::render(float delta) {
 				glm::vec3{ 50.f }
 			)
 		);
-
+		//Back
 		Renderer::SubmitModel(
 			get_plane("./resources/textures/skybox/back.bmp"),
 			glm::scale(
 				glm::rotate(
-					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 0.f, 50.f }),
-					glm::radians(-90.f), glm::vec3{ 1.f, 0.f, 0.f }
+					glm::rotate(
+						glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 0.f, 50.f }),
+						glm::radians(-90.f), glm::vec3{ 1.f, 0.f, 0.f }
+					),
+					glm::radians(180.f), glm::vec3{ 0.f, 1.f, 0.f }
 				),
 				glm::vec3{ 50.f }
 			)
 		);
-
-		Renderer::SubmitModel(
-			get_plane("./resources/textures/skybox/left.bmp"),
-			glm::scale(
-				glm::rotate(
-					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 50.f, 0.f, 0.f }),
-					glm::radians(90.f), glm::vec3{ 0.f, 0.f, 1.f }
-				),
-				glm::vec3{ 50.f }
-			)
-		);
-
+		//Right
 		Renderer::SubmitModel(
 			get_plane("./resources/textures/skybox/right.bmp"),
 			glm::scale(
 				glm::rotate(
-					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ -50.f, 0.f, 0.f }),
-					glm::radians(-90.f), glm::vec3{ 0.f, 0.f, 1.f }
+					glm::rotate(
+						glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 50.f, 0.f, 0.f }),
+						glm::radians(90.f), glm::vec3{ 0.f, 0.f, 1.f }
+					),
+					glm::radians(-90.f), glm::vec3{ 0.f, 1.f, 0.f }
 				),
 				glm::vec3{ 50.f }
 			)
 		);
-
-		//front
-		//Renderer::SubmitModel(
-		//	AssetManager::GetOrCreate<Model>(
-		//		"./resources/models/plane.obj", {Material{
-		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
-		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/front.bmp")
-		//		}}
-		//	),
-		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-		//		{ 0.0f, 0.0f, -50.0f }),										//position
-		//		(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-		//back
-		//Renderer::SubmitModel(
-		//	AssetManager::GetOrCreate<Model>(
-		//		"./resources/models/plane.obj", { {
-		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
-		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/back.bmp")
-		//		} }
-		//	),
-		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-		//		{ 0.0f, 0.0f, 50.0f }),										//position
-		//		(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-		//left
-		//Renderer::SubmitModel(
-		//	AssetManager::GetOrCreate<Model>(
-		//		"./resources/models/plane.obj", { {
-		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
-		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/left.bmp")
-		//		} }
-		//	),
-		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-		//		{ -50.0f, 0.0f, 0.0f }),										//position
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),		//x rotation
-		//		(float)(90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),	//y rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),		//z rotation
-		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
-
-		//right
-		//Renderer::SubmitModel(
-		//	AssetManager::GetOrCreate<Model>(
-		//		"./resources/models/plane.obj", { {
-		//			glm::vec3{1.f}, glm::vec3{0.f}, glm::vec3{0.f}, 1.f, 1.f,
-		//			AssetManager::GetOrCreate<Texture>("./resources/textures/skybox/right.bmp")
-		//		} }
-		//	),
-		//	glm::scale(glm::rotate(glm::rotate(glm::rotate(glm::translate(glm::identity<glm::mat4>(),
-		//		{ 50.0f, 0.0f, 0.0f }),										//position
-		//		(float)(-180.0f * (M_PI / 180.0f)), glm::vec3{ 1.0f, 0.0f, 0.0f }),	//x rotation
-		//		(float)(0.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 1.0f, 0.0f }),		//y rotation
-		//		(float)(-90.0f * (M_PI / 180.0f)), glm::vec3{ 0.0f, 0.0f, 1.0f }),	//z rotation
-		//		glm::vec3{ 50.0f, 1.0f, 50.0f }),								//scale
-		//	glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });								//color
+		//Left
+		Renderer::SubmitModel(
+			get_plane("./resources/textures/skybox/left.bmp"),
+			glm::scale(
+				glm::rotate(
+					glm::rotate(
+						glm::translate(glm::identity<glm::mat4>(), glm::vec3{ -50.f, 0.f, 0.f }),
+						glm::radians(-90.f), glm::vec3{ 0.f, 0.f, 1.f }
+					),
+					glm::radians(90.f), glm::vec3{ 0.f, 1.f, 0.f }
+				),
+				glm::vec3{ 50.f }
+			)
+		);
 
 		//Render Camera Target Location
 		if (gameCamera.getTarget() != std::nullopt) {
@@ -223,7 +175,7 @@ void PlayState::render(float delta) {
 				+ ";  y = " + std::to_string(gameCamera.getPosition().y)
 				+ ";  z = " + std::to_string(gameCamera.getPosition().z),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 2.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
+					(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 
 			//Render Mouse Information
 			/*Renderer::SubmitText("Mouse:  x - " + std::to_string(Mouse::x) + ";  y - " + std::to_string(Mouse::y)
@@ -233,15 +185,15 @@ void PlayState::render(float delta) {
 
 			Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 28.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
+					(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 
 			Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
+					(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 			if (doubleClick1Check) {
 				Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
 					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
+						(window->getData().size.y / 2.f) - 67.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
 			}
 		}
 		else {
