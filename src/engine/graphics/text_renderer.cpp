@@ -1,5 +1,7 @@
 #include "text_renderer.h"
 
+#include <numeric>
+
 #include <src/engine/io/event.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -52,63 +54,78 @@ void TextRenderer::destroy() {
 	this->fonts.fill(nullptr);
 }
 
-void TextRenderer::submitText(const std::string& text, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, const glm::vec2& scale, float rotation) {
-	float height = font->getTextHeight(text) * scale.y;
-	float x = pos.x, y = pos.y;
+void TextRenderer::submitText(const std::string& rawtext, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, const glm::vec2& scale, float rotation) {
+	float height = font->getTextHeight(rawtext) * scale.y;
+	float startX = pos.x, startY = pos.y;
 
-
-	if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
-		x -= (font->getTextWidth(text) * scale.x) / 2.0f;
-	}
-	else if (gravity & Gravity::RIGHT) {
-		x -= (font->getTextWidth(text) * scale.x);
-	}
+	size_t lineCount = std::accumulate(rawtext.begin(), rawtext.end(), 1, [](size_t count, char c) { return count + (c == '\n'); });
+	
 	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {
-		y -= (height) / 2.0f;
-	}
-	else if (gravity & Gravity::TOP) {
-		y -= (height);
+		startY += (height) / 2.0f - height / (float) lineCount;
+	} else if (gravity & Gravity::TOP) {
+		startY -= (height / (float) lineCount);
 	}
 
-	// Don't overflow the texture buffer.
-	auto found = std::find(fonts.begin(), fonts.end(), font);
-	auto idx = found - fonts.begin();
-	if (idx == 32) {
-		if (this->fontCount >= 32)
-			this->draw();
-		idx = fontCount;
-		this->fonts[idx] = font;
-		fontCount++;
-	}
-	const float cosine = cos(glm::radians(rotation));
-	const float sine = sin(glm::radians(rotation));
-	const glm::mat4 transform = glm::translate(
-		glm::mat4{ {1.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.0f}, {x, y, 0.0f, 1.0f} } *
-		glm::mat4{ {cosine, sine, 0.0f, 0.0f}, {-sine, cosine, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} },
-		{ -x, -y, 0.0f }
-	);
+	height /= (float) lineCount;
+	std::size_t offset = 0;
+	while (offset < rawtext.size()) {
+		std::size_t size = rawtext.find_first_of('\n', offset);
+		std::string text = rawtext.substr(offset, size - offset);
+		offset += text.size()+1;
 
-	for (const auto& c : text) {
-		auto& ch = font->getCharacterData(c);
-		// Don't overflow the quad buffer.
-		if (this->count >= TEXT_MAX_QUADS) {
-			this->draw();
+		float x = startX, y = startY;
+
+		if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
+			x -= (font->getTextWidth(text) * scale.x) / 2.0f;
 		}
-		// Put the character quad into the quads buffer.
-		float xpos = x + ch.offset.x * scale.x;
-		float ypos = y - (ch.size.y - ch.offset.y) * scale.y;
+		else if (gravity & Gravity::RIGHT) {
+			x -= (font->getTextWidth(text) * scale.x);
+		}
 
-		float wpos = xpos + ch.size.x * scale.x;
-		float hpos = ypos + ch.size.y * scale.y;
+		// Don't overflow the texture buffer.
+		auto found = std::find(fonts.begin(), fonts.end(), font);
+		auto idx = found - fonts.begin();
+		if (idx == 32) {
+			if (this->fontCount >= 32)
+				this->draw();
+			idx = fontCount;
+			this->fonts[idx] = font;
+			fontCount++;
+		}
+		const float cosine = cos(glm::radians(rotation));
+		const float sine = sin(glm::radians(rotation));
+		const glm::mat4 transform = glm::translate(
+			glm::mat4{ {1.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.0f}, {x, y, 0.0f, 1.0f} } *
+			glm::mat4{ {cosine, sine, 0.0f, 0.0f}, {-sine, cosine, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 1.0f} },
+			{ -x, -y, 0.0f }
+		);
 
-		this->quads[count++] = TextQuad{
-			TextVertex{ { xpos, hpos, pos.z }, { ch.stpq.s, ch.stpq.t }, (uint32_t)idx, color, transform },
-			TextVertex{ { xpos, ypos, pos.z }, { ch.stpq.s, ch.stpq.q }, (uint32_t)idx, color, transform },
-			TextVertex{ { wpos, ypos, pos.z }, { ch.stpq.p, ch.stpq.q }, (uint32_t)idx, color, transform },
-			TextVertex{ { wpos, hpos, pos.z }, { ch.stpq.p, ch.stpq.t }, (uint32_t)idx, color, transform }
-		};
-		x += ch.advance * scale.x;
+		for (const auto& c : text) {
+			auto& ch = font->getCharacterData(c);
+
+			// Don't overflow the quad buffer.
+			if (this->count >= TEXT_MAX_QUADS) {
+				this->draw();
+			}
+			// Put the character quad into the quads buffer.
+			float xpos = x + ch.offset.x * scale.x;
+			float ypos = y - (ch.size.y - ch.offset.y) * scale.y;
+
+			float wpos = xpos + ch.size.x * scale.x;
+			float hpos = ypos + ch.size.y * scale.y;
+
+			this->quads[count++] = TextQuad{
+				TextVertex{ { xpos, hpos, pos.z }, { ch.stpq.s, ch.stpq.t }, (uint32_t)idx, color, transform },
+				TextVertex{ { xpos, ypos, pos.z }, { ch.stpq.s, ch.stpq.q }, (uint32_t)idx, color, transform },
+				TextVertex{ { wpos, ypos, pos.z }, { ch.stpq.p, ch.stpq.q }, (uint32_t)idx, color, transform },
+				TextVertex{ { wpos, hpos, pos.z }, { ch.stpq.p, ch.stpq.t }, (uint32_t)idx, color, transform }
+			};
+			x += ch.advance * scale.x;
+		}
+		startY -= height;
 	}
+
+	
 }
 
 void TextRenderer::draw() {

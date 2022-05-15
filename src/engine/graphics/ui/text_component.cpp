@@ -35,8 +35,9 @@ const glm::vec3& TextComponent::getPosition() const {
 }
 
 void TextComponent::draw(std::shared_ptr<Window> window, float delta) {
-	glm::vec2 scale = window->getData().scale * this->scale;
-	Renderer::SubmitText(text, this->position.value() + glm::vec3{ 0.f, this->font->getTextHeight(this->text) * scale.y, 0.f}, color, this->font, gravity, scale);
+	const glm::vec2 scale = window->getData().scale * this->scale;
+	//glm::vec3 position = this->position.value();
+	Renderer::SubmitText(text, this->position.value(), color, this->font, gravity, scale);
 }
 
 bool TextComponent::SetText(std::shared_ptr<TextComponent> component, const std::string& text) {

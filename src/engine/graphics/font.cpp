@@ -100,9 +100,11 @@ uint32_t Font::getTextWidth(const std::string& text) {
 }
 
 int32_t Font::getTextHeight(const std::string& text) {
+	size_t lineCount = 1;
 	int32_t height = 0;
 	for (const auto& c : text) {
+		lineCount += (c == '\n');
 		height = std::max(this->getCharacterData(c).size.y, height);
 	}
-	return height;
+	return height * lineCount;
 }

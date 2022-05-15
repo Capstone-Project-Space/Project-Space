@@ -40,7 +40,17 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         .4f, Gravity::CENTER_VERTICAL
     ));
 
-    LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
+
+    componentManager.addComponent(new TextComponent(
+        "many_lines",
+        new RelativeLayout("window:center:0", "window:center:0"),
+        "This text will contain new lines.\nThis line should appear below the other.\n This line should exist at the bottom of this text.",
+        AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .3f, Gravity::CENTER
+    ));
+
+
+    /*LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
     container->add(std::shared_ptr<UIComponent>(new TextComponent(
         "onoff_desc1", nullptr,
         "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
@@ -56,7 +66,7 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
         .4f, Gravity::BOTTOM
     )));
-    componentManager.addComponent(container);
+    componentManager.addComponent(container);*/
 
 }
 
