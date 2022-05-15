@@ -53,8 +53,15 @@ public:
 	 */
 	void changeWindow(std::shared_ptr<Window> window);
 
+	virtual bool onKeyPressed(const Key& key) override;
+	virtual bool onKeyReleased(const Key& key) override;
+	virtual bool onKeyRepeated(const Key& key) override;
+
 	virtual bool onMouseButtonPressed(const MouseButton& button) override;
 	virtual bool onMouseButtonReleased(const MouseButton& button) override;
+	virtual bool onMouseDoubleClick(const MouseButton& button) override;
+	virtual bool onMouseWheelScroll(const float xoffset, const float yoffset) override;
+	virtual bool onMouseMoved(float x, float y, float dx, float dy) override;
 	virtual void onWindowResize(const float oldWidth, const float oldHeight, const float newWidth, const float newHeight) override;
 
 	/**

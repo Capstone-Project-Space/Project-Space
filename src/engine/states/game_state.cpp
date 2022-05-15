@@ -22,16 +22,39 @@ void GameState::changeWindow(std::shared_ptr<Window> window) {
 	this->componentManager.applyLayouts(window);
 }
 
+bool GameState::onKeyPressed(const Key& key) {
+	return this->componentManager.onKeyPressed(key);
+}
+bool GameState::onKeyReleased(const Key& key) {
+	return this->componentManager.onKeyReleased(key);
+}
+
+bool GameState::onKeyRepeated(const Key& key) {
+	return this->componentManager.onKeyRepeated(key);
+}
+
 bool GameState::onMouseButtonPressed(const MouseButton& button) {
-	return componentManager.onMouseButtonPressed(button);
+	return this->componentManager.onMouseButtonPressed(button);
 }
 
 bool GameState::onMouseButtonReleased(const MouseButton& button) {
-	return componentManager.onMouseButtonReleased(button);
+	return this->componentManager.onMouseButtonReleased(button);
+}
+
+bool GameState::onMouseDoubleClick(const MouseButton& button) {
+	return this->componentManager.onMouseDoubleClick(button);
+}
+
+bool GameState::onMouseWheelScroll(float xOffset, float yOffset) {
+	return this->componentManager.onMouseWheelScroll(xOffset, yOffset);
+}
+
+bool GameState::onMouseMoved(float x, float y, float dx, float dy) {
+	return this->componentManager.onMouseMoved(x, y, dx, dy);
 }
 
 void GameState::onWindowResize(float oldWidth, float oldHeight, float newWidth, float newHeight) {
-	componentManager.applyLayouts(window);
+	this->componentManager.applyLayouts(window);
 }
 
 std::shared_ptr<GameState> State::CurrentState = nullptr;

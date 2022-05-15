@@ -17,48 +17,29 @@ PlayState::PlayState(std::shared_ptr<Window> window) : GameState(window, "play_s
 
 void PlayState::update(float delta) {
 	starBody.update(delta);
-	if (doubleClick1Check) {
-		if (doubleClick1Time > 0.15f) {
-			doubleClick1Check = false;
-			doubleClick1Time = 0.0f;
-		}
-		else {
-			doubleClick1Time += delta;
-		}
-	}
-
-	if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1)) {
-		if (mouse1DownTime < 1.0f) mouse1DownTime += delta;
-		if (mouse1DownTime > 1.0f) mouse1DownTime = 1.0f;
-	}
-
 
 	if (!Console::Get().getVisible()) {
 		if (Keyboard::IsKeyDown(GLFW_KEY_UP)) {
-			if (gameCamera.getTarget() == std::nullopt) {
+			if (!gameCamera.getTarget()) {
 				gameCamera.move(1.5 * delta, MoveDirection::FORWARDS);
-			}
-			else {
-
 			}
 		}
 		if (Keyboard::IsKeyDown(GLFW_KEY_LEFT)) {
-			if (gameCamera.getTarget() == std::nullopt) {
+			if (!gameCamera.getTarget()) {
 				gameCamera.move(1.5 * delta, MoveDirection::LEFT);
 			}
 		}
 		if (Keyboard::IsKeyDown(GLFW_KEY_DOWN)) {
-			if (gameCamera.getTarget() == std::nullopt) {
+			if (!gameCamera.getTarget()) {
 				gameCamera.move(1.5 * delta, MoveDirection::BACKWARDS);
 			}
 		}
 		if (Keyboard::IsKeyDown(GLFW_KEY_RIGHT)) {
-			if (gameCamera.getTarget() == std::nullopt) {
+			if (!gameCamera.getTarget()) {
 				gameCamera.move(1.5 * delta, MoveDirection::RIGHT);
 			}
 		}
 	}
-	this->delta = delta;
 }
 
 void PlayState::render(float delta) {
@@ -83,7 +64,7 @@ void PlayState::render(float delta) {
 				glm::rotate(
 					glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 0.f, 50.f, 0.f }),
 					glm::radians(180.f), glm::vec3{ 1.f, 0.f, 0.f }
-					),
+				),
 				glm::vec3{ 50.f }
 			)
 		);
@@ -176,27 +157,7 @@ void PlayState::render(float delta) {
 				+ ";  z = " + std::to_string(gameCamera.getPosition().z),
 				{ -(window->getData().size.x / 2.f) + 1.0f,
 					(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
-
-			//Render Mouse Information
-			/*Renderer::SubmitText("Mouse:  x - " + std::to_string(Mouse::x) + ";  y - " + std::to_string(Mouse::y)
-				+ ";  dx - " + std::to_string(mouseDX) + ";  dy - " + std::to_string(mouseDY),
-				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 15.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });*/
-
-			Renderer::SubmitText("Mouse 1 Down Time: " + std::to_string(mouse1DownTime),
-				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 41.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
-
-			Renderer::SubmitText("Mouse 1 Double Click: " + (std::string)(doubleClick1Check ? "True" : "False"),
-				{ -(window->getData().size.x / 2.f) + 1.0f,
-					(window->getData().size.y / 2.f) - 54.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
-			if (doubleClick1Check) {
-				Renderer::SubmitText("Mouse 1 Double Click Time: " + std::to_string(doubleClick1Time),
-					{ -(window->getData().size.x / 2.f) + 1.0f,
-						(window->getData().size.y / 2.f) - 67.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, glm::vec2{ 0.3f });
-			}
-		}
-		else {
+		} else {
 			glm::vec2 size = window->getData().size;
 			size.y *= (3.f / 5.f);
 			const float bottom{ (window->getData().size.y / 2.f) - (size.y) };
@@ -224,7 +185,6 @@ void PlayState::onWindowResize(float oldWidth, float oldHeight, float newWidth, 
 }
 
 bool PlayState::onKeyPressed(const Key& key) {
-
 	if ((Keyboard::IsShiftDown()) && key == GLFW_KEY_GRAVE_ACCENT) {
 		printf("PlayState: Grave Accent Pressed -- Swapping Console Visibility\n");
 		#if defined(DEBUG)
@@ -276,27 +236,11 @@ bool PlayState::onKeyPressed(const Key& key) {
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
 			State::RestoreState();
-		}
-		if (key == GLFW_KEY_F) {
+		} else if (key == GLFW_KEY_F) {
 			gameCamera.focusOn(starBody.getPosition());
+		} else {
+			return GameState::onKeyPressed(key);
 		}
-	}
-	return true;
-}
-
-bool PlayState::onMouseButtonReleased(const MouseButton& button) {
-	if (button == GLFW_MOUSE_BUTTON_1) {
-		if (mouse1DownTime < 0.15f) {
-			if (!doubleClick1Check) {
-				doubleClick1Check = true;
-			}
-			else {
-				//On Double Click
-
-			}
-		}
-
-		mouse1DownTime = 0.0f;
 	}
 	return true;
 }
@@ -308,25 +252,24 @@ bool PlayState::onMouseWheelScroll(float xOffset, float yOffset) {
 	if (Keyboard::IsShiftDown() == true) {
 		// gameCamera.setCameraSpeed(gameCamera.getCameraSpeed() + yOffset);
 	}
-	return true;
+	return GameState::onMouseWheelScroll(xOffset, yOffset);
 }
 
 bool PlayState::onMouseMoved(float x, float y, float dx, float dy) {
 	if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1) == true && Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
 		gameCamera.move(dx, MoveDirection::LEFT);
 		gameCamera.move(dy, MoveDirection::FORWARDS);
-	}
-	else {
+		return true;
+	} else {
 		if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_1) == true) {
 
 		}
 		if (Mouse::IsButtonDown(GLFW_MOUSE_BUTTON_2) == true) {
 			gameCamera.setPitch(gameCamera.getPitch() + dy * .4f);
 			gameCamera.setYaw(gameCamera.getYaw() + dx * .4f);
+			return true;
 		}
 	}
-
-	/*mouseDX = dx;
-	mouseDY = dy;*/
-	return true;
+	return GameState::onMouseMoved(x, y, dx, dy);
 }
+

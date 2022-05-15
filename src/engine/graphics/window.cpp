@@ -46,9 +46,17 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 		[](GLFWwindow* window, int button, int action, int mods) {
 			switch (action) {
 			case GLFW_PRESS:
+			{
+				uint64_t now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 				Mouse::ButtonStates[button] = true;
-				Events::DispatchEvent(Event<MouseButton>{ EventType::MOUSE_BUTTON_PRESSED, (uint32_t) button });
+				if (now - Mouse::TimeStamp[button] <= 250000000) {
+					Events::DispatchEvent(Event<MouseButton>{ EventType::MOUSE_DOUBLE_CLICK, (uint32_t)button });
+				} else {
+					Events::DispatchEvent(Event<MouseButton>{ EventType::MOUSE_BUTTON_PRESSED, (uint32_t) button });
+				}
+				Mouse::TimeStamp[button] = now;
 				break;
+			}
 			case GLFW_RELEASE:
 				Mouse::ButtonStates[button] = false;
 				Events::DispatchEvent(Event<MouseButton>{ EventType::MOUSE_BUTTON_RELEASED, (uint32_t) button });

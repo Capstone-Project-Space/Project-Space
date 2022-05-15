@@ -12,6 +12,7 @@ enum class EventType {
 	KEY_REPEATED,
 	MOUSE_BUTTON_PRESSED,
 	MOUSE_BUTTON_RELEASED,
+	MOUSE_DOUBLE_CLICK,
 	MOUSE_WHEEL_SCROLL,
 	MOUSE_POSITION,
 	WINDOW_RESIZE
@@ -59,6 +60,9 @@ struct Events {
 		case EventType::MOUSE_BUTTON_RELEASED:
 			if (State::CurrentState->onMouseButtonReleased((const MouseButton)e.eventData)) return;
 			break;
+		case EventType::MOUSE_DOUBLE_CLICK:
+			if (State::CurrentState->onMouseDoubleClick((const MouseButton) e.eventData)) return;
+			break;
 		case EventType::MOUSE_WHEEL_SCROLL:
 			vals = (float*)(e.eventData);
 			if (State::CurrentState->onMouseWheelScroll(vals[0], vals[1])) return;
@@ -88,10 +92,13 @@ struct Events {
 				if (recv->onKeyRepeated((const Key&)e.eventData)) return;
 				break;
 			case EventType::MOUSE_BUTTON_PRESSED:
-				if (recv->onMouseButtonPressed((const MouseButton&)e.eventData)) return;
+				if (recv->onMouseButtonPressed((const MouseButton)e.eventData)) return;
 				break;
 			case EventType::MOUSE_BUTTON_RELEASED:
-				if (recv->onMouseButtonReleased((const MouseButton&)e.eventData)) return;
+				if (recv->onMouseButtonReleased((const MouseButton)e.eventData)) return;
+				break;
+			case EventType::MOUSE_DOUBLE_CLICK:
+				if (recv->onMouseDoubleClick((const MouseButton)e.eventData)) return;
 				break;
 			case EventType::MOUSE_WHEEL_SCROLL:
 				vals = (float*)(e.eventData);
