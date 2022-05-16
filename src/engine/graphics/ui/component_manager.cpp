@@ -51,15 +51,65 @@ void ComponentManager::drawComponents(float delta, const Camera& camera) {
 	Renderer::End2DScene();
 }
 
+bool ComponentManager::onKeyPressed(const Key& key) {
+	for (auto& component : components) {
+		if (component->onKeyPressed(key)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onKeyReleased(const Key& key) {
+	for (auto& component : components) {
+		if (component->onKeyReleased(key)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onKeyRepeated(const Key& key) {
+	for (auto& component : components) {
+		if (component->onKeyRepeated(key)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onKeyChar(const char* text) {
+	for (auto& component : components) {
+		if (component->onKeyChar(text)) return true;
+	}
+	return false;
+}
+
 bool ComponentManager::onMouseButtonPressed(const MouseButton& button) {
-	for (auto component : components) {
+	for (auto& component : components) {
 		if (component->onMouseButtonPressed(button)) return true;
 	}
 	return false;
 }
+
 bool ComponentManager::onMouseButtonReleased(const MouseButton& button) {
 	for (auto& component : components) {
 		if (component->onMouseButtonReleased(button)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onMouseDoubleClick(const MouseButton& button) {
+	for (auto& component : components) {
+		if (component->onMouseDoubleClick(button)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onMouseWheelScroll(float xOffset, float yOffset) {
+	for (auto& component : components) {
+		if (component->onMouseWheelScroll(xOffset, yOffset)) return true;
+	}
+	return false;
+}
+
+bool ComponentManager::onMouseMoved(float x, float y, float dx, float dy) {
+	for (auto& component : components) {
+		if (component->onMouseMoved(x, y, dx, dy)) return true;
 	}
 	return false;
 }

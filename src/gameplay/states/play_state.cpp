@@ -198,25 +198,6 @@ bool PlayState::onKeyPressed(const Key& key) {
 	}
 
 	if (Console::Get().getVisible()) {
-		if (key >= 'A' && key <= 'Z') {
-			(Keyboard::IsShiftDown()) ? Console::Get().pushChar(key) : Console::Get().pushChar(key + 32);
-			#if defined(DEBUG)
-				printf("PlayState: Console -- Character Added: ");
-				(Keyboard::isShiftDown()) ? printf("%c", key) : printf("%c", (key + 32));
-				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
-			#endif
-		}
-
-		if ((key >= '0' && key <= '9') || (key == ' ') || (key == '.')) {
-			Console::Get().pushChar(key);
-			#if defined(DEBUG)
-				printf("PlayState: Console -- Character Added: ");
-				printf("%c", key);
-				printf("\tNew Command: %s\n", console->getCmdLine().c_str());
-			#endif
-		}
-
-
 		if (key == GLFW_KEY_BACKSPACE) {
 			Console::Get().popChar();
 			#if defined(DEBUG)
@@ -230,9 +211,10 @@ bool PlayState::onKeyPressed(const Key& key) {
 				#endif
 				Console::Get().pushString(Console::Get().getCmdLine().c_str());
 			}
+		} else {
+			Console::Get().pushString(glfwGetKeyName(key.keyCode, key.scanCode));
 		}
-	}
-	else {
+	} else {
 		if (key == GLFW_KEY_ESCAPE) {
 			printf("PlayState: Escape Key Pressed -- Ending PlayState\n");
 			State::RestoreState();

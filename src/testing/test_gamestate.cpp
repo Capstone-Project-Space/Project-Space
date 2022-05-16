@@ -99,41 +99,41 @@ TestResult* GS_TestEventReceiving() {
 	std::shared_ptr<GameState> state = GameState::CreateState<TestState>("test");
 	State::ChangeState(state);
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, GLFW_KEY_F });
-	if (GS_Last_Key_Pressed != GLFW_KEY_F) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, { GLFW_KEY_F, 0 } });
+	if (GS_Last_Key_Pressed.keyCode != GLFW_KEY_F) {
 		result->msg = "Key Pressed event did not dispatch";
 		return result;
 	}
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, GLFW_KEY_G });
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, GLFW_KEY_H });
-	if (GS_Last_Key_Pressed != GLFW_KEY_H) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, { GLFW_KEY_G, 0 } });
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, { GLFW_KEY_H, 0 } });
+	if (GS_Last_Key_Pressed.keyCode != GLFW_KEY_H) {
 		result->msg = "Double Key Pressed didn't update correctly";
 		return result;
 	}
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, GLFW_KEY_F });
-	if (GS_Last_Key_Released != GLFW_KEY_F) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, { GLFW_KEY_F, 0 } });
+	if (GS_Last_Key_Released.keyCode != GLFW_KEY_F) {
 		result->msg = "Key Released event did not dispatch";
 		return result;
 	}
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, GLFW_KEY_G });
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, GLFW_KEY_H });
-	if (GS_Last_Key_Released!= GLFW_KEY_H) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, { GLFW_KEY_G, } });
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, { GLFW_KEY_H, 0 } });
+	if (GS_Last_Key_Released.keyCode != GLFW_KEY_H) {
 		result->msg = "Double Key Release didn't update correctly";
 		return result;
 	}
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, GLFW_KEY_F });
-	if (GS_Last_Key_Repeated != GLFW_KEY_F) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, { GLFW_KEY_F, 0 } });
+	if (GS_Last_Key_Repeated.keyCode != GLFW_KEY_F) {
 		result->msg = "Key Repeated event did not dispatch";
 		return result;
 	}
 
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, GLFW_KEY_G });
-	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, GLFW_KEY_H });
-	if (GS_Last_Key_Repeated != GLFW_KEY_H) {
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, { GLFW_KEY_G, 0 } });
+	Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, { GLFW_KEY_H, 0 } });
+	if (GS_Last_Key_Repeated.keyCode != GLFW_KEY_H) {
 		result->msg = "Double Key Repeat didn't update correctly";
 		return result;
 	}
@@ -165,7 +165,7 @@ TestResult* GS_TestEventReceiving() {
 	}
 
 	float pos[4] = { .2345f, .453f, 0.0f, 0.0f };
-	Events::DispatchEvent(Event<float[4]>{EventType::MOUSE_POSITION, pos});
+	Events::DispatchEvent(Event<float*>{EventType::MOUSE_POSITION, pos});
 	if (GS_Mouse_X != .2345f) {
 		result->msg = "Mouse Position Event did not update mouse x";
 		return result;

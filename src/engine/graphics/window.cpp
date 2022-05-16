@@ -23,22 +23,32 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 
 	glfwSetKeyCallback(window->window,
 		[](GLFWwindow* window, int key, int scancode, int action, int mods) {
+			Key keyPair = { (uint32_t) key, (uint32_t) scancode };
 			switch (action) {
 			case GLFW_PRESS:
-				Keyboard::KeyStates[key] = true;
-				Keyboard::TimeStamp[key] = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-				Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, (uint32_t) key });
+				Keyboard::KeyStates[keyPair] = true;
+				Keyboard::TimeStamp[keyPair] = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				Events::DispatchEvent(Event<Key>{ EventType::KEY_PRESSED, keyPair });
 				break;
 			case GLFW_RELEASE:
-				Keyboard::KeyStates[key] = false;
-				Keyboard::TimeStamp[key] = 0;
-				Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, (uint32_t) key });
+				Keyboard::KeyStates[keyPair] = false;
+				Keyboard::TimeStamp[keyPair] = 0;
+				Events::DispatchEvent(Event<Key>{ EventType::KEY_RELEASED, keyPair });
 				break;
 			case GLFW_REPEAT:
-				Keyboard::TimeStamp[key] = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-				Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, (uint32_t) key });
+				Keyboard::TimeStamp[keyPair] = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				Events::DispatchEvent(Event<Key>{ EventType::KEY_REPEATED, keyPair });
 				break;
 			}
+		}
+	);
+
+	glfwSetCharCallback(window->window,
+		[](GLFWwindow* windoow, unsigned int codepoint) {
+			char chars[5];
+			memcpy_s(chars, 4, &codepoint, 4);
+			chars[4] = 0;
+			Events::DispatchEvent(Event<char*>{EventType::KEY_CHARACTER, chars});
 		}
 	);
 
@@ -68,7 +78,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 	glfwSetScrollCallback(window->window,
 		[](GLFWwindow* window, double xoffset, double yoffset) {
 			float vals[2] = { xoffset, yoffset };
-			Events::DispatchEvent(Event<float[2]>{EventType::MOUSE_WHEEL_SCROLL, vals});
+			Events::DispatchEvent(Event<float*>{EventType::MOUSE_WHEEL_SCROLL, vals});
 		}
 	);
 
@@ -80,7 +90,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 			float vals[4] = { xpos, ypos, xpos - Mouse::x, ypos - Mouse::y };
 			Mouse::x = xpos;
 			Mouse::y = ypos;
-			Events::DispatchEvent(Event<float[4]>{ EventType::MOUSE_POSITION, vals });
+			Events::DispatchEvent(Event<float*>{ EventType::MOUSE_POSITION, vals });
 		}
 	);
 
@@ -93,7 +103,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 			data->scale = data->size / data->initialSize;
 			data->orthographicCamera = {width / -2.f, width / 2.f, height / -2.f, height / 2.f};
 			glViewport(0, 0, width, height);
-			Events::DispatchEvent(Event<float[4]>{ EventType::WINDOW_RESIZE, vals });
+			Events::DispatchEvent(Event<float*>{ EventType::WINDOW_RESIZE, vals });
 		}
 	);
 

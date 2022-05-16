@@ -12,6 +12,8 @@ public:
 	virtual bool onKeyReleased(const Key& key) { return false; }
 	virtual bool onKeyRepeated(const Key& key) { return false; }
 
+	virtual bool onKeyChar(const char* text) { return false; }
+
 	virtual bool onMouseButtonPressed(const MouseButton& button) { return false; }
 	virtual bool onMouseButtonReleased(const MouseButton& button) { return false; }
 	virtual bool onMouseDoubleClick(const MouseButton& button) { return false; }

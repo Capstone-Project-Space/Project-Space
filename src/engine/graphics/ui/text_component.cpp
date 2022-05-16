@@ -1,5 +1,6 @@
 #include "text_component.h"
 
+#include <src/engine/graphics/asset_manager.h>
 #include <src/engine/graphics/renderer.h>
 
 TextComponent::TextComponent(
@@ -36,7 +37,6 @@ const glm::vec3& TextComponent::getPosition() const {
 
 void TextComponent::draw(std::shared_ptr<Window> window, float delta) {
 	const glm::vec2 scale = window->getData().scale * this->scale;
-	//glm::vec3 position = this->position.value();
 	Renderer::SubmitText(text, this->position.value(), color, this->font, gravity, scale);
 }
 

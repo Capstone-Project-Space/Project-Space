@@ -26,17 +26,17 @@ glm::vec3 RelativeLayout::position(const std::shared_ptr<Window> window, const U
 		pos.x = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->leftID, this->leftSide), leftX.value(), window, Side::LEFT);
 	}
 	if (rightX.has_value()) {
-		pos.x = std::min(pos.x, RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->rightID, this->rightSide), rightX.value(), window, Side::LEFT) - self.getWidth());
+		pos.x = std::min(pos.x, RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->rightID, this->rightSide), rightX.value(), window, Side::RIGHT) - self.getWidth());
 	}
 
 	if (topY.has_value()) {
-		pos.y = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->topID, this->topSide), topY.value(), window, Side::LEFT) - self.getHeight();
+		pos.y = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->topID, this->topSide), topY.value(), window, Side::TOP) - self.getHeight();
 	}
 	if (bottomY.has_value()) {
-		pos.y = std::min(pos.y, RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->bottomID, this->bottomSide), bottomY.value(), window, Side::LEFT));
+		pos.y = std::min(pos.y, RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->bottomID, this->bottomSide), bottomY.value(), window, Side::BOTTOM));
 	}
 
-	pos.z = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->infrontID, Side::INFRONT), infrontZ.value(), window, Side::LEFT);
+	pos.z = RelativeLayout::GetValue(RelativeLayout::GetRelativeValue(window, peers, this->infrontID, Side::INFRONT), infrontZ.value(), window, Side::INFRONT);
 
 	return pos;
 }

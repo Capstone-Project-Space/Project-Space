@@ -35,6 +35,7 @@ std::shared_ptr<Font> Font::CreateFont(const std::string_view& filepath, unsigne
 	for (uint32_t c = startChar; c < endChar; c++) {
 		if (FT_Load_Char(face, (unsigned char)c, FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_LIGHT)) {
 			fprintf(stderr, "Couldn't load character with ascii '%hhu'.\n", c);
+			font->characters[c] = { glm::vec4{0}, glm::ivec2{0}, glm::ivec2{0}, 0 };
 			continue;
 		}
 		FT_Bitmap* bmp = &face->glyph->bitmap;
@@ -76,6 +77,8 @@ std::shared_ptr<Font> Font::CreateFont(const std::string_view& filepath, unsigne
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	font->newlineHeight = face->height >> 6;
+
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 	free(fontAtlas);
@@ -107,4 +110,22 @@ int32_t Font::getTextHeight(const std::string& text) {
 		height = std::max(this->getCharacterData(c).size.y, height);
 	}
 	return height * lineCount;
+}
+
+uint32_t Font::getFontWidth() {
+	uint32_t size = 0;
+	for (uint32_t c = startChar; c < endChar; c++) {
+		if (size < this->characters[c].advance)
+			size = this->characters[c].advance;
+	}
+	return size;
+}
+
+int32_t Font::getFontHeight() {
+	int32_t size = INT32_MIN;
+	for (uint32_t c = startChar; c < endChar; c++) {
+		if (size < this->characters[c].size.y)
+			size = this->characters[c].size.y;
+	}
+	return size;
 }

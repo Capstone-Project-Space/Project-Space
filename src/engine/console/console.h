@@ -7,32 +7,26 @@ class Console {
 public:
     static Console& Get();
 
-     Console();
-     ~Console();
-
      void setVisible(bool visible) { this->visible = visible; }
      bool getVisible() { return this->visible; }
 
-     void setCmdLine(std::string cmdLine) {
-          if (this->cmdLine == nullptr) {
-               this->cmdLine = new std::string("");
-          }
-          this->cmdLine->assign(cmdLine);
+     void setCmdLine(const std::string& cmdLine) {
+          this->cmdLine.assign(cmdLine);
      }
-     std::string getCmdLine() { return *cmdLine; }
+     const std::string& getCmdLine() { return cmdLine; }
 
-     void setArchive(std::deque<std::string> archive) { this->archive = archive; }
-     std::deque<std::string> getArchive() { return this->archive; }
+     void setArchive(const std::deque<std::string>& archive) { this->archive = archive; }
+     const std::deque<std::string>& getArchive() { return this->archive; }
      int getArchiveSize() { return this->archive.size(); }
-     std::string getArchiveAt(int i) { return this->archive.at(i); }
+     const std::string& getArchiveAt(int i) { return this->archive.at(i); }
 
      void pushChar(char);
      void popChar();
 
-     void pushString(std::string);
+     void pushString(const std::string&);
 
 private:
-     bool visible;
-     std::string* cmdLine;
+     bool visible = false;
+     std::string cmdLine;
      std::deque<std::string> archive;
 };

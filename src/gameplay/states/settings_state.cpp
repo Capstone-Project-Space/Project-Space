@@ -5,6 +5,7 @@
 #include <src/engine/graphics/ui/button_component.h>
 #include <src/engine/graphics/ui/checkbox_component.h>
 #include <src/engine/graphics/ui/text_component.h>
+#include <src/engine/graphics/ui/text_box_component.h>
 #include <src/engine/graphics/ui/linear_component_container.h>
 #include <src/engine/graphics/ui/relative_layout.h>
 #include <src/engine/graphics/ui/constraint_layout.h>
@@ -49,6 +50,12 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         .3f, Gravity::CENTER
     ));
 
+    componentManager.addComponent(new TextBoxComponent(
+        "text_input",
+        new RelativeLayout("window:center:-10", "window:top:0"),
+        "Please Enter Text Here", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        glm::vec3{1.f}, glm::vec3{.6f}, .6f, Gravity::LEFT
+    ));
 
     /*LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
     container->add(std::shared_ptr<UIComponent>(new TextComponent(

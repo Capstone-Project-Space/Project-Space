@@ -52,9 +52,15 @@ public:
 	uint32_t getTextWidth(const std::string& text);
 	int32_t getTextHeight(const std::string& text);
 
+	uint32_t getFontWidth();
+	int32_t getFontHeight();
+
+	inline uint32_t getNewLineHeight() const { return newlineHeight; }
+
 private:
 	uint32_t id;
 	uint32_t startChar, endChar;
 	Character* characters;
+	uint32_t newlineHeight;
 	Font(unsigned char startChar, uint32_t length);
 };

@@ -1,14 +1,27 @@
 #pragma once
 #include <array>
+#include <map>
 #include <stdint.h>
 
 #include <glfw3/glfw3.h>
 
-using Key = uint32_t;
+struct Key {
+	uint32_t keyCode;
+	uint32_t scanCode;
+	Key() : keyCode(0), scanCode(0) {}
+	Key(uint32_t keyCode) : keyCode(keyCode), scanCode(0) {}
+	Key(uint32_t keyCode, uint32_t scanCode) : keyCode(keyCode), scanCode(scanCode) {}
+	bool operator<(const Key& key) const {
+		return ((uint64_t)this->keyCode << 32 | (uint64_t)this->scanCode) < ((uint64_t)key.keyCode << 32 | (uint64_t)key.scanCode);
+	}
+	bool operator==(const Key& key) const {
+		return this->keyCode == key.keyCode && this->scanCode == key.scanCode;
+	}
+};
 
 struct Keyboard {
-	static std::array<bool, GLFW_KEY_LAST + 1> KeyStates;
-	static std::array<uint64_t, GLFW_KEY_LAST + 1> TimeStamp;
+	static std::map<Key, bool> KeyStates;
+	static std::map<Key, uint64_t> TimeStamp;
 
 	static inline bool IsKeyDown(const Key key) {
 		return Keyboard::KeyStates[key];
@@ -19,15 +32,15 @@ struct Keyboard {
 	}
 
 	static inline bool IsCtrlDown() {
-		return Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL) || Keyboard::IsKeyDown(GLFW_KEY_LEFT_CONTROL);
+		return Keyboard::IsKeyDown({ GLFW_KEY_LEFT_CONTROL, 0 }) || Keyboard::IsKeyDown({ GLFW_KEY_RIGHT_CONTROL, 0 });
 	}
 
 	static inline bool IsShiftDown() {
-		return Keyboard::IsKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard::IsKeyDown(GLFW_KEY_RIGHT_SHIFT);
+		return Keyboard::IsKeyDown({ GLFW_KEY_LEFT_SHIFT, 0 }) || Keyboard::IsKeyDown({ GLFW_KEY_RIGHT_SHIFT, 0 });
 	}
 
 	static inline bool IsAltDown() {
-		return Keyboard::IsKeyDown(GLFW_KEY_LEFT_ALT) || Keyboard::IsKeyDown(GLFW_KEY_RIGHT_ALT);
+		return Keyboard::IsKeyDown({ GLFW_KEY_LEFT_ALT, 0 }) || Keyboard::IsKeyDown({ GLFW_KEY_RIGHT_ALT, 0 });
 	}
 
 };

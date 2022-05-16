@@ -32,6 +32,10 @@ bool GameState::onKeyRepeated(const Key& key) {
 	return this->componentManager.onKeyRepeated(key);
 }
 
+bool GameState::onKeyChar(const char* text) {
+	return this->componentManager.onKeyChar(text);
+}
+
 bool GameState::onMouseButtonPressed(const MouseButton& button) {
 	return this->componentManager.onMouseButtonPressed(button);
 }

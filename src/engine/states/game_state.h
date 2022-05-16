@@ -57,6 +57,8 @@ public:
 	virtual bool onKeyReleased(const Key& key) override;
 	virtual bool onKeyRepeated(const Key& key) override;
 
+	virtual bool onKeyChar(const char* text) override;
+
 	virtual bool onMouseButtonPressed(const MouseButton& button) override;
 	virtual bool onMouseButtonReleased(const MouseButton& button) override;
 	virtual bool onMouseDoubleClick(const MouseButton& button) override;
