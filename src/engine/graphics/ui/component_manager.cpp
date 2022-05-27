@@ -1,5 +1,7 @@
 #include "component_manager.h"
 
+#include <iostream>
+
 #include <src/engine/graphics/renderer.h>
 
 ComponentManager::ComponentManager(std::shared_ptr<Window> window) {
@@ -15,7 +17,7 @@ void ComponentManager::addComponent(std::shared_ptr<UIComponent> component) {
 
 void ComponentManager::removeComponent(std::shared_ptr<UIComponent> component) {
 	if (componentMapping.find(component->getID()) != componentMapping.end()) {
-		std::remove(this->components.begin(), this->components.end(), component);
+		this->components.erase(std::remove(this->components.begin(), this->components.end(), component), this->components.end());
 		this->componentMapping.erase(component->getID());
 	}
 }
@@ -24,7 +26,7 @@ std::optional<std::shared_ptr<UIComponent>> ComponentManager::removeComponent(co
 	if (componentMapping.find(id) != componentMapping.end()) {
 		auto opt = std::make_optional<std::shared_ptr<UIComponent>>(componentMapping[id]);
 		componentMapping.erase(id);
-		std::remove(this->components.begin(), this->components.end(), opt.value());
+		this->components.erase(std::remove(this->components.begin(), this->components.end(), opt.value()), this->components.end());
 	}
 	return std::nullopt;
 }
@@ -39,6 +41,9 @@ void ComponentManager::applyLayouts(std::shared_ptr<Window> window) {
 	this->window = window;
 	for (auto& component : components) {
 		component->applyLayout(window, componentMapping, true);
+	}
+	for (auto& component : components) {
+		std::cerr << component->getID() << ": {" << component->getPosition().x << ", " << component->getPosition().y << "} {" << component->getSize().x << ", " << component->getSize().y << "}\n";
 	}
 	this->hasAppliedLayout = true;
 }

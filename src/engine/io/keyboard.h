@@ -12,10 +12,12 @@ struct Key {
 	Key(uint32_t keyCode) : keyCode(keyCode), scanCode(0) {}
 	Key(uint32_t keyCode, uint32_t scanCode) : keyCode(keyCode), scanCode(scanCode) {}
 	bool operator<(const Key& key) const {
+		if (scanCode == 0 || key.scanCode == 0) return this->keyCode < key.keyCode;
 		return ((uint64_t)this->keyCode << 32 | (uint64_t)this->scanCode) < ((uint64_t)key.keyCode << 32 | (uint64_t)key.scanCode);
 	}
 	bool operator==(const Key& key) const {
-		return this->keyCode == key.keyCode && this->scanCode == key.scanCode;
+		if (scanCode == 0 || key.scanCode == 0) return this->keyCode == key.keyCode;
+		return this->scanCode == key.scanCode;
 	}
 };
 

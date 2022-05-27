@@ -17,7 +17,8 @@ float TextComponent::getContentHeight() const {
 }
 
 const glm::vec3& TextComponent::getPosition() const {
-	glm::vec3 pos = this->position.value();
+	static glm::vec3 pos;
+	pos = UIComponent::getPosition();
 	const glm::vec2& size = this->size.value();
 	if (gravity & Gravity::CENTER_HORIZONTAL) {
 		pos.x -= size.x / 2.f;

@@ -57,7 +57,7 @@ void TextRenderer::destroy() {
 void TextRenderer::submitText(const std::string& rawtext, const glm::vec3& pos, const glm::vec4& color, const std::shared_ptr<Font> font, Gravity gravity, const glm::vec2& scale, float rotation) {
 	float startX = pos.x, startY = pos.y;
 	
-	size_t lineCount = std::accumulate(rawtext.begin(), rawtext.end(), 1, [](size_t count, char c) { return count + (c == '\n'); });
+	size_t lineCount = std::accumulate(rawtext.begin(), rawtext.end(), 1ull, [](size_t count, char c) -> size_t { return count + (size_t) (c == '\n'); });
 	float height = font->getNewLineHeight() * scale.y * lineCount;
 	
 	if ((gravity & Gravity::CENTER_VERTICAL) == Gravity::CENTER_VERTICAL) {

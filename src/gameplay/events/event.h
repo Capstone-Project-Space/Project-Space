@@ -13,8 +13,8 @@ constexpr int MAX_NUMBER_OF_RESOURCES = 2;
 
 class Handler {
 public:
-	int value;
-	char symbol;
+	int value = -1;
+	char symbol = 0;
 };
 
 class GameEvent {
@@ -27,7 +27,7 @@ public:
 	Handler reward[MAX_NUMBER_OF_RESOURCES];
 	Handler consequense[MAX_NUMBER_OF_RESOURCES];
 
-	bool evilEvent;
+	bool evilEvent = false;
 };
 
 GameEvent cleanEvent(GameEvent eventObject); // Meant to zero out values

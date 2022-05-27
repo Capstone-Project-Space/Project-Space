@@ -42,6 +42,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			mat = &map[line.substr(7)];
 		} else if (line.rfind("Ka ") == 0) {
 			assert(mat);
+			if (!mat) throw "No material for map_Kd";
 			int count = sscanf(
 				line.c_str(), "Ka %f %f %f\n", 
 				&mat->ambient.r, &mat->ambient.g, &mat->ambient.b
@@ -49,6 +50,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			if (count != 3) throw "parsing ambient in mtl file: " + filepath;
 		} else if (line.rfind("Kd ") == 0) {
 			assert(mat);
+			if (!mat) throw "No material for map_Kd";
 			int count = sscanf(
 				line.c_str(), "Kd %f %f %f\n",
 				&mat->diffuse.r, &mat->diffuse.g, &mat->diffuse.b
@@ -56,6 +58,7 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			if (count != 3) throw "parsing diffuse in mtl file: " + filepath;
 		} else if (line.rfind("Ks ") == 0) {
 			assert(mat);
+			if (!mat) throw "No material for map_Kd";
 			int count = sscanf(
 				line.c_str(), "Ks %f %f %f\n",
 				&mat->specular.r, &mat->specular.g, &mat->specular.b
@@ -63,10 +66,11 @@ const std::map<std::string, Material> Model::CreateMaterial(const std::string& f
 			if (count != 3) throw "parsing specular in mtl file: " + filepath;
 		} else if (line.rfind("Ns ") == 0) {
 			assert(mat);
+			if (!mat) throw "No material for map_Kd";
 			int count = sscanf(line.c_str(), "Ns %f\n", &mat->specExponent);
 			if (count != 1) throw "parsing specular exponent in mtl file: " + filepath;
 		} else if (line.rfind("map_Kd ") == 0) {
-			assert(mat);
+			if (!mat) throw "No material for map_Kd";
 			mat->texture = Texture::CreateTexture("./resources/textures/" + line.substr(7));
 		}
 		if (mat && !mat->texture) mat->texture = AssetManager::GetOrCreate<Texture>(glm::vec4{1.f});
@@ -97,7 +101,7 @@ std::shared_ptr<Model> Model::CreateModel(const std::string_view& filepath, std:
 
 	std::string line;
 	std::ifstream file{ filepath.data()};
-	assert(file, "File does not exist.");
+	assert(file && "File does not exist.");
 	std::stringstream obj;
 	obj << file.rdbuf();
 

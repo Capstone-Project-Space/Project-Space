@@ -25,7 +25,7 @@ enum class StarClass { A, F, G, K, M };
 HabitType GetRandomHabitFromBodyType(BodyType type);
 float GetRandomScaleFromBodyType(BodyType type);
 float GetStarRadiusFromClass(StarClass cl);
-const glm::vec3& GetStarColorFromClass(StarClass cl);
+glm::vec3 GetStarColorFromClass(StarClass cl);
 
 class Body {
 public:

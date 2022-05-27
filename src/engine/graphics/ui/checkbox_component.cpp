@@ -27,7 +27,8 @@ float CheckboxComponent::getContentHeight() const {
 }
 
 const glm::vec3& CheckboxComponent::getPosition() const {
-	glm::vec3 pos = this->position.value();
+	static glm::vec3 pos;
+	pos = UIComponent::getPosition();
 	if ((gravity & Gravity::CENTER_HORIZONTAL) == Gravity::CENTER_HORIZONTAL) {
 		pos.x -= this->getWidth() / 2.f;
 	}

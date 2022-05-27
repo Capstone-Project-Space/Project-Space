@@ -77,7 +77,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 
 	glfwSetScrollCallback(window->window,
 		[](GLFWwindow* window, double xoffset, double yoffset) {
-			float vals[2] = { xoffset, yoffset };
+			float vals[2] = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
 			Events::DispatchEvent(Event<float*>{EventType::MOUSE_WHEEL_SCROLL, vals});
 		}
 	);
@@ -87,7 +87,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 			WindowData* data = (WindowData*)glfwGetWindowUserPointer(window);
 			xpos -= data->size.x / 2.f;
 			ypos = data->size.y / 2.f - ypos;
-			float vals[4] = { xpos, ypos, xpos - Mouse::x, ypos - Mouse::y };
+			float vals[4] = { static_cast<float>(xpos), static_cast<float>(ypos), static_cast<float>(xpos - Mouse::x), static_cast<float>(ypos - Mouse::y) };
 			Mouse::x = xpos;
 			Mouse::y = ypos;
 			Events::DispatchEvent(Event<float*>{ EventType::MOUSE_POSITION, vals });
@@ -97,7 +97,7 @@ std::shared_ptr<Window> Window::CreateGLWindow(const std::string& name, int widt
 	glfwSetWindowSizeCallback(window->window,
 		[](GLFWwindow* glfwWindow, int width, int height) {
 			WindowData* data = (WindowData*) glfwGetWindowUserPointer(glfwWindow);
-			float vals[4] = { data->size.x, data->size.y, width, height };
+			float vals[4] = { static_cast<float>(data->size.x), static_cast<float>(data->size.y), static_cast<float>(width), static_cast<float>(height) };
 			data->size.x = width;
 			data->size.y = height;
 			data->scale = data->size / data->initialSize;

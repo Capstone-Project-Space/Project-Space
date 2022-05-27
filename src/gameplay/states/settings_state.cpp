@@ -25,68 +25,45 @@ SettingsState::SettingsState(std::shared_ptr<Window> window)
         Color{ glm::vec3{ 0.6f } }, Color{ glm::vec3{ 1.0f, 0.76953125f, 0.1484375f } }
     ));
     componentManager.addComponent(new TextComponent(
-        "desc",
-        new ConstraintLayout("window:center", "window:center"),
-        "This is the screen to change settings of the game.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .6f, Gravity::CENTER, glm::vec4{ 1.f }
+        "title",
+        new RelativeLayout("window:center:0", "window:top:-12%"),
+        "Settings", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .8f, Gravity::CENTER, glm::vec4{ 1.f }
     ));
+
     componentManager.addComponent(new CheckboxComponent(
-        "onoff",
-        new RelativeLayout("window:center:0", "window:center:10%"), glm::vec2{ 32.f, 32.f }
+        "soundfx_on_off",
+        new RelativeLayout("window:left:15%", "title:bottom:-10"), glm::vec2{ 32.f, 32.f }
     ));
     componentManager.addComponent(new TextComponent(
-        "onoff_desc",
-        new RelativeLayout("onoff:right:10", "onoff:center:0"),
-        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .4f, Gravity::CENTER_VERTICAL
+        "soundfx_on_off_desc",
+        new RelativeLayout("soundfx_on_off:right:10", "", "", "soundfx_on_off:center:0"),
+        "Turn Some Setting On or Off.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::CENTER_VERTICAL, glm::vec4{ .8f, .8f, .8f, 1.f }
     ));
 
-
+    componentManager.addComponent(new CheckboxComponent(
+        "bgm_on_off",
+        new RelativeLayout("window:left:15%", "soundfx_on_off:bottom:-10"), glm::vec2{ 32.f, 32.f }
+    ));
     componentManager.addComponent(new TextComponent(
-        "many_lines",
-        new RelativeLayout("window:center:0", "window:center:0"),
-        "This text will contain new lines.\nThis line should appear below the other.\n This line should exist at the bottom of this text.",
-        AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .3f, Gravity::CENTER
+        "bmg_on_off_desc",
+        new RelativeLayout("bgm_on_off:right:10", "", "", "bgm_on_off:center:0"),
+        "Turn Some Other Setting On or Off.", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
+        .4f, Gravity::CENTER_VERTICAL, glm::vec4{.8f, .8f, .8f, 1.f}
     ));
-
-    componentManager.addComponent(new TextBoxComponent(
-        "text_input",
-        new RelativeLayout("window:center:-10", "window:top:0"),
-        "Please Enter Text Here", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        glm::vec3{1.f}, glm::vec3{.6f}, .6f, Gravity::LEFT
-    ));
-
-    /*LinearComponentContainer* container = new LinearComponentContainer("container", new RelativeLayout("window:left:10%", "window:top:-10%", "window:right:-10%", "window:bottom:10%"));
-    container->add(std::shared_ptr<UIComponent>(new TextComponent(
-        "onoff_desc1", nullptr,
-        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .4f, Gravity::BOTTOM
-    )));
-    container->add(std::shared_ptr<UIComponent>(new TextComponent(
-        "onoff_desc2", nullptr,
-        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .4f, Gravity::BOTTOM
-    )));
-    container->add(std::shared_ptr<UIComponent>(new TextComponent(
-        "onoff_desc3", nullptr,
-        "Sound On/Off", AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"),
-        .4f, Gravity::BOTTOM
-    )));
-    componentManager.addComponent(container);*/
 
 }
 
 void SettingsState::update(float delta) {}
 
 void SettingsState::render(float delta) {
-     Renderer::Begin2DScene(window->getData().orthographicCamera);
-     Renderer::ChangeFont(AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"));
-     Renderer::SubmitQuad(glm::vec3{ 0.f }, window->getData().size, AssetManager::GetOrCreate<Texture>(SETTINGS_GAME_SCREEN_TEXTURE));
+    Renderer::Begin2DScene(window->getData().orthographicCamera);
+    Renderer::ChangeFont(AssetManager::GetOrCreate<Font>("./resources/fonts/Arial.ttf"));
+    Renderer::SubmitQuad(glm::vec3{ 0.f }, window->getData().size, AssetManager::GetOrCreate<Texture>(SETTINGS_GAME_SCREEN_TEXTURE));
 
-     /*Renderer::SubmitText("This is the screen to change settings of the game",
-          { -200.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, Gravity::LEFT, 0.6);*/
+    Renderer::SubmitQuad(glm::vec3{ 0.f }, window->getData().size / 1.3f , AssetManager::GetOrCreate<Texture>("./resources/textures/ui/background.png"));
 
-     Renderer::End2DScene();
-     componentManager.drawComponents(delta, window->getData().orthographicCamera);
+    Renderer::End2DScene();
+    componentManager.drawComponents(delta, window->getData().orthographicCamera);
 }

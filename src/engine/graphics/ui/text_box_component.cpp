@@ -26,7 +26,8 @@ float TextBoxComponent::getContentHeight() const {
 }
 
 const glm::vec3& TextBoxComponent::getPosition() const {
-	glm::vec3 pos = this->position.value();
+	static glm::vec3 pos;
+	pos = UIComponent::getPosition();
 	const glm::vec2& size = this->size.value();
 	if (gravity & Gravity::CENTER_HORIZONTAL) {
 		pos.x -= size.x / 2.f;
@@ -46,6 +47,20 @@ const glm::vec3& TextBoxComponent::getPosition() const {
 
 void TextBoxComponent::draw(std::shared_ptr<Window> window, float delta) {
 	const glm::vec2 scale = this->scale * window->getData().scale;
+	glm::vec3 pos = position.value();
+	if (gravity & Gravity::RIGHT) {
+		pos.x -= this->size.value().x / 2.f;
+	}
+	else if (!(gravity & Gravity::CENTER_HORIZONTAL)) {
+		pos.x += this->size.value().x / 2.f;
+	}
+	if (gravity & Gravity::TOP) {
+		pos.y -= this->size.value().y / 2.f;
+	}
+	else if (!(gravity & Gravity::CENTER_VERTICAL)) {
+		pos.y += this->size.value().y / 2.f;
+	}
+	Renderer::SubmitQuad(pos, this->size.value() * 1.3f, AssetManager::GetOrCreate<Texture>("./resources/textures/ui/border.png"));
 	if (this->text.empty()) {
 		Renderer::SubmitText(this->defaultText, this->position.value(), defaultColor, this->font, gravity, scale);
 	} else {
@@ -56,7 +71,10 @@ void TextBoxComponent::draw(std::shared_ptr<Window> window, float delta) {
 		if (this->cursorTimer < .6) {
 			glm::vec3 position = this->position.value();
 			float yOffset = -((float) font->getNewLineHeight() * (float) cursorPos.y);
-			position += glm::vec3{ font->getTextWidth(getLine(this->cursorPos.y).substr(0, this->cursorPos.x)), yOffset, 0.f } * glm::vec3{ scale, .0f};
+			float xOffset = font->getTextWidth(getLine(this->cursorPos.y).substr(0, this->cursorPos.x));
+			if (gravity & Gravity::CENTER_HORIZONTAL) xOffset /= 2;
+			else if (gravity & Gravity::RIGHT) xOffset = 0;
+			position += glm::vec3{ xOffset, yOffset, 0.f } * glm::vec3{ scale, .0f};
 			Renderer::SubmitText(
 				"|", position,
 				color, this->font, gravity, scale

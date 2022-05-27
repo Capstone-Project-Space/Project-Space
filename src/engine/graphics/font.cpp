@@ -28,7 +28,7 @@ std::shared_ptr<Font> Font::CreateFont(const std::string_view& filepath, unsigne
 	int tex_height = tex_width;
 
 	unsigned char* fontAtlas = (unsigned char*)calloc(tex_height * tex_width, sizeof(unsigned char));
-	assert(fontAtlas);
+	if (!fontAtlas) throw "Out of memory";
 
 	int x = 0, y = 0;
 	uint32_t endChar = startChar + length;

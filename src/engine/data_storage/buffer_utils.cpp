@@ -103,12 +103,12 @@ void BufferUtils::WriteDouble(void** buffer, double d) {
 
 std::string BufferUtils::ReadString(const void** buffer) {
 	size_t length = ((size_t*) *buffer)[0];
-	char* string = (char*) malloc(length + 1);
+	char* string = new char[length + 1];
 	assert(string && "Out of memory.");
-	std::memcpy(string, *((char**) buffer) + sizeof(size_t), length);
+	std::memcpy(string, *((const char**) buffer) + sizeof(size_t), length);
 	string[length] = 0;
 	*((char**) buffer) += length + sizeof(size_t);
-	return string;
+	return std::string{std::move(string)};
 }
 
 void BufferUtils::WriteString(void** buffer, const std::string& string) {

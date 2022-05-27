@@ -16,6 +16,7 @@ HabitType GetRandomHabitFromBodyType(BodyType type) {
 		case BodyType::WATER: return RandomGen::RangedRandomDouble(0., 1.) > .2 ? HabitType::HABITABLE : HabitType::UNHABITABLE;
 		case BodyType::MOON: case BodyType::SUN: return HabitType::UNHABITABLE;
 	}
+	throw "Unknown BodyType";
 }
 
 float GetRandomScaleFromBodyType(BodyType type) {
@@ -27,6 +28,7 @@ float GetRandomScaleFromBodyType(BodyType type) {
 	case BodyType::MOON: 
 		return RandomGen::RangedRandomFloat(0.01f, 0.06f);
 	}
+	throw "Unknown BodyType";
 }
 
 float GetStarRadiusFromClass(StarClass cl) {
@@ -37,9 +39,10 @@ float GetStarRadiusFromClass(StarClass cl) {
 		case StarClass::K: return 1.0f;
 		case StarClass::M: return 0.5f;
 	}
+	throw "Unknown StarClass";
 }
 
-const glm::vec3& GetStarColorFromClass(StarClass cl) {
+glm::vec3 GetStarColorFromClass(StarClass cl) {
 	switch (cl) {
 		case StarClass::A: return { 0.0f, 0.7f, 0.8f };
 		case StarClass::F: return { 0.5f, 0.4f, 0.8f };
@@ -47,6 +50,7 @@ const glm::vec3& GetStarColorFromClass(StarClass cl) {
 		case StarClass::K: return { 0.9f, 0.6f, 0.0f };
 		case StarClass::M: return { 0.9f, 0.1f, 0.1f };
 	}
+	throw "Unknown StarClass";
 }
 
 Body Body::CreateSingleStarSystem(const std::string& name) {

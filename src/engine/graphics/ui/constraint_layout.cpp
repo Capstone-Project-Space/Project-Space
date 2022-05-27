@@ -47,7 +47,7 @@ glm::vec3 ConstraintLayout::position(const std::shared_ptr<Window> window, const
 			pos.y = -window->getData().size.y / 2.0f;
 		} else if (relationVert == std::string_view{ "center" }) {
 			// pos.y = 0.0f;
-		} else assert(false, "The only applicable alignments are left, right, and center.");
+		} else assert(false && "The only applicable alignments are left, right, and center.");
 	} else {
 		auto& peerVert = peers.at(idVert);
 		peerVert->applyLayout(window, peers);
@@ -113,7 +113,7 @@ float ConstraintLayout::GetXFromSide(const std::shared_ptr<UIComponent> componen
 		return component->getX() + component->getWidth();
 	} else if (side == std::string_view{ "center" }) {
 		return component->getX() + (component->getWidth() / 2.0f);
-	} else assert(false && "The only applicable alignments are left, right, and center.");
+	} else throw "The only applicable alignments are left, right, and center.";
 }
 
 float ConstraintLayout::GetYFromSide(const std::shared_ptr<UIComponent> component, const std::string_view& side) {
@@ -123,5 +123,5 @@ float ConstraintLayout::GetYFromSide(const std::shared_ptr<UIComponent> componen
 		return component->getY();
 	} else if (side == std::string_view{ "center" }) {
 		return component->getY() - (component->getHeight() / 2.0f);
-	} else assert(false && "The only applicable alignments are top, bottom, and center.");
+	} else throw "The only applicable alignments are top, bottom, and center.";
 }

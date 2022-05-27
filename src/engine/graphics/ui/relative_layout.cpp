@@ -124,6 +124,7 @@ std::pair<float, float> RelativeLayout::GetRelativeValue(const std::shared_ptr<W
 			throw "Got Side::NONE when evaluating relative value.";
 		}
 	}
+	throw "Unknown Side when evaluating relative value.";
 }
 
 using Literal = RelativeLayout::Literal;
